@@ -14,4 +14,16 @@ The application provides a home network control center through building a networ
 
 * Global logging facilities and information aggregation from tools outputs
 
-This project is IoT devices oriented since these connected objects are perfect attack vectors to get control over a poorly monitored home network. However, all devices in such network will be considered and analyzed by the application (PCs, router, ...). 
+This project is IoT devices oriented since these connected objects are perfect attack vectors to get control over a poorly monitored home network. However, all devices in such network will be considered and analyzed by the application (PCs, router, smartphones, servers, ...). 
+
+### Requirements
+Ideally this application should run in a standalone device connected in the network to monitor.
+
+#### Needed
+* Linux distribution with Python 3.7 available 
+* Network interface and IP address in the target network
+* Underlying tools installed : *nmap*, *Snort*, *metasploit* and so on (detailed in modules requirements)
+
+#### Optional
+* Second wireless network interface monitor mode enabled for sniffing
+* Configurable router for trafic duplication towards device where the app is running
