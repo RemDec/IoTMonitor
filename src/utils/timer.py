@@ -1,6 +1,6 @@
+import abc
 from threading import Thread
 from time import sleep
-import abc
 
 
 def has_method(obj, name):
@@ -24,14 +24,15 @@ class TimerThread(Thread):
         self.stopped = True
 
     def subscribe(self, obj):
-        if has_method(obj, 'decr') and has_method(obj, 'is_decrementable'):
-            self.subs.append(obj)
-        else:
-            print("Impossible subscribe,", repr(obj), "should implement decr() and is_decrementable()")
+        if not obj in self.subs:
+            if has_method(obj, 'decr') and has_method(obj, 'is_decrementable'):
+                self.subs.append(obj)
+            else:
+                print("Impossible subscribe,", repr(obj), "should implement decr() and is_decrementable()")
 
     def unsub(self, obj):
         try:
-            self.obj.remove(obj)
+            self.subs.remove(obj)
         except ValueError:
             pass
 

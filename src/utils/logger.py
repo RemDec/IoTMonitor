@@ -1,5 +1,6 @@
-from sys import stdout
 from datetime import datetime
+from sys import stdout
+
 
 class Logger():
 
