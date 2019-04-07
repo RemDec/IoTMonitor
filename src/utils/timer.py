@@ -1,9 +1,11 @@
 from threading import Thread
 from time import sleep
+import abc
 
 
 def has_method(obj, name):
     return callable(getattr(obj, name, None))
+
 
 class TimerThread(Thread):
 
@@ -43,11 +45,24 @@ class TimerThread(Thread):
             sleep(self.t)
             self.decr_all()
 
-    def str(self):
-        return "Timer with " + len(self.subs) + " subscribed objects:" + str(self.subs)
+    def __str__(self):
+        return f"Timer with {len(self.subs)} subscribed objects:{str(self.subs)}"
 
 
-class PrototypeSubscriber():
+class TimerInterface(abc.ABC):
+
+    @abc.abstractmethod
+    def is_decrementable(self):
+        # Bool indicating wether call or not decr() on subscribed object
+        pass
+
+    @abc.abstractmethod
+    def decr(self):
+        # Call done each times Timer triggers (1 sec likely)
+        pass
+
+
+class PrototypeSubscriber(TimerInterface):
 
     def __init__(self):
         self.expiration = 5
@@ -66,10 +81,11 @@ class PrototypeSubscriber():
         elif self.alive:
             self.expiration -= 1
 
+
 if __name__ == '__main__':
     import threading as thr
     timer = TimerThread()
     obj = PrototypeSubscriber()
     timer.subscribe(obj)
     timer.launch()
-    print("Timer started,", thr.active_count(), "threads currently : timer", timer, "and main :", thr.current_thread())
+    print(f"Timer started, {thr.active_count()} threads currently : timer {timer} and main :{thr.current_thread()}")
