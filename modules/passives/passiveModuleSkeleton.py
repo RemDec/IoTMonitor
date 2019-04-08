@@ -29,14 +29,26 @@ class PModNameMod(PassiveModule):
         return CommunicationThread(self.distrib_output, timer, read_interv)
 
     def launch(self, output_stream=None, read_interv=0):
-        # start a thread for cmd + params execution
+        # spawn 2 threads: bg managing subprocess cmd and comm pulling and treating its output
         cmd = [self.CMD]
         for param, val in self.params.items():
             cmd.append(self.PARAMS[param][2] + val)
         bg_thread = self.get_bg_thread(output_stream)
         read_thread = self.get_comm_thread(self.timer, read_interv)
-        pipe = bg_thread.start(cmd)
+
+        bg_thread.start(cmd)
+        pipe = bg_thread.get_output_pipe()
+        # waiting bg thread to link an output stream file (pipe)
+        while pipe is None:
+            sleep(0.3)
+            pipe = bg_thread.get_output_pipe()
         read_thread.start(pipe)
+        super().register_thread(bg_thread)
+        super().register_thread(read_thread)
+
+    def stop(self):
+        # ask registered threads to smoothly terminate their activity
+        super().terminate_threads()
 
     def get_description(self):
         return f"[{self.m_id}] Skeleton for writing a passive module"

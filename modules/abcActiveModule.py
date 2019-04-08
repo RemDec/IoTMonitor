@@ -19,9 +19,10 @@ class ActiveModule(Module):
         return True
 
     def register_thread(self, th):
-        self.curr_threads.append(th)
+        if th not in self.curr_threads:
+            self.curr_threads.append(th)
 
-    def purge_threads(self):
+    def purge_threadlist(self):
         self.curr_threads = [th for th in self.curr_threads if th.is_alive()]
 
     def terminate_threads(self, wait_for_purge=0):
@@ -30,7 +31,7 @@ class ActiveModule(Module):
         if wait_for_purge:
             from time import sleep
             sleep(wait_for_purge)
-        self.purge_threads()
+        self.purge_threadlist()
 
     def str_threads(self):
         s = ""

@@ -5,6 +5,11 @@ import threading, subprocess, pipes
 
 class PassiveModule(Module):
 
+    def __init__(self):
+        self.bg_threads = []
+        self.comm_threads = []
+        self.max_shutdown_time = 5
+
     @abc.abstractmethod
     def get_bg_thread(self, output_stream):
         pass
@@ -15,6 +20,62 @@ class PassiveModule(Module):
 
     def is_active(self):
         return False
+
+    def get_list_relative(self, th):
+        if isinstance(th, BackgroundThread):
+            return self.bg_threads
+        if isinstance(th, CommunicationThread):
+            return self.comm_threads
+
+    def register_thread(self, th):
+        th_list = self.get_list_relative(th)
+        if not th in th_list:
+            th_list.append(th)
+
+    def purge_thlists(self):
+        self.bg_threads = [th for th in self.bg_threads if th.is_alive()]
+        self.comm_threads = [th for th in self.comm_threads if th.is_alive()]
+
+    def interrupt_ths_list(self, thlist):
+        for thread in thlist:
+            thread.interrupt()
+
+    def terminate_threads(self, wait_for_purge=0):
+        # close first reading side
+        self.interrupt_ths_list(self.bg_threads)
+        from time import sleep
+        i = 0
+        while i <= self.max_shutdown_time:
+            sleep(1)
+            self.purge_thlists()
+            if len(self.bg_threads) == 0:
+                # when done close writing side
+                self.interrupt_ths_list(self.comm_threads)
+                break
+            if i == self.max_shutdown_time:
+                # Raise exception
+                print(f"Max waiting time reached to interrupt all bg threads in {self}")
+            i += 1
+        if wait_for_purge:
+            sleep(wait_for_purge)
+        self.purge_thlists()
+
+    def str_threads(self, thlist):
+        s = ""
+        for thread in thlist:
+            state = "A" if thread.is_alive() else "N"
+            s += "\n------" + state + "------\n" + str(thread)
+        if s == "":
+            s = "[[" + self.get_module_id() + "]empty thread list]"
+        return s
+
+    def __str__(self):
+        s = f"Thread lists of passive module [{self.get_module_id()}] :\n"
+        s += f"    | Background threads list (length {len(self.bg_threads)})\n"
+        s += self.str_threads(self.bg_threads) + "\n"
+        s += f"    | Communicator threads list (length {len(self.comm_threads)})\n"
+        s += self.str_threads(self.comm_threads)
+        return s
 
     def treat_params(self, defaults, given_params):
         final_par = {}
@@ -43,7 +104,7 @@ class BackgroundThread(threading.Thread):
         self.pipe_w = self.popen.stdout
         print(super().getName() + "\n  |> launched subprocess outputing in", self.pipe_w)
 
-    def get_pipe_output(self):
+    def get_output_pipe(self):
         return self.pipe_w
 
     def start(self, cmd):
@@ -63,6 +124,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
         self.read_t = self.init_read_t
         self.pipe_r = None
         self.must_read = False
+        
 
     def is_decrementable(self):
         return self.must_read
