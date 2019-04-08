@@ -16,9 +16,10 @@ class AModNameMod(ActiveModule):
 
     def set_params(self, params):
         # fix missing execution params with defaults
+        # self.params is dict (paramName:paramValue)
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
-    def parse_output(self, output):
+    def parse_output(self, txt_output):
         # how script output should act on application (netmap filling, alert raising, logging,..)
         pass
 
@@ -40,6 +41,7 @@ class AModNameMod(ActiveModule):
         # start a thread for cmd + params execution
         cmd = [self.CMD]
         for param, val in self.params.items():
+            # getting potential prefix and appending cmd arg value (-flag val)
             cmd.append(self.PARAMS[param][2] + val)
         s_thread = self.get_script_thread()
         s_thread.start(cmd)

@@ -9,11 +9,13 @@ def has_method(obj, name):
 
 class TimerThread(Thread):
 
-    def __init__(self, t=1):
+    def __init__(self, autostart=False, t=1):
         Thread.__init__(self)
         self.t = t
         self.stopped = True
         self.subs = []
+        if autostart:
+            self.launch()
 
     def launch(self, auto_start=True):
         self.stopped = False

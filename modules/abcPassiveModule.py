@@ -1,19 +1,16 @@
 from abcModule import *
+from utils.timer import *
 import threading, subprocess, pipes
 
 
 class PassiveModule(Module):
 
     @abc.abstractmethod
-    def get_bg_thread(self):
+    def get_bg_thread(self, output_stream):
         pass
 
     @abc.abstractmethod
-    def get_comm_thread(self):
-        pass
-
-    @abc.abstractmethod
-    def get_pipe(self):
+    def get_comm_thread(self, timer, read_interv):
         pass
 
     def is_active(self):
@@ -31,60 +28,64 @@ class PassiveModule(Module):
     
 class BackgroundThread(threading.Thread):
     
-    def __init__(self):
+    def __init__(self, output_stream=None):
         super().__init__()
-        self.pipe = None
+        self.output_stream = output_stream
         self.pipe_w = None
+        self.popen = None
 
     def run(self):
         print(super().getName())
-        pipe_w = pipes.Template().open(self.pipe, 'w')
-        self.popen = subprocess.Popen(self.cmd, stdout=pipe_w)
-        print("Passive bg end")
+        if self.output_stream is not None:
+            self.popen = subprocess.Popen(self.cmd, stdout=self.output_stream, stderr=subprocess.STDOUT)
+        else:
+            self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self.pipe_w = self.popen.stdout
+        print(super().getName() + "\n  |> launched subprocess outputing in", self.pipe_w)
 
-    def start(self, cmd, pipe):
+    def get_pipe_output(self):
+        return self.pipe_w
+
+    def start(self, cmd):
         self.cmd = cmd
-        self.pipe = pipe
-        super().setName(f"Passive module bg thread ({threading.currentThread().ident}) running {' '.join(cmd)} and writing {pipe}")
+        super().setName(f"Background thread ({threading.currentThread().ident}) running {' '.join(cmd)}")
         super().start()
+        return self.pipe_w
         
 
-class CommunicationThread(threading.Thread):
+class CommunicationThread(threading.Thread, TimerInterface):
 
-    def __init__(self, read_fct=None, read_timer=0):
+    def __init__(self, read_fct=None, timer=None, read_timer=0):
         super().__init__()
         self.read_fct = read_fct
-        self.init_read_t = read_timer if read_timer>0 else 100
+        self.timer = timer
+        self.init_read_t = read_timer if read_timer > 0 else 20
         self.read_t = self.init_read_t
-        self.fd_pos = 0
-        self.output = None
-        self.pipe = None
         self.pipe_r = None
-        self.decrementable = False
+        self.must_read = False
+
+    def is_decrementable(self):
+        return self.must_read
 
     def decr(self):
         if self.read_t > 0:
             self.read_t -= 1
         else:
-            # start program output treatment
-            try:
-                self.decrementable = False
-                if self.pipe_r is None:
-                    self.pipe_r = pipes.Template.open(self.pipe, 'r')
-                self.fd_pos = self.output.seek(self.fd_pos)
-                # read + parsing + log
-                if self.output is not None:
-                    current_output = self.output.read()
-                    if self.read_fct is not None:
-                        self.read_fct(current_output)
-                    else:
-                        print(f"No read fct defined, redirect stdout {current_output}")
-                self.fd_pos = self.output.tell()
-                # ended treatment, wait next trigger
-                self.read_t = self.init_read_t
-                self.decrementable = True
-            except FileNotFoundError as e:
-                print(e)
+            self.must_read = False
+            self.read_pipe()
+            # ended treatment, wait next trigger
+            self.read_t = self.init_read_t
+            self.must_read = True
+
+    def read_pipe(self):
+        # start program running in exec thread output treatment
+        self.call_parsing_fct(self.pipe_r.read1())
+
+    def call_parsing_fct(self, output):
+        if self.read_fct is not None:
+            self.read_fct(output)
+        else:
+            print(f"No read fct defined, redirect stdout {output}")
 
     def close_pipe(self):
         if self.pipe_r is not None:
@@ -92,10 +93,19 @@ class CommunicationThread(threading.Thread):
 
     def run(self):
         print(super().getName())
-        self.output = self.pipe.open('r')
-        self.decrementable = True
+        self.set_reading()
 
-    def start(self, pipe):
-        self.pipe = pipe
-        super().setName(f"Communication thread ({threading.currentThread().ident}) with pipe {pipe}")
+    def start(self, pipe_output):
+        self.pipe_r = pipe_output
+        super().setName(f"Communication thread ({threading.currentThread().ident}) with pipe {self.pipe_r} as given param (read every {self.read_t}s)")
         super().start()
+
+    def set_reading(self, run=True, t=None):
+        if t is not None:
+            self.read_t = t
+            self.init_read_t = t
+        self.must_read = run
+        if run:
+            if self.timer is None:
+                self.timer = TimerThread(autostart=True)
+            self.timer.subscribe(self)
