@@ -67,9 +67,15 @@ class PModPing(PassiveModule):
 
 
 if __name__ == '__main__':
-    ping = PModPing(read_interval=5)
+    ping = PModPing(read_interval=2, timer=TimerThread())
     ping.launch()
+    ping.timer.start()
     from time import sleep
-    for i in range(10):
+    for i in range(6):
         sleep(1)
         print("\n##############################\n", ping)
+    print("####### TERMINATING MODULE #######")
+    ping.terminate_threads()
+    print(ping)
+    # Timer thread still alive independently (looping)
+    ping.timer.stop()

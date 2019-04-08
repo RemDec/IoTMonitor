@@ -1,6 +1,7 @@
 from abcModule import *
 from utils.timer import *
-import threading, subprocess, pipes
+from time import sleep
+import threading, subprocess
 
 
 class PassiveModule(Module):
@@ -36,43 +37,46 @@ class PassiveModule(Module):
         self.bg_threads = [th for th in self.bg_threads if th.is_alive()]
         self.comm_threads = [th for th in self.comm_threads if th.is_alive()]
 
-    def interrupt_ths_list(self, thlist):
+    def purge_bglist(self):
+        self.bg_threads = [th for th in self.bg_threads if th.is_alive()]
+
+    def purge_commlist(self):
+        self.comm_threads = [th for th in self.comm_threads if th.is_alive()]
+
+    def interrupt_thlist(self, thlist):
         for thread in thlist:
             thread.interrupt()
-
-    def terminate_threads(self, wait_for_purge=0):
+        
+    def terminate_threads(self):
         # close first reading side
-        self.interrupt_ths_list(self.bg_threads)
-        from time import sleep
+        self.interrupt_thlist(self.bg_threads)
         i = 0
-        while i <= self.max_shutdown_time:
-            sleep(1)
-            self.purge_thlists()
+        while i < self.max_shutdown_time:
+            self.purge_bglist()
             if len(self.bg_threads) == 0:
-                # when done close writing side
-                self.interrupt_ths_list(self.comm_threads)
+                self.interrupt_thlist(self.comm_threads)
                 break
-            if i == self.max_shutdown_time:
-                # Raise exception
-                print(f"Max waiting time reached to interrupt all bg threads in {self}")
-            i += 1
-        if wait_for_purge:
-            sleep(wait_for_purge)
-        self.purge_thlists()
+            i+=1
+        if i > self.max_shutdown_time:
+            print("Some module remains unterminable :", self)
+        else:
+            self.purge_commlist()
 
     def str_threads(self, thlist):
         s = ""
         for thread in thlist:
             state = "A" if thread.is_alive() else "N"
-            s += "\n------" + state + "------\n" + str(thread)
+            s += "------" + state + "------\n" + str(thread)
         if s == "":
             s = "[[" + self.get_module_id() + "]empty thread list]"
         return s
 
     def __str__(self):
-        s = f"Thread lists of passive module [{self.get_module_id()}] :\n"
+        s = f"Threads lists of passive module [{self.get_module_id()}] :\n"
+        s += f"    |\n"
         s += f"    | Background threads list (length {len(self.bg_threads)})\n"
         s += self.str_threads(self.bg_threads) + "\n"
+        s += f"    |\n"
         s += f"    | Communicator threads list (length {len(self.comm_threads)})\n"
         s += self.str_threads(self.comm_threads)
         return s
@@ -112,7 +116,13 @@ class BackgroundThread(threading.Thread):
         super().setName(f"Background thread ({threading.currentThread().ident}) running {' '.join(cmd)}")
         super().start()
         return self.pipe_w
-        
+
+    def interrupt(self):
+        if self.popen is not None and self.popen.poll() is None:
+            self.popen.terminate()
+            if self.popen.poll() is None:
+                self.popen.kill()
+
 
 class CommunicationThread(threading.Thread, TimerInterface):
 
@@ -124,20 +134,34 @@ class CommunicationThread(threading.Thread, TimerInterface):
         self.read_t = self.init_read_t
         self.pipe_r = None
         self.must_read = False
-        
+        self.decr_threads = []
+
+    def get_dumb_name(self):
+        return f"DumbThread [{len(self.decr_threads)}]"
 
     def is_decrementable(self):
         return self.must_read
 
-    def decr(self):
+    def decr(self, new_dumb_thread=True):
         if self.read_t > 0:
             self.read_t -= 1
         else:
+            if new_dumb_thread:
+                # should restart this reading + parsing work in a new dump thread running decr()
+                dumb_thread = threading.Thread(target=self.decr,
+                                               name=self.get_dumb_name(),
+                                               kwargs={'new_dumb_thread': False})
+                self.decr_threads.append(dumb_thread)
+                dumb_thread.start()
+                return
             self.must_read = False
             self.read_pipe()
             # ended treatment, wait next trigger
             self.read_t = self.init_read_t
             self.must_read = True
+        if not(new_dumb_thread):
+            # we are at the end of dumb decr() thread
+            self.decr_threads.remove(threading.current_thread())
 
     def read_pipe(self):
         # start program running in exec thread output treatment
@@ -171,3 +195,15 @@ class CommunicationThread(threading.Thread, TimerInterface):
             if self.timer is None:
                 self.timer = TimerThread(autostart=True)
             self.timer.subscribe(self)
+
+    def interrupt(self):
+        self.set_reading(run=False)
+        self.timer.unsub(self)
+        remaining = False
+        for thread in self.decr_threads:
+            thread.join(1)
+            if thread.is_alive():
+                remaining = True
+        if remaining:
+            print("Warning dumb thread alive after interrupt->join", self.decr_threads)
+        self.decr_threads = []
