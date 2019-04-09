@@ -7,8 +7,8 @@ import threading, subprocess
 class PassiveModule(Module):
 
     def __init__(self):
-        self.bg_threads = []
-        self.comm_threads = []
+        # thlist of instancied pairs at launch call (bg_thread, comm_thread)
+        self.pair_threads = []
         self.max_shutdown_time = 5
 
     @abc.abstractmethod
@@ -22,79 +22,87 @@ class PassiveModule(Module):
     def is_active(self):
         return False
 
-    def get_list_relative(self, th):
-        if isinstance(th, BackgroundThread):
-            return self.bg_threads
-        if isinstance(th, CommunicationThread):
-            return self.comm_threads
+    def get_bg_threads(self):
+        return [th_pair[0] for th_pair in self.pair_threads]
 
-    def register_thread(self, th):
-        th_list = self.get_list_relative(th)
-        if not th in th_list:
-            th_list.append(th)
+    def get_comm_threads(self):
+        return [th_pair[1] for th_pair in self.pair_threads]
 
-    def purge_thlists(self):
-        self.bg_threads = [th for th in self.bg_threads if th.is_alive()]
-        self.comm_threads = [th for th in self.comm_threads if th.is_alive()]
+    def register_thread(self, th_pair):
+        bg, comm = th_pair
+        if bg not in self.get_bg_thread() and comm not in self.get_comm_threads():
+            self.pair_threads.append((bg, comm))
 
-    def purge_bglist(self):
-        self.bg_threads = [th for th in self.bg_threads if th.is_alive()]
+    def purge_thlist(self):
+        alive_list = []
+        for bg, comm in self.pair_threads:
+            bg_proc_status = bg.under_proc_state()
+            if bg_proc_status[0]:
+                # bg process finished (returned an exit code)
+                if comm.is_active() or comm.is_dumbparsing():
+                    # main reading thread didn't exit yet or dumb thread doing output parsing task
+                    alive_list.append((bg, comm))
+            else:
+                # bg process underlying bg thread still running
+                alive_list.append((bg, comm))
+        self.pair_threads = alive_list
+        return len(self.pair_threads) == 0
 
-    def purge_commlist(self):
-        self.comm_threads = [th for th in self.comm_threads if th.is_alive()]
-
-    def interrupt_thlist(self, thlist):
-        for thread in thlist:
+    def interrupt_thlist(self):
+        # interrupt firstly threads at writing side (killing bg processes)
+        for thread in self.get_bg_thread():
             thread.interrupt()
-        
-    def terminate_threads(self):
-        # close first reading side
-        self.interrupt_thlist(self.bg_threads)
+        # interrupt after reading threads
+        for thread in self.get_comm_thread():
+            thread.interrupt()
+
+    def terminate_threads(self, wait_interv=0):
+        # order all threads to terminate (bgs first and comms after)
+        self.interrupt_thlist()
         i = 0
         while i < self.max_shutdown_time:
-            self.purge_bglist()
-            if len(self.bg_threads) == 0:
-                self.interrupt_thlist(self.comm_threads)
+            if self.purge_thlist():
+                # all threads finished their tasks
                 break
-            i+=1
+            # relaunch terminate signal on each pair thread
+            self.interrupt_thlist()
+            i += 1
+            if wait_interv:
+                sleep(wait_interv)
         if i > self.max_shutdown_time:
             print("Some module remains unterminable :", self)
-        else:
-            self.purge_commlist()
+            return False
+        return True
 
     def nbr_alive_subproc(self):
-        return len([bg for bg in self.bg_threads if not bg.under_proc_state()[0]])
+        return len([bg for bg in self.get_bg_threads() if not bg.under_proc_state()[0]])
 
     def nbr_reading_comm(self):
-        return len([comm for comm in self.comm_threads if not comm.must_read])
+        return len([comm for comm in self.get_comm_threads() if not comm.must_read])
 
-    def str_threads(self, thlist):
-        s = ""
-        for thread in thlist:
-            state = "A" if thread.is_alive() else "N"
-            s += "------" + state + "------\n" + str(thread)
-        if s == "":
-            s = "[[" + self.get_module_id() + "]empty thread list]"
+    def str_pair_threads(self):
+        s = f"[{self.get_module_id()}] Pair list of active threads in this module instance\n"
+        for i, bg, comm in enumerate(self.pair_threads):
+            s += f">>>>>>> Thread {i} <<<<<<<\n"
+            s += f"----- Background ({bg.is_active()}) -----\n"
+            s += str(bg) + "\n"
+            s += f"----- Communicator ({comm.is_active()}) -----\n"
+            s += str(comm) + "\n"
+        if self.pair_threads:
+            s += f" [[ empty thread tuples list ]]\n"
         return s
 
     def str_summary(self, short=False):
         if short:
-            s = f"[{self.get_module_id()}] ~ BG[{self.nbr_alive_subproc()}/{len(self.bg_threads)}]" \
-                f" COMM[{self.nbr_reading_comm()}/{len(self.comm_threads)}]"
+            s = f"[{self.get_module_id()}] ~ BG[{self.nbr_alive_subproc()}/{len(self.get_bg_threads())}]" \
+                f" COMM[{self.nbr_reading_comm()}/{len(self.get_comm_threads())}]"
         else:
             s = f"PModule [{self.get_module_id()}]:" \
-                f" maintains {len(self.bg_threads)} threads bg + {len(self.comm_threads)} comm threads"
+                f" maintains {len(self.get_bg_threads())} threads bg + {len(self.get_comm_threads())} comm threads"
         return s
 
     def __str__(self):
-        s = f"Threads lists of passive module [{self.get_module_id()}] :\n"
-        s += f"    |\n"
-        s += f"    | Background threads list (length {len(self.bg_threads)})\n"
-        s += self.str_threads(self.bg_threads) + "\n"
-        s += f"    |\n"
-        s += f"    | Communicator threads list (length {len(self.comm_threads)})\n"
-        s += self.str_threads(self.comm_threads)
-        return s
+        return self.str_pair_threads()
 
     def treat_params(self, defaults, given_params):
         final_par = {}
@@ -162,6 +170,9 @@ class CommunicationThread(threading.Thread, TimerInterface):
     def get_dumb_name(self):
         return f"DumbThread [{len(self.decr_threads)}]"
 
+    def is_dumbparsing(self):
+        return len(self.decr_threads) > 0
+
     def is_decrementable(self):
         return self.must_read
 
@@ -186,15 +197,15 @@ class CommunicationThread(threading.Thread, TimerInterface):
             # we are at the end of dumb decr() thread
             self.decr_threads.remove(threading.current_thread())
 
-    def read_pipe(self):
-        # start program running in exec thread output treatment
-        self.call_parsing_fct(self.pipe_r.read1())
-
     def call_parsing_fct(self, output):
         if self.read_fct is not None:
             self.read_fct(output)
         else:
             print(f"No read fct defined, redirect stdout {output}")
+
+    def read_pipe(self):
+        # start program running in exec thread output treatment
+        self.call_parsing_fct(self.pipe_r.read1())
 
     def close_pipe(self):
         if self.pipe_r is not None:
