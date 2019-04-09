@@ -9,6 +9,9 @@ class PModNameMod(PassiveModule):
         self.CMD = ""
         self.PARAMS = {}
         # where one param <-> (defaultValue, isMandatory, prefix)
+        self.read_interval = 60
+        # time between each reading on the output of background subprocess running cmd
+
         self.timer = timer
         self.netmap = netmap
         self.logger = logger
@@ -25,7 +28,15 @@ class PModNameMod(PassiveModule):
 
     def new_comm_thread(self, timer=None, read_interv=0):
         # a comm_thread reading in bg_thread cmd output and parsing it regularly (triggered by timer)
+        if read_interv == 0:
+            read_interv = self.read_interval
         return CommunicationThread(self.distrib_output, timer, read_interv)
+
+    def set_read_interval(self, duration):
+        self.read_interval = duration
+
+    def get_read_interval(self):
+        return self.read_interval
 
     def distrib_output(self, buffer_read):
         # do some work with output of bg process (parsing, filling netmap, ..)

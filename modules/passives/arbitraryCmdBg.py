@@ -9,6 +9,7 @@ class PModArbitraryCmdBg(PassiveModule):
         self.m_id = "arbcmd_bg"
         self.PARAMS = {"prog": ("watch", True, ""),
                        "args": ("-t -n1 echo repeated_text_default_arbcmd_bg", False, "")}
+        self.read_interval = 60
         self.timer = timer
         self.netmap = netmap
         self.logger = logger
@@ -26,6 +27,12 @@ class PModArbitraryCmdBg(PassiveModule):
     def new_comm_thread(self, timer=None, read_interv=0):
         # a comm_thread reading in bg_thread cmd output and parsing it regularly (triggered by timer)
         return CommunicationThread(self.distrib_output, timer, read_interv)
+
+    def set_read_interval(self, duration):
+        self.read_interval = duration
+
+    def get_read_interval(self):
+        return self.read_interval
 
     def distrib_output(self, buffer_read):
         # do some work with output of bg process (parsing, filling netmap, ..)

@@ -1,5 +1,8 @@
 
 def has_method(obj, name):
+    """Look if obj contains a definition for function name
+
+    """
     return callable(getattr(obj, name, None))
 
 

@@ -1,5 +1,6 @@
 from src.utils.misc_fcts import str_frame
 
+
 class Panel:
 
     def __init__(self, netmap=None, logger=None):
@@ -49,6 +50,18 @@ class Panel:
                 return i
         return -1
 
+    def pause(self):
+        if self.is_running:
+            for entry in self.set:
+                entry.module.stop()
+            self.is_running = False
+
+    def resume(self):
+        if not self.is_running:
+            for entry in self.set:
+                entry.module.launch(read_interv=entry.module.get_read_interval())
+            self.is_running = True
+
     def is_empty(self):
         return len(self.set) == 0
 
@@ -72,9 +85,17 @@ class Panel:
         if level == 0:
             return self.__str__()
         elif level == 1:
-            return self.adaptive_display(lambda entry: entry.module.str_summary(short=True))
+            return self.adaptive_display(lambda entry: entry.pid + " " + entry.module.str_summary(short=True))
         else:
-            pass
+            s = f"Panel composed of {len(self.set)} passive modules (running : {self.is_running})\n"
+            sep = "+"*len(s) + "\n"
+            s += sep
+            for entry in self.set:
+                s += "*"*(len(sep)//2) + " " + entry.pid + "\n"
+                s += entry.module.str_pair_threads()
+                s += "*"*(len(sep)//2 + len(entry.pid) + 1) + "\n"
+            s += sep
+            return s
 
 
 class PanelEntry:
@@ -90,17 +111,25 @@ class PanelEntry:
 if __name__ == '__main__':
     from modules.passives.pingTarget import *
     panel = Panel()
-    ping = PModPing()
-    panel.add_module(ping)
+    timer = TimerThread()
+    ping = PModPing(timer=timer)
     panel.add_module(ping)
     panel.add_module(ping, given_id="sameinst_ping")
-    ping2 = PModPing()
+    ping2 = PModPing(timer=timer)
     panel.add_module(ping2)
 
     print("Simple call __str__()\n", panel)
     print("\nCall detailed display\n", panel.detail_str(level=1))
 
     print("\nLaunching pingit")
-    ping.launch(read_interv=4)
-    sleep(1)
-    print(panel.detail_str(level=1))
+    ping.timer.launch()
+    ping.set_read_interval(3)
+    ping2.set_read_interval(4)
+    panel.resume()
+    for i in range(10):
+        sleep(1)
+        print(panel.detail_str(level=1))
+    panel.pause()
+    timer.stop()
+    sleep(2)
+    print("\nAfter interrupt :\n", panel.detail_str(level=2))

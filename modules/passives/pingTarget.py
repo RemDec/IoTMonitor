@@ -14,7 +14,7 @@ class PModPing(PassiveModule):
                         "divargs": ("", False, ""),
                         "IP": ("192.168.1.1", True, "")}
         # where one param <-> (defaultValue, isMandatory, prefix)
-        self.read_interv = read_interval
+        self.read_interval = read_interval
         self.timer = timer
         self.netmap = netmap
         self.logger = logger
@@ -30,8 +30,14 @@ class PModPing(PassiveModule):
 
     def new_comm_thread(self, timer=None, read_interv=0):
         if read_interv == 0:
-            read_interv = self.read_interv
+            read_interv = self.read_interval
         return CommunicationThread(self.distrib_output, timer, read_interv)
+
+    def set_read_interval(self, duration):
+        self.read_interval = duration
+
+    def get_read_interval(self):
+        return self.read_interval
 
     def distrib_output(self, buffer_read):
         print(f"DATA from bg thread output length {len(buffer_read.decode())}")

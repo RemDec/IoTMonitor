@@ -19,6 +19,14 @@ class PassiveModule(Module):
     def new_comm_thread(self, timer, read_interv):
         pass
 
+    @abc.abstractmethod
+    def set_read_interval(self, duration):
+        pass
+
+    @abc.abstractmethod
+    def get_read_interval(self):
+        pass
+
     def is_active(self):
         return False
 
@@ -245,9 +253,10 @@ class CommunicationThread(threading.Thread, TimerInterface):
         self.timer.unsub(self)
         remaining = False
         for thread in self.decr_threads:
-            thread.join(1)
             if thread.is_alive():
-                remaining = True
+                thread.join(1)
+                if thread.is_alive():
+                    remaining = True
         if remaining:
             print("Warning dumb thread alive after interrupt->join", self.decr_threads)
         self.decr_threads = []

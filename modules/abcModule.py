@@ -20,6 +20,10 @@ class Module(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def stop(self):
+        pass
+
+    @abc.abstractmethod
     def distrib_output(self, output):
         pass
 
