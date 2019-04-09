@@ -33,14 +33,26 @@ class ActiveModule(Module):
             sleep(wait_for_purge)
         self.purge_threadlist()
 
+    def get_nbr_running(self):
+        # count threads which underlying script subprocess not yet exited
+        return len([th for th in self.curr_threads if not th.under_proc_state()[0]])
+
     def str_threads(self):
-        s = ""
-        for thread in self.curr_threads:
-            state = "A" if thread.is_alive() else "N"
-            s += "\n------" + state + "------\n" + str(thread)
-        if s == "":
-            s = "[[" + self.get_module_id() + "]empty thread list]"
+        s = f"[{self.get_module_id()}] List of active threads in this module instance\n"
+        for i, thread in enumerate(self.curr_threads):
+            state = "Alive" if thread.is_alive() else "Terminated"
+            s += f">>>>>>> Thread {i} ({state}) <<<<<<<\n"
+            s += str(thread) + "\n"
+        if len(self.curr_threads) == 0:
+            s += "   [ empty thread list ]"
         return s
+
+    def str_summary(self):
+        s = f"[{self.get_module_id()}] ~ Thlist[{self.get_nbr_running()}/{len(self.curr_threads)}]"
+        return s
+
+    def __str__(self):
+        return self.str_threads()
 
     def treat_params(self, defaults, given_params):
         final_par = {}
@@ -56,7 +68,7 @@ class ActiveModule(Module):
 
 class ScriptThread(threading.Thread):
 
-    def __init__(self, callback_fct=None, max_exec_time=180):
+    def __init__(self, callback_fct=None, max_exec_time=120):
         threading.Thread.__init__(self)
         self.callback_fct = callback_fct
         self.max_exec_time = max_exec_time
@@ -86,3 +98,22 @@ class ScriptThread(threading.Thread):
             self.popen.terminate()
             if self.popen.poll() is None:
                 self.popen.kill()
+
+    def under_proc_state(self):
+        if self.popen is None:
+            return False, -1
+        ret = self.popen.poll()
+        if ret is None:
+            return False, self.popen.pid
+        else:
+            return True, ret
+
+    def __str__(self):
+        ended, code_or_pid = self.under_proc_state()
+        s = f"Script thread (max duration:{self.max_exec_time}s) for cmd {self.cmd}"
+        if ended:
+            s += f" (script subproc exited with code {code_or_pid})"
+        else:
+            s += f" (script subproc still working, pid {code_or_pid})"
+        s += f"\n  |_ treat output with callback fct {self.callback_fct}"
+        return s

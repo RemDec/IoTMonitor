@@ -68,6 +68,9 @@ class Queue(TimerInterface):
     def pause(self):
         self.is_running = False
 
+    def resume(self):
+        self.is_running = True
+
     def is_decrementable(self):
         return self.is_running
 

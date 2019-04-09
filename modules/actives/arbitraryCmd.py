@@ -73,5 +73,5 @@ if __name__ == '__main__':
     arb.stop()
     print("Thread list just after interrupt with one active : ", arb.str_threads())
     time.sleep(1)
-    arb.purge_threads()
+    arb.terminate_threads()
     print("Thread list after clearing dead thread : ", arb.str_threads())

@@ -85,7 +85,7 @@ class Panel:
         if level == 0:
             return self.__str__()
         elif level == 1:
-            return self.adaptive_display(lambda entry: entry.pid + " " + entry.module.str_summary(short=True))
+            return self.adaptive_display(lambda entry: entry.pid + " " + entry.module.str_summary())
         else:
             s = f"Panel composed of {len(self.set)} passive modules (running : {self.is_running})\n"
             sep = "+"*len(s) + "\n"
@@ -105,7 +105,7 @@ class PanelEntry:
         self.pid = pid
 
     def __str__(self):
-        return str_frame(f"{self.pid} -> {self.module.str_summary(short=True)}")
+        return str_frame(f"{self.pid} -> {self.module.str_summary()}")
 
 
 if __name__ == '__main__':

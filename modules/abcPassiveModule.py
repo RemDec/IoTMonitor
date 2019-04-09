@@ -100,13 +100,9 @@ class PassiveModule(Module):
             s += f" [[ empty thread tuples list ]]\n"
         return s
 
-    def str_summary(self, short=False):
-        if short:
-            s = f"[{self.get_module_id()}] ~ BG[{self.nbr_alive_subproc()}/{len(self.get_bg_threads())}]" \
-                f" COMM[{self.nbr_reading_comm()}/{len(self.get_comm_threads())}]"
-        else:
-            s = f"PModule [{self.get_module_id()}]:" \
-                f" maintains {len(self.get_bg_threads())} threads bg + {len(self.get_comm_threads())} comm threads"
+    def str_summary(self):
+        s = f"[{self.get_module_id()}] ~ BG[{self.nbr_alive_subproc()}/{len(self.get_bg_threads())}]" \
+            f" COMM[{self.nbr_reading_comm()}/{len(self.get_comm_threads())}]"
         return s
 
     def __str__(self):
@@ -141,6 +137,8 @@ class BackgroundThread(threading.Thread):
         # waiting for popen cmd exit would be a waste of resources (since it should run continuously)
 
     def under_proc_state(self):
+        if self.popen is None:
+            return False, -1
         ret = self.popen.poll()
         if ret is None:
             return False, self.popen.pid

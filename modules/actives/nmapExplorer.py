@@ -60,4 +60,9 @@ class AModNmapExplorer(ActiveModule):
 
 if __name__ == '__main__':
     nmap = AModNmapExplorer()
+    print(nmap)
     nmap.launch()
+    print("Directly after launching :\n", nmap)
+    from time import sleep
+    sleep(10)
+    print("After waiting :\n", nmap)
