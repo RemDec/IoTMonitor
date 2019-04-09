@@ -1,10 +1,7 @@
 import abc
 from threading import Thread
 from time import sleep
-
-
-def has_method(obj, name):
-    return callable(getattr(obj, name, None))
+from src.utils.misc_fcts import has_method
 
 
 class TimerThread(Thread):

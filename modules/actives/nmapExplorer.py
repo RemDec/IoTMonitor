@@ -34,7 +34,7 @@ class AModNmapExplorer(ActiveModule):
             print(f"Module [{self.m_id}] execution raised exception :{py_except}")
 
     def launch(self):
-        super().purge_threads()
+        super().purge_threadlist()
         cmd = self.CMD.split(' ')
         for param, val in self.params.items():
             cmd.append(self.PARAMS[param][2] + val)

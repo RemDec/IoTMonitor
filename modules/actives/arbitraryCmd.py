@@ -36,7 +36,7 @@ class AModArbitraryCmd(ActiveModule):
 
     def launch(self):
         # start a thread for cmd + params execution
-        super().purge_threads()
+        super().purge_threadlist()
         s_thread = self.get_script_thread()
         if self.params.get("args") is None:
             self.params["args"] = self.PARAMS["args"][0] if self.params["prog"] == "echo" else ""

@@ -62,6 +62,12 @@ class PassiveModule(Module):
         else:
             self.purge_commlist()
 
+    def nbr_alive_subproc(self):
+        return len([bg for bg in self.bg_threads if not bg.under_proc_state()[0]])
+
+    def nbr_reading_comm(self):
+        return len([comm for comm in self.comm_threads if not comm.must_read])
+
     def str_threads(self, thlist):
         s = ""
         for thread in thlist:
@@ -69,6 +75,15 @@ class PassiveModule(Module):
             s += "------" + state + "------\n" + str(thread)
         if s == "":
             s = "[[" + self.get_module_id() + "]empty thread list]"
+        return s
+
+    def str_summary(self, short=False):
+        if short:
+            s = f"[{self.get_module_id()}] ~ BG[{self.nbr_alive_subproc()}/{len(self.bg_threads)}]" \
+                f" COMM[{self.nbr_reading_comm()}/{len(self.comm_threads)}]"
+        else:
+            s = f"PModule [{self.get_module_id()}]:" \
+                f" maintains {len(self.bg_threads)} threads bg + {len(self.comm_threads)} comm threads"
         return s
 
     def __str__(self):
@@ -107,6 +122,14 @@ class BackgroundThread(threading.Thread):
             self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         self.pipe_w = self.popen.stdout
         print(super().getName() + "\n  |> launched subprocess outputing in", self.pipe_w)
+        # waiting for popen cmd exit would be a waste of resources (since it should run continuously)
+
+    def under_proc_state(self):
+        ret = self.popen.poll()
+        if ret is None:
+            return False, self.popen.pid
+        else:
+            return True, ret
 
     def get_output_pipe(self):
         return self.pipe_w
@@ -207,3 +230,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
         if remaining:
             print("Warning dumb thread alive after interrupt->join", self.decr_threads)
         self.decr_threads = []
+
+    def __str__(self):
+        s = f"Communication thread for [{self.read_fct}] (decrementable {self.set_reading()}),\n" \
+            f"  {len(self.decr_threads)} dumb reading threads on output {self.pipe_r}"

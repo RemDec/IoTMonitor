@@ -37,7 +37,7 @@ class AModNameMod(ActiveModule):
             print(f"Module [{self.m_id}] execution raised exception :{py_except}")
 
     def launch(self):
-        super().purge_threads()
+        super().purge_threadlist()
         # start a thread for cmd + params execution
         cmd = [self.CMD]
         for param, val in self.params.items():

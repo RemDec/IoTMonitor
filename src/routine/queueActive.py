@@ -35,8 +35,8 @@ class Queue(TimerInterface):
     def get_mod_entry(self, active_mod, given_timer, given_id):
         exp_timer = active_mod.get_default_timer() if not given_timer else given_timer
         m_id = active_mod.get_module_id()
-        q_id = self.get_unique_qid(given_id) if given_id is not None else self.get_unique_qid(m_id)
-        return QueueEntry(active_mod, exp_timer, q_id)
+        qid = self.get_unique_qid(given_id) if given_id is not None else self.get_unique_qid(m_id)
+        return QueueEntry(active_mod, exp_timer, qid)
 
     def get_unique_qid(self, try_id):
         curr_id = try_id

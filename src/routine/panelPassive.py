@@ -1,0 +1,106 @@
+from src.utils.misc_fcts import str_frame
+
+class Panel:
+
+    def __init__(self, netmap=None, logger=None):
+        self.netmap = netmap
+        self.logger = logger
+
+        self.set = []
+        self.is_running = False
+
+    def add_module(self, passive_mod, given_id=None):
+        # create+add a PanelEntry object if the passive_mod instance not yet in an entry within the panel
+        if passive_mod.is_active() or self.get_presence(passive_mod) > -1:
+            return False
+        new_entry = self.get_mod_entry(passive_mod, given_id)
+        self.set.append(new_entry)
+
+    def remove_module(self, mod):
+        # remove a module given his instance or pid in the Panel
+        ind = self.get_presence(mod)
+        if ind >= 0:
+            self.set.pop(ind)
+            return True
+        return False
+
+    def get_mod_entry(self, mod, given_id):
+        # return a PanelEntry with adapted pid (no duplicate)
+        m_id = mod.get_module_id()
+        pid = self.get_unique_pid(m_id)
+        return PanelEntry(mod, pid)
+
+    def get_unique_pid(self, try_id):
+        # create unique pid in panel from module basic id
+        curr_id = try_id
+        counter = 1
+        for mod_entry in self.set:
+            if mod_entry.pid == curr_id:
+                curr_id = try_id + str(counter)
+                counter += 1
+        return curr_id
+
+    def get_presence(self, mod):
+        # mod is in panel where mod is a module instance or pid : -1 if absent, PanelEntry indice in set else
+        for i, entry in enumerate(self.set):
+            if isinstance(mod, str) and mod == entry.pid:
+                return i
+            if mod is entry.module:
+                return i
+        return -1
+
+    def is_empty(self):
+        return len(self.set) == 0
+
+    def __str__(self):
+        return self.adaptive_display(lambda entry: entry.pid)
+
+    def adaptive_display(self, fct_to_entry, header=True):
+        s = ""
+        if header:
+            s = f"Panel composed of {len(self.set)} passive modules (running : {self.is_running})\n"
+        if self.is_empty():
+            s += " "*5 + "[ empty panel ]"
+        else:
+            inter = ""
+            for entry in self.set:
+                inter += f" {fct_to_entry(entry)} |"
+            s += str_frame(inter[:-1])
+        return s
+
+    def detail_str(self, level=0):
+        if level == 0:
+            return self.__str__()
+        elif level == 1:
+            return self.adaptive_display(lambda entry: entry.module.str_summary(short=True))
+        else:
+            pass
+
+
+class PanelEntry:
+
+    def __init__(self, module, pid):
+        self.module = module
+        self.pid = pid
+
+    def __str__(self):
+        return str_frame(f"{self.pid} -> {self.module.str_summary(short=True)}")
+
+
+if __name__ == '__main__':
+    from modules.passives.pingTarget import *
+    panel = Panel()
+    ping = PModPing()
+    panel.add_module(ping)
+    panel.add_module(ping)
+    panel.add_module(ping, given_id="sameinst_ping")
+    ping2 = PModPing()
+    panel.add_module(ping2)
+
+    print("Simple call __str__()\n", panel)
+    print("\nCall detailed display\n", panel.detail_str(level=1))
+
+    print("\nLaunching pingit")
+    ping.launch(read_interv=4)
+    sleep(1)
+    print(panel.detail_str(level=1))
