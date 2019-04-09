@@ -25,10 +25,10 @@ class PModPing(PassiveModule):
         # fix missing execution params with defaults
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
-    def get_bg_thread(self, output_stream=None):
+    def new_bg_thread(self, output_stream=None):
         return BackgroundThread(output_stream)
 
-    def get_comm_thread(self, timer=None, read_interv=0):
+    def new_comm_thread(self, timer=None, read_interv=0):
         if read_interv == 0:
             read_interv = self.read_interv
         return CommunicationThread(self.distrib_output, timer, read_interv)
@@ -44,16 +44,15 @@ class PModPing(PassiveModule):
                 cmd.append(self.PARAMS[param][2] + val)
         if "divargs" in self.params:
             cmd.append(shlex.split(self.params["divargs"]))
-        bg_thread = self.get_bg_thread(output_stream)
-        read_thread = self.get_comm_thread(self.timer, read_interv)
+        bg_thread = self.new_bg_thread(output_stream)
+        read_thread = self.new_comm_thread(self.timer, read_interv)
         bg_thread.start(cmd)
         pipe = bg_thread.get_output_pipe()
         while pipe is None:
             sleep(0.3)
             pipe = bg_thread.get_output_pipe()
         read_thread.start(pipe)
-        super().register_thread(bg_thread)
-        super().register_thread(read_thread)
+        super().register_threadpair((bg_thread, read_thread))
 
     def stop(self):
         super().terminate_threads()
@@ -69,7 +68,7 @@ class PModPing(PassiveModule):
 if __name__ == '__main__':
     ping = PModPing(read_interval=2, timer=TimerThread())
     ping.launch()
-    ping.timer.start()
+    ping.timer.launch()
     from time import sleep
     for i in range(6):
         sleep(1)

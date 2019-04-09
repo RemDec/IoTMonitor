@@ -44,9 +44,12 @@ class TimerThread(Thread):
         while not self.stopped:
             sleep(self.t)
             self.decr_all()
+        print("End of timer running loop", self)
 
     def __str__(self):
-        return f"Timer with {len(self.subs)} subscribed objects:{str(self.subs)}"
+        subs_str = '\n  > '.join([str(o) for o in self.subs])
+        state = "stopped" if self.stopped else "running"
+        return f"Timer ({state}) with {len(self.subs)} subscribed objects:\n{subs_str}"
 
 
 class TimerInterface(abc.ABC):
@@ -77,7 +80,6 @@ class PrototypeSubscriber(TimerInterface):
             from threading import current_thread
             print("[DumbSubs]I died in the thread", current_thread())
             self.alive = False
-
         elif self.alive:
             self.expiration -= 1
 

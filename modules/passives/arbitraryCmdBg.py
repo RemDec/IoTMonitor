@@ -1,14 +1,14 @@
 from abcPassiveModule import *
+import shlex
 
 
-class PModNameMod(PassiveModule):
+class PModArbitraryCmdBg(PassiveModule):
 
     def __init__(self, params=None, timer=None, netmap=None, logger=None):
         super().__init__()
-        self.m_id = "default"
-        self.CMD = ""
-        self.PARAMS = {}
-        # where one param <-> (defaultValue, isMandatory, prefix)
+        self.m_id = "arbcmd_bg"
+        self.PARAMS = {"prog": ("watch", True, ""),
+                       "args": ("-t -n1 echo repeated_text_default_arbcmd_bg", False, "")}
         self.timer = timer
         self.netmap = netmap
         self.logger = logger
@@ -32,10 +32,11 @@ class PModNameMod(PassiveModule):
         print("Data to treat ->", buffer_read.decode())
 
     def launch(self, output_stream=None, read_interv=0):
-        # spawn 2 threads: bg managing subprocess cmd and comm pulling and treating its output
-        cmd = [self.CMD]
-        for param, val in self.params.items():
-            cmd.append(self.PARAMS[param][2] + val)
+        if self.params.get("args") is None:
+            self.params["args"] = self.PARAMS["args"][0] if self.params["prog"] == "watch" else ""
+        args_split = shlex.split(self.params["args"])
+        cmd = [self.params["prog"]] + args_split
+
         bg_thread = self.new_bg_thread(output_stream)
         read_thread = self.new_comm_thread(self.timer, read_interv)
         # launching bg thread that is running cmd and directing output to given output_stream or pipe
@@ -49,14 +50,27 @@ class PModNameMod(PassiveModule):
         read_thread.start(pipe)
         # Register those 2 threads to this module instance threadlist
         super().register_threadpair((bg_thread, read_thread))
+        return bg_thread, read_thread
 
     def stop(self):
         # ask registered threads to smoothly terminate their activity
         super().terminate_threads()
 
     def get_description(self):
-        return f"[{self.m_id}] Skeleton for writing a passive module"
+        return f"[{self.m_id}] Blackbox module executing a given program with constant output in background"
 
     def get_module_id(self):
         # unique short string identifying this module
         return self.m_id
+
+
+if __name__=='__main__':
+    cmd = PModArbitraryCmdBg()
+    bg_thread, comm_thread = cmd.launch(read_interv=2)
+    import time
+    time.sleep(5)
+    print("######################\n", cmd)
+    time.sleep(10)
+    cmd.stop()
+    print("######## STOP PROCESS #######\n", cmd)
+    comm_thread.timer.stop()
