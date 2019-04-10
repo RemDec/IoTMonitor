@@ -1,7 +1,7 @@
 # IoTMonitor
 Home network supervision tool mainly focusing IoT security flaws, using several multi-purposes scanners and trafic analyzers.
 
-The application provides a home network control center through building a network map of all users connected appliances and a automated scanning system. Scanners rely on already written tools covering a wide range of purposes like **network discovery, related CVEs highlighting, default credentials bruteforcing, penetration testing,** ... based on *nmap*, *searchsploit*, *vulscan*, *IoTSeeker*, *metasploit* etc. 
+The application provides a home network control center through building a network map of all users connected appliances and an automated scanning system. Scanners rely on already written tools covering a wide range of purposes like **network discovery, related CVEs highlighting, default credentials bruteforcing, penetration testing,** ... based on *nmap*, *searchsploit*, *vulscan*, *IoTSeeker*, *metasploit* etc. 
 
 ### Main goals
 * Home network overview with all connected devices and their characteristics : MAC & IP adresses, manufacturer, model, firmware, ports & services, used protocols ...
@@ -14,10 +14,10 @@ The application provides a home network control center through building a networ
 
 * Global logging facilities and information aggregation from tools outputs
 
-This project is IoT devices oriented since these connected objects are perfect attack vectors to get control over a poorly monitored home network. However, all devices in such network will be considered and analyzed by the application (PCs, router, smartphones, servers, ...). 
+This project is IoT devices oriented since these connected objects are very well suited attack vectors to get control over a poorly monitored home network. However, all devices in such network will be considered and analyzed by the application (PCs, router, smartphones, servers, ...). 
 
 ### Requirements
-Ideally this application should run in a standalone device connected in the network to monitor.
+Ideally this application should run in a standalone device connected in the network to monitor. To use its full set of features, a superuser access is necessary.
 
 #### Needed
 * Linux distribution with Python 3.7 available 
