@@ -1,4 +1,5 @@
 from abcModule import *
+from src.utils.misc_fcts import get_infoname_py
 import threading, subprocess
 
 
@@ -44,7 +45,7 @@ class ActiveModule(Module):
             s += f">>>>>>> Thread {i} ({state}) <<<<<<<\n"
             s += str(thread) + "\n"
         if len(self.curr_threads) == 0:
-            s += "   [ empty thread list ]"
+            s += "   [ empty thread list ]\n"
         return s
 
     def str_summary(self):
@@ -110,10 +111,11 @@ class ScriptThread(threading.Thread):
 
     def __str__(self):
         ended, code_or_pid = self.under_proc_state()
+        fname, modname = get_infoname_py(self.callback_fct)
         s = f"Script thread (max duration:{self.max_exec_time}s) for cmd {self.cmd}"
         if ended:
             s += f" (script subproc exited with code {code_or_pid})"
         else:
             s += f" (script subproc still working, pid {code_or_pid})"
-        s += f"\n  |_ treat output with callback fct {self.callback_fct}"
+        s += f"\n  |_ treat output with callback function {fname} of [{modname}]"
         return s

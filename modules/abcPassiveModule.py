@@ -1,5 +1,6 @@
 from abcModule import *
 from utils.timer import *
+from utils.misc_fcts import get_infoname_py
 from time import sleep
 import threading, subprocess
 
@@ -97,7 +98,7 @@ class PassiveModule(Module):
             s += f"----- Communicator ({comm.is_alive()}) -----\n"
             s += str(comm) + "\n"
         if len(self.pair_threads) == 0:
-            s += f" [[ empty thread tuples list ]]\n"
+            s += f"   [ empty thread tuples list (bg, comm) ]\n"
         return s
 
     def str_summary(self):
@@ -260,6 +261,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
         self.decr_threads = []
 
     def __str__(self):
-        s = f"Communication thread for [{self.read_fct}] (decrementable {self.must_read}),\n" \
+        fname, modname = get_infoname_py(self.read_fct)
+        s = f"Communication thread calling {fname} of [{modname}] (decrementable {self.must_read}, timer {self.timer}),\n" \
             f"  |_ currently {len(self.decr_threads)} dumb reading threads on output {self.pipe_r}"
         return s

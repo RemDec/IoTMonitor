@@ -16,6 +16,7 @@ class Panel:
             return False
         new_entry = self.get_mod_entry(passive_mod, given_id)
         self.set.append(new_entry)
+        return True
 
     def remove_module(self, mod):
         # remove a module given his instance or pid in the Panel
@@ -50,10 +51,12 @@ class Panel:
                 return i
         return -1
 
-    def pause(self):
+    def pause(self, kill_thmods=True):
+        # for panel pause means interrupt current continuously working threads so kill_thmods should be true
         if self.is_running:
-            for entry in self.set:
-                entry.module.stop()
+            if kill_thmods:
+                for entry in self.set:
+                    entry.module.stop()
             self.is_running = False
 
     def resume(self):
@@ -65,6 +68,20 @@ class Panel:
     def is_empty(self):
         return len(self.set) == 0
 
+    def get_mod_by_id(self, pid):
+        for entry in self.set:
+            if entry.pid == pid:
+                return entry.module
+
+    def get_corresp_entry(self, field):
+        # field either module instance or id
+        for entry in self.set:
+            if field is entry.module or field == entry.pid:
+                return entry
+
+    def get_idlist(self):
+        return [entry.pid for entry in self.set]
+
     def __str__(self):
         return self.adaptive_display(lambda entry: entry.pid)
 
@@ -73,7 +90,7 @@ class Panel:
         if header:
             s = f"Panel composed of {len(self.set)} passive modules (running : {self.is_running})\n"
         if self.is_empty():
-            s += " "*5 + "[ empty panel ]"
+            s += " "*5 + "[ empty panel ]\n"
         else:
             inter = ""
             for entry in self.set:

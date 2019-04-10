@@ -6,10 +6,11 @@ from src.utils.misc_fcts import has_method
 
 class TimerThread(Thread):
 
-    def __init__(self, autostart=False, t=1):
+    def __init__(self, autostart=False, t=1, name="DefaultTimer"):
         Thread.__init__(self)
         self.t = t
         self.stopped = True
+        self.name = name
         self.subs = []
         if autostart:
             self.launch()
@@ -46,10 +47,24 @@ class TimerThread(Thread):
             self.decr_all()
         print("End of timer running loop", self)
 
-    def __str__(self):
-        subs_str = '\n  > '.join([str(o) for o in self.subs])
+    def start(self):
+        # overriding super method to avoid confusion of calling super.start() only (doesn't launch timer correctly)
+        self.launch()
+
+    def detail_str(self, level=0):
         state = "stopped" if self.stopped else "running"
-        return f"Timer ({state}) with {len(self.subs)} subscribed objects:\n{subs_str}"
+        if level == 0:
+            return f"{self.name} ({state})"
+        elif level == 1:
+            return f"{self.name} (timer state : {state}, interval {self.t}s) ~ {len(self.subs)} subscribers"
+        else:
+            if len(self.subs) == 0:
+                return f"Timer ({state}) with no subscribed object"
+            subs_str = '\n  > ' + '\n  > '.join([f"[{i+1}] {obj}" for i, obj in enumerate(self.subs)])
+            return f"{self.name} ({state}) with {len(self.subs)} subscribed objects:{subs_str}"
+
+    def __str__(self):
+        return self.detail_str(0)
 
 
 class TimerInterface(abc.ABC):
@@ -90,4 +105,4 @@ if __name__ == '__main__':
     obj = PrototypeSubscriber()
     timer.subscribe(obj)
     timer.launch()
-    print(f"Timer started, {thr.active_count()} threads currently : timer {timer} and main :{thr.current_thread()}")
+    print(f"{timer.name} started, {thr.active_count()} threads currently : timer {timer} and main :{thr.current_thread()}")
