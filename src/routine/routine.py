@@ -108,18 +108,20 @@ if __name__=='__main__':
     from modules.actives.nmapExplorer import *
     from modules.passives.pingTarget import *
     from src.utils.timer import *
+    from src.utils.logger import *
 
+    Logger("../../svd/configs/default_logger.yaml")
     t = TimerThread()
     nmap = AModNmapExplorer()
     ping = PModPing(timer=t)
     rout = Routine(modules=[(nmap, 'nmapSURNAME', 10), ping], timer=t)
-    print(rout.detail_str(level=1))
+    logging.getLogger("debug").debug(rout.detail_str(level=1))
     t.launch()
     rout.resume()
     for i in range(5):
         sleep(5)
-        print("\n##########################\n", rout.detail_str(level=1))
-    print("\n\n########## Before Pausing ##########", rout.detail_str(2))
+        logging.getLogger("debug").debug(f"\n##########################\n{rout.detail_str(level=1)}")
+    logging.getLogger("debug").debug(f"\n\n########## Before Pausing ##########\n{rout.detail_str(2)}")
     rout.pause()
     t.stop()
-    print("\n\n########## Paused ##########", rout.detail_str(2))
+    logging.getLogger("debug").debug(f"\n\n########## Paused ##########\n{rout.detail_str(2)}")

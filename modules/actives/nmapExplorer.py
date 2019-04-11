@@ -64,5 +64,7 @@ if __name__ == '__main__':
     nmap.launch()
     print("Directly after launching :\n", nmap)
     from time import sleep
-    sleep(10)
+    sleep(1)
+    print("Waited a few second for launching thread :\n", nmap)
+    sleep(15)
     print("After waiting :\n", nmap)

@@ -128,13 +128,13 @@ class BackgroundThread(threading.Thread):
         self.popen = None
 
     def run(self):
-        print(super().getName())
+        logging.getLogger("debug").debug(f"Starting thread : {super().getName()}")
         if self.output_stream is not None:
             self.popen = subprocess.Popen(self.cmd, stdout=self.output_stream, stderr=subprocess.STDOUT)
         else:
             self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         self.pipe_w = self.popen.stdout
-        print(super().getName() + "\n  |> launched subprocess outputing in", self.pipe_w)
+        logging.getLogger("debug").debug(f"{super().getName()}\n  |> launched subprocess outputing in {self.pipe_w}")
         # waiting for popen cmd exit would be a waste of resources (since it should run continuously)
 
     def under_proc_state(self):
@@ -162,12 +162,16 @@ class BackgroundThread(threading.Thread):
                 self.popen.kill()
 
     def __str__(self):
+        if self.cmd is None:
+            cmd = "unknown (must be passed with start())"
+        else:
+            cmd = ' '.join(self.cmd)
         ended, code_or_pid = self.under_proc_state()
-        s = f"Background thread for cmd {self.cmd}"
+        s = f"Background thread for cmd {cmd}"
         if ended:
             s += f" (bg proc exited with code {code_or_pid})"
         else:
-            s += f" (bg proc still working, pid {code_or_pid})"
+            s += f" (bg proc still working/unlaunched, pid {code_or_pid})"
         s += f"\n  |_ writing output in {self.pipe_w}"
         return s
 
@@ -229,7 +233,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
             self.pipe_r.close()
 
     def run(self):
-        print(super().getName())
+        logging.getLogger("debug").debug(f"Starting thread :{super().getName()}")
         self.set_reading()
 
     def start(self, pipe_output):

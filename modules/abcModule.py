@@ -1,4 +1,7 @@
 import abc
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class Module(abc.ABC):

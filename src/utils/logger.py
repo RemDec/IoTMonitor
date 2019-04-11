@@ -1,32 +1,31 @@
-from datetime import datetime
-from sys import stdout
+import logging
+import logging.config
+from utils.misc_fcts import replace_in_dicts
 
 
-class Logger():
+class Logger:
 
-    def __init__(self, output=None):
-        self.output = stdout if output is None else output
-        self.curr_buffer = ""
-        self.max_length = 1000
+    def __init__(self, cfg_file=None):
+        self.cfg_file = cfg_file if cfg_file else "default_logger.yaml"
+        self.setup_from_yaml(self.cfg_file)
+        self.curr_cfg = {}
 
-    def log(self, msg, level=0, suffix=""):
-        self.output.write("[" + str(level) + "] " + suffix + msg + '\n')
-        if len(self.curr_buffer) + len(msg) > self.max_length:
-            self.write_logfile()
-            self.curr_buffer = ""
-        self.curr_buffer += msg
+    def setup_from_yaml(self, file):
+        import yaml
+        with open(file, 'r') as f:
+            cfg_dic = yaml.safe_load(f.read())
+        print(cfg_dic)
+        self.curr_cfg = cfg_dic
+        logging.config.dictConfig(cfg_dic)
 
-    def write_logfile(self):
-        name = datetime.now().strftime('log_%H_%M_%d_%m_%Y.log')
-        with open(name, 'w') as fd:
-            fd.write(self.curr_buffer)
+    def change_cfg_values(self, key, new_val):
+        replace_in_dicts(self.curr_cfg, key, new_val)
 
     def __str__(self):
-        return "Logger current state :\n" + "\tBuffer :\n" + self.curr_buffer
+        return f"Logger using cfg {self.cfg_file}"
 
 
-if __name__ == '__main__':
-    logger = Logger()
-    logger.log("A message totally arbitrary")
-    print(logger)
-    logger.write_logfile()
+if __name__ == "__main__":
+    l = Logger()
+    print(l)
+    logging.getLogger("control").debug("Debugging logger")

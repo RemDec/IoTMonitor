@@ -77,7 +77,8 @@ class ScriptThread(threading.Thread):
         self.popen = None
 
     def run(self):
-        print(super().getName())
+        # print(super().getName())
+        logging.getLogger("debug").debug(f"Starting thread : {super().getName()}")
         self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT,
                                   universal_newlines=True)
@@ -112,10 +113,14 @@ class ScriptThread(threading.Thread):
     def __str__(self):
         ended, code_or_pid = self.under_proc_state()
         fname, modname = get_infoname_py(self.callback_fct)
-        s = f"Script thread (max duration:{self.max_exec_time}s) for cmd {self.cmd}"
+        s = f"Script thread (max duration:{self.max_exec_time}s) for cmd {' '.join(self.cmd)}"
         if ended:
-            s += f" (script subproc exited with code {code_or_pid})"
+            s += f"\n  |_ script subprocess exited with return code {code_or_pid}"
         else:
-            s += f" (script subproc still working, pid {code_or_pid})"
+            if code_or_pid > -1:
+                state = f"still working with pid {code_or_pid}"
+            else:
+                state = f"launching, pid not yet allocated"
+            s += f"\n  |_ script subprocess {state})"
         s += f"\n  |_ treat output with callback function {fname} of [{modname}]"
         return s

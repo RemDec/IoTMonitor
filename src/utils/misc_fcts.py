@@ -16,6 +16,17 @@ def get_infoname_py(fun):
     return fun.__name__, modname
 
 
+def replace_in_dicts(dic, key, newval):
+    """Replace values for a key in multilevel dict
+
+    """
+    for k in dic:
+        if k == key:
+            dic[k] = newval
+        elif isinstance(dic[k], dict):
+            replace_in_dicts(dic[k], key, newval)
+
+
 def bound_frame(s):
     s = s.replace('|', '+')
     return "".join(["-" if c != "+" else c for c in s])
@@ -57,3 +68,7 @@ if __name__ == '__main__':
     print("\n-----------------\n")
     print(str_multiframe("with one | only | line"))
     print(str_multiframe("str\nstr a bit longer\nmark|here"))
+
+    a = {0: 1, 1: {}, 2: {0: "b", 1: "c"}, 3: {0: {}}}
+    replace_in_dicts(a, 0, "a")
+    print("\n\nAfter replacing 0 keys with value 'a'\n", a)
