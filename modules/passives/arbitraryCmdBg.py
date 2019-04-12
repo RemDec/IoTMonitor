@@ -4,17 +4,24 @@ import shlex
 
 class PModArbitraryCmdBg(PassiveModule):
 
-    def __init__(self, params=None, timer=None, netmap=None, logger=None):
+    def __init__(self, params=None, timer=None, netmap=None):
         super().__init__()
         self.m_id = "arbcmd_bg"
         self.PARAMS = {"prog": ("watch", True, ""),
                        "args": ("-t -n1 echo repeated_text_default_arbcmd_bg", False, "")}
+        self.desc_PARAMS = {"prog": "A command to execute available on the system",
+                            "args": "CLI arguments to pass as one string (all in it)"}
         self.read_interval = 60
         self.timer = timer
         self.netmap = netmap
-        self.logger = logger
 
         self.set_params(params)
+
+    def get_cmd(self):
+        return "arbitrary"
+
+    def get_params(self):
+        return self.params, self.PARAMS, self.desc_PARAMS
 
     def set_params(self, params):
         # fix missing execution params with defaults
@@ -36,7 +43,7 @@ class PModArbitraryCmdBg(PassiveModule):
 
     def distrib_output(self, buffer_read):
         # do some work with output of bg process (parsing, filling netmap, ..)
-        print("Data to treat ->", buffer_read.decode())
+        logging.getLogger("debug").debug(f"[{self.m_id}] Data to treat -> {buffer_read.decode()}")
 
     def launch(self, output_stream=None, read_interv=0):
         if self.params.get("args") is None:

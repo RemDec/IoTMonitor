@@ -1,9 +1,15 @@
 from abcActiveModule import *
 
 
+desc_PARAMS = {"IP": "Target IP adress(es) acceptable as Nmap syntax",
+               "SYNports": "Ports targeted for SYN probing",
+               "UDPports": "Ports targeted for UDP probing",
+               "options": "other options compatible with -sn to pass to nmap"}
+
+
 class AModNmapExplorer(ActiveModule):
 
-    def __init__(self, params=None, netmap=None, logger=None):
+    def __init__(self, params=None, netmap=None):
         super().__init__()
         self.m_id = "nmapexplo"
         self.CMD = "nmap -sn"
@@ -12,10 +18,16 @@ class AModNmapExplorer(ActiveModule):
                        "UDPports": ("53,135,137,161", True, "-PU"),
                        "IP": ("192.168.1.0/24", True, "")
                        }
-
+        self.desc_PARAMS = desc_PARAMS
         self.netmap = netmap
-        self.logger = logger
+
         self.set_params(params)
+
+    def get_cmd(self):
+        return self.CMD
+
+    def get_params(self):
+        return self.params, self.PARAMS, self.desc_PARAMS
 
     def set_params(self, params):
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
@@ -27,11 +39,11 @@ class AModNmapExplorer(ActiveModule):
         if isinstance(script_output[0], int):
             code, popen = script_output
             output = popen.stdout.read()
-            print(f"Module [{self.m_id}] execution returned (code {code}):\n{output}")
+            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution returned (code {code}):\n{output}")
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             py_except, popen = script_output
-            print(f"Module [{self.m_id}] execution raised exception :{py_except}")
+            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution raised exception :{py_except}")
 
     def launch(self):
         super().purge_threadlist()
@@ -52,7 +64,7 @@ class AModNmapExplorer(ActiveModule):
         return 60
 
     def get_description(self):
-        return f"[{self.m_id}] Nmap scan to discover hosts by SYN/UDP probing on common ports (need sudo)"
+        return f"[{self.m_id}] Nmap scan to discover hosts (-sn mode) by SYN/UDP probing on common ports (need sudo)"
 
     def get_module_id(self):
         return self.m_id

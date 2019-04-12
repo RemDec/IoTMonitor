@@ -1,18 +1,26 @@
 from abcActiveModule import *
+# import logging is done in superclass abcModule
 
 
 class AModNameMod(ActiveModule):
 
-    def __init__(self, params=None, netmap=None, logger=None):
+    def __init__(self, params=None, netmap=None):
         super().__init__()
         self.m_id = "default"
         self.CMD = ""
         self.PARAMS = {}
-        # where one param <-> (defaultValue, isMandatory, prefix)
+        # where mapping param_name -> (defaultValue, isMandatory, prefix)
+        self.desc_PARAMS = {}
+        # where mapping param_name -> string_description
         self.netmap = netmap
-        self.logger = logger
 
         self.set_params(params)
+
+    def get_cmd(self):
+        return self.CMD
+
+    def get_params(self):
+        return self.params, self.PARAMS, self.desc_PARAMS
 
     def set_params(self, params):
         # fix missing execution params with defaults
@@ -29,20 +37,21 @@ class AModNameMod(ActiveModule):
             code, popen = script_output
             output = popen.stdout.read()
             # if code OK, should parse results to integrate in app (netmap, alert threats, ..)
-            print(f"Module [{self.m_id}] execution returned (code {code}):\n{output}")
+            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution returned (code {code}):\n{output}")
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             # pull info from exception
             py_except, popen = script_output
-            print(f"Module [{self.m_id}] execution raised exception :{py_except}")
+            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution raised exception :{py_except}")
 
     def launch(self):
         super().purge_threadlist()
-        # start a thread for cmd + params execution
         cmd = [self.CMD]
         for param, val in self.params.items():
             # getting potential prefix and appending cmd arg value (-flag val)
             cmd.append(self.PARAMS[param][2] + val)
+
+        # start a thread for cmd + params execution
         s_thread = self.get_script_thread()
         s_thread.start(cmd)
         super().register_thread(s_thread)
@@ -55,7 +64,7 @@ class AModNameMod(ActiveModule):
         return ScriptThread(callback_fct=self.distrib_output, max_exec_time=60)
 
     def get_default_timer(self):
-        # how frequent should execute in routine
+        # how frequent should be executed in automated queue of routine
         return 60
 
     def get_description(self):

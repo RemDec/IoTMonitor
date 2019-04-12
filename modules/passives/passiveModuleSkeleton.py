@@ -3,20 +3,27 @@ from abcPassiveModule import *
 
 class PModNameMod(PassiveModule):
 
-    def __init__(self, params=None, timer=None, netmap=None, logger=None):
+    def __init__(self, params=None, timer=None, netmap=None):
         super().__init__()
         self.m_id = "default"
         self.CMD = ""
         self.PARAMS = {}
-        # where one param <-> (defaultValue, isMandatory, prefix)
+        # where mapping param_name -> (defaultValue, isMandatory, prefix)
+        self.desc_PARAMS = {}
+        # where mapping param_name -> string_description
         self.read_interval = 60
         # time between each reading on the output of background subprocess running cmd
 
         self.timer = timer
         self.netmap = netmap
-        self.logger = logger
 
         self.set_params(params)
+
+    def get_cmd(self):
+        return self.CMD
+
+    def get_params(self):
+        return self.params, self.PARAMS, self.desc_PARAMS
 
     def set_params(self, params):
         # fix missing execution params with defaults
@@ -40,7 +47,7 @@ class PModNameMod(PassiveModule):
 
     def distrib_output(self, buffer_read):
         # do some work with output of bg process (parsing, filling netmap, ..)
-        print("Data to treat ->", buffer_read.decode())
+        logging.getLogger("debug").debug("Data to treat ->", buffer_read.decode())
 
     def launch(self, output_stream=None, read_interv=0):
         # spawn 2 threads: bg managing subprocess cmd and comm pulling and treating its output

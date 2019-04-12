@@ -145,7 +145,7 @@ if __name__ == '__main__':
     panel.resume()
     for i in range(10):
         sleep(1)
-        print(panel.detail_str(level=2))
+        print(panel.detail_str(level=1))
     panel.pause()
     timer.stop()
     sleep(2)

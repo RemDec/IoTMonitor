@@ -1,18 +1,26 @@
 from abcActiveModule import *
+# permits CLI arguments smart parsing
 import shlex
 
 
 class AModArbitraryCmd(ActiveModule):
 
-    def __init__(self, params=None, netmap=None, logger=None):
+    def __init__(self, params=None, netmap=None):
         super().__init__()
         self.m_id = "arbcmd"
         self.PARAMS = {"prog": ("echo", True, ""),
                        "args": ("No or bad command given to arbitrary module [arbcmd]", False, "")}
+        self.desc_PARAMS = {"prog": "A command to execute available on the system",
+                            "args": "CLI arguments to pass as one string (all in it)"}
         self.netmap = netmap
-        self.logger = logger
 
         self.set_params(params)
+
+    def get_cmd(self):
+        return "arbitrary"
+
+    def get_params(self):
+        return self.params, self.PARAMS, self.desc_PARAMS
 
     def set_params(self, params):
         # fix missing execution params with defaults
@@ -27,12 +35,12 @@ class AModArbitraryCmd(ActiveModule):
             code, popen = script_output
             output = popen.stdout.read()
             # if code OK, should parse results to integrate in app (netmap, alert threats, ..)
-            print(f"Module [{self.m_id}] arbitrary execution of {popen.args} returned (code {code}):\n{output}")
+            logging.getLogger("debug").debug(f"Module [{self.m_id}] arbitrary execution of {popen.args} returned (code {code}):\n{output}")
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             # pull info from exception
             py_except, popen = script_output
-            print(f"Module [{self.m_id}] execution raised exception : {py_except}")
+            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution raised exception : {py_except}")
 
     def launch(self):
         # start a thread for cmd + params execution
