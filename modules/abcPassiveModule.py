@@ -1,8 +1,9 @@
-from abcModule import *
-from utils.timer import *
-from utils.misc_fcts import get_infoname_py
+from modules.abcModule import *
+from src.utils.timer import *
+from src.utils.misc_fcts import get_infoname_py
 from time import sleep
-import threading, subprocess
+import threading
+import subprocess
 
 
 class PassiveModule(Module):
@@ -214,7 +215,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
             # ended treatment, wait next trigger
             self.read_t = self.init_read_t
             self.must_read = True
-        if not(new_dumb_thread):
+        if not new_dumb_thread:
             # we are at the end of dumb decr() thread
             self.decr_threads.remove(threading.current_thread())
 

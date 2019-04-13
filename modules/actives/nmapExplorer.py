@@ -1,4 +1,4 @@
-from abcActiveModule import *
+from modules.abcActiveModule import *
 
 
 desc_PARAMS = {"IP": "Target IP adress(es) acceptable as Nmap syntax",

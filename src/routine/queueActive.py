@@ -1,5 +1,5 @@
-from utils.timer import *
-from utils.misc_fcts import str_frame, str_multiframe
+from src.utils.timer import *
+from src.utils.misc_fcts import str_frame, str_multiframe
 
 
 class Queue(TimerInterface):
@@ -165,8 +165,8 @@ class QueueEntry:
 if __name__=="__main__":
     q = Queue()
     print(q)
-    from actives.nmapExplorer import *
-    from actives.arbitraryCmd import *
+    from modules.actives.nmapExplorer import *
+    from modules.actives.arbitraryCmd import *
 
     nmap = AModNmapExplorer()
     sleep = AModArbitraryCmd({"prog": "sleep", "args": "5"})

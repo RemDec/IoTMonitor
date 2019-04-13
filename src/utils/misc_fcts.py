@@ -1,3 +1,6 @@
+#from modules.actives import *
+#from modules.passives import *
+#from src.utils.moduleManager import *
 
 def has_method(obj, name):
     """Look if obj contains a definition for function name
@@ -79,6 +82,23 @@ def str_multiframe(str_to_frame):
     return '\n'.join([top] + adjusted + [bot])
 
 
+def get_root_path():
+    """Get absolute path root for this project in the system
+
+    """
+    from pathlib import Path
+    return Path(__file__).parent.parent.parent
+
+
+def write_modlib(file_dest=None):
+    if file_dest is None:
+        file_dest = get_root_path() / 'svd' / 'configs' / 'modlib.xml'
+    actives = [arbitraryCmd.AModArbitraryCmd(), nmapExplorer.AModNmapExplorer()]
+    passives = [arbitraryCmdBg.PModArbitraryCmdBg(), pingTarget.PModPing()]
+    mod_instances = actives + passives
+    ModManager().create_modlib(mod_instances)
+
+
 if __name__ == '__main__':
     print(str_frame("simple|frame"))
     print(str_frame("test with \n carriage"))
@@ -92,3 +112,5 @@ if __name__ == '__main__':
     default = {'par1': ("par1val", True, ""), 'par2': ("par2val", False, ""), 'par3': ("par3val", False, "")}
     given = {'par1':"new_val1", 'par3': "new_val3", 'unknown': "val"}
     print("\n\nSee used parameters\n", str_param_comp(default, given))
+
+    write_modlib()

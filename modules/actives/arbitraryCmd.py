@@ -1,4 +1,4 @@
-from abcActiveModule import *
+from modules.abcActiveModule import *
 # permits CLI arguments smart parsing
 import shlex
 

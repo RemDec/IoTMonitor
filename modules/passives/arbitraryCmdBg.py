@@ -1,4 +1,4 @@
-from abcPassiveModule import *
+from modules.abcPassiveModule import *
 import shlex
 
 
@@ -78,7 +78,7 @@ class PModArbitraryCmdBg(PassiveModule):
         return self.m_id
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     cmd = PModArbitraryCmdBg()
     bg_thread, comm_thread = cmd.launch(read_interv=2)
     import time

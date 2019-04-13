@@ -1,4 +1,4 @@
-from abcPassiveModule import *
+from modules.abcPassiveModule import *
 import shlex
 
 desc_PARAMS = {"IP": "Target IP adress(es) in ping command syntax",
@@ -13,10 +13,10 @@ class PModPing(PassiveModule):
         super().__init__()
         self.m_id = "pingit"
         self.CMD = "ping"
-        self.PARAMS = { "nbr": ("", False, "-c"),
-                        "interv": ("", False, "-i"),
-                        "divargs": ("", False, ""),
-                        "IP": ("192.168.1.1", True, "")}
+        self.PARAMS = {"nbr": ("", False, "-c"),
+                       "interv": ("", False, "-i"),
+                       "divargs": ("", False, ""),
+                       "IP": ("192.168.1.1", True, "")}
         self.desc_PARAMS = desc_PARAMS
         self.read_interval = read_interval
         self.timer = timer

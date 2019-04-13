@@ -1,4 +1,4 @@
-from abcPassiveModule import *
+from modules.abcPassiveModule import *
 
 
 class PModNameMod(PassiveModule):

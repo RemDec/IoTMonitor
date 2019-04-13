@@ -1,6 +1,6 @@
 from src.routine.panelPassive import *
 from src.routine.queueActive import *
-from modules.abcModule import *
+
 
 class Routine:
 
@@ -104,7 +104,7 @@ class Routine:
         return self.detail_str()
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     from modules.actives.nmapExplorer import *
     from modules.passives.pingTarget import *
     from src.utils.timer import *

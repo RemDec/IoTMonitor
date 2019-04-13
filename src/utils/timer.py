@@ -1,4 +1,5 @@
 import abc
+import logging
 from threading import Thread
 from time import sleep
 from src.utils.misc_fcts import has_method
@@ -45,7 +46,7 @@ class TimerThread(Thread):
         while not self.stopped:
             sleep(self.t)
             self.decr_all()
-        print("End of timer running loop", self)
+        logging.getLogger("debug").debug("End of timer running loop" + str(self))
 
     def start(self):
         # overriding super method to avoid confusion of calling super.start() only (doesn't launch timer correctly)

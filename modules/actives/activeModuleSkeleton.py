@@ -1,4 +1,4 @@
-from abcActiveModule import *
+from modules.abcActiveModule import *
 # import logging is done in superclass abcModule
 
 

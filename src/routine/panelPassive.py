@@ -127,6 +127,7 @@ class PanelEntry:
 
 if __name__ == '__main__':
     from modules.passives.pingTarget import *
+    from src.utils.timer import *
     panel = Panel()
     timer = TimerThread()
     ping = PModPing(timer=timer)

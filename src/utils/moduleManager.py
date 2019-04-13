@@ -1,9 +1,9 @@
 from modules.abcModule import *
 from lxml import etree
 from lxml.builder import E
-from utils.misc_fcts import str_param_comp
+from src.utils.misc_fcts import str_param_comp, get_root_path
 
-default_libfile = "../modules/modules_descriptor.xml"
+default_libfile = get_root_path() / 'svd' / 'configs' / 'modlib.xml'
 
 
 class ModManager:

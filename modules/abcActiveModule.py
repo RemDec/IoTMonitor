@@ -1,6 +1,7 @@
-from abcModule import *
+from modules.abcModule import *
 from src.utils.misc_fcts import get_infoname_py
-import threading, subprocess
+import threading
+import subprocess
 
 
 class ActiveModule(Module):

@@ -1,6 +1,6 @@
 import logging
 import logging.config
-from utils.misc_fcts import replace_in_dicts
+from src.utils.misc_fcts import replace_in_dicts
 
 
 class Logger:
