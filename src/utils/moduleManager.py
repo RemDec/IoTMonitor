@@ -8,18 +8,23 @@ default_libfile = get_root_path() / 'svd' / 'configs' / 'modlib.xml'
 
 class ModManager:
 
-    def __init__(self, modlib_file=default_libfile, load_direct=False):
+    def __init__(self, modlib_file=str(default_libfile), load_direct=False):
         self.modlib_file = modlib_file
         self.available_mods = []
         if load_direct:
             self.load_modlib()
 
     def create_modlib(self, modlist=[], include_nondefault_param=False):
-        tree = etree.ElementTree(E.modlib())
+        actives = E.actives()
+        passives = E.passives()
+        tree = etree.ElementTree(E.modlib(actives, passives))
         for mod_instance in modlist:
             mod_desc = ModDescriptor(mod_inst=mod_instance, include_nondefault_param=include_nondefault_param)
             entry = mod_desc.modinfos_to_xml(include_nondefault_param=include_nondefault_param)
-            tree.getroot().append(entry)
+            if mod_desc.m_active:
+                actives.append(entry)
+            else:
+                passives.append(entry)
             self.available_mods.append(mod_desc)
         tree.write(self.modlib_file, pretty_print=True, xml_declaration=True)
 
@@ -46,7 +51,8 @@ class ModManager:
     def clear_modlib(self):
         self.available_mods.clear()
 
-    def get_mod_from_desc(self, id):
+    def get_mod_from_id(self, id):
+        # from mod_id and current module descriptors list, instantiate a fresh module instance
         for mod_desc in self.available_mods:
             if mod_desc.m_id == id:
                 return mod_desc.get_mod_instance()
@@ -66,8 +72,17 @@ class ModManager:
         return ModDescriptor(mod_inst=mod_instance).modinfos_to_xml(include_nondefault_param=keep_params)
 
     def modconfig_to_xml(self, mod_instance, set_id=None):
-        # generate xml struct with module proper identifier and used params on it, to reinstance later
+        # generate xml struct with module proper identifier and used params on it (not all general), to reinstance later
         return ModDescriptor(mod_inst=mod_instance).modconfig_to_xml(set_id)
+
+    def modinst_from_modconfig(self, xml_config):
+        # instanciate a module from its id and set params in config
+        mod_desc = ModDescriptor()
+        mod_desc.parse_modconfig(xml_config)
+        if self.is_available(mod_desc.m_id):
+            mod_inst = self.get_mod_from_id(mod_desc.m_id)
+            mod_inst.set_params(mod_desc.curr_params)
+            return mod_inst, mod_desc.setid
 
     def get_all_desc(self):
         # return a list with all module descriptors of registered modules in modlib_file
@@ -87,6 +102,7 @@ class ModDescriptor:
     def __init__(self, mod_inst=None, xml_tree=None, include_nondefault_param=False):
         self.m_id = "unknown"
         self.m_active = False
+        self.setid = "unknown"
         self.txt_desc = "No module description provided"
         self.cmd = "unknown"
         self.def_timer = -1
@@ -176,7 +192,7 @@ class ModDescriptor:
         # modconfig is a save of parameters for a module, including the unique id of this module and
         # setid, permitting to reinstanciate it if we have the corresp mod_id class (need pymod pyclass
         # defined in self in addition to do it with self.get_mod_instance())
-        self.mod_id = xml_tree.get("modid")
+        self.m_id = xml_tree.get("modid")
         self.setid = xml_tree.get("setid")
         self.parse_savedparam(xml_tree)
 

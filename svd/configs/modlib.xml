@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='ASCII'?>
+<modlib>
+  <actives>
+    <actmod modid="arbcmd" pymod="modules.actives.arbitraryCmd" pyclass="AModArbitraryCmd">
+      <desc>[arbcmd] Blackbox module executing any command given</desc>
+      <defparams>
+        <param code="prog" mandatory="True" default="echo" prefix="">A command to execute available on the system</param>
+        <param code="args" mandatory="False" default="No or bad command given to arbitrary module [arbcmd]" prefix="">CLI arguments to pass as one string (all in it)</param>
+      </defparams>
+      <savedparams/>
+      <dependencies/>
+    </actmod>
+    <actmod modid="nmapexplo" pymod="modules.actives.nmapExplorer" pyclass="AModNmapExplorer">
+      <desc>[nmapexplo] Nmap scan to discover hosts (-sn mode) by SYN/UDP probing on common ports (need sudo)</desc>
+      <defparams>
+        <param code="options" mandatory="False" default="" prefix="">other options compatible with -sn to pass to nmap</param>
+        <param code="SYNports" mandatory="True" default="21,22,23,80,443,3389" prefix="-PS">Ports targeted for SYN probing</param>
+        <param code="UDPports" mandatory="True" default="53,135,137,161" prefix="-PU">Ports targeted for UDP probing</param>
+        <param code="IP" mandatory="True" default="192.168.1.0/24" prefix="">Target IP adress(es) acceptable as Nmap syntax</param>
+      </defparams>
+      <savedparams/>
+      <dependencies/>
+    </actmod>
+  </actives>
+  <passives>
+    <passmod modid="arbcmd_bg" pymod="modules.passives.arbitraryCmdBg" pyclass="PModArbitraryCmdBg">
+      <desc>[arbcmd_bg] Blackbox module executing a given program with constant output in background</desc>
+      <defparams>
+        <param code="prog" mandatory="True" default="watch" prefix="">A command to execute available on the system</param>
+        <param code="args" mandatory="False" default="-t -n1 echo repeated_text_default_arbcmd_bg" prefix="">CLI arguments to pass as one string (all in it)</param>
+      </defparams>
+      <savedparams/>
+      <dependencies/>
+    </passmod>
+    <passmod modid="pingit" pymod="modules.passives.pingTarget" pyclass="PModPing">
+      <desc>[pingit] Module pinging constantly a given target</desc>
+      <defparams>
+        <param code="nbr" mandatory="False" default="" prefix="-c">Integer if should ping limited times</param>
+        <param code="interv" mandatory="False" default="" prefix="-i">Interval between each ping</param>
+        <param code="divargs" mandatory="False" default="" prefix="">Other acceptable args for ping command</param>
+        <param code="IP" mandatory="True" default="192.168.1.1" prefix="">Target IP adress(es) in ping command syntax</param>
+      </defparams>
+      <savedparams/>
+      <dependencies/>
+    </passmod>
+  </passives>
+</modlib>
