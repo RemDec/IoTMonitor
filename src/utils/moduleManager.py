@@ -1,9 +1,9 @@
-from modules.abcModule import *
 from lxml import etree
 from lxml.builder import E
-from src.utils.misc_fcts import str_param_comp, get_root_path
+from src.utils.misc_fcts import str_param_comp
+from src.utils.filesManager import get_dflt_entry
 
-default_libfile = get_root_path() / 'svd' / 'configs' / 'modlib.xml'
+default_libfile = get_dflt_entry("lib")
 
 
 class ModManager:
@@ -87,6 +87,11 @@ class ModManager:
     def get_all_desc(self):
         # return a list with all module descriptors of registered modules in modlib_file
         return self.available_mods
+
+    def list_all_modid(self):
+        act = [desc.m_id for desc in self.available_mods if desc.m_active]
+        pas = [desc.m_id for desc in self.available_mods if not desc.m_active]
+        return act, pas
 
 
 class ModDescriptor:

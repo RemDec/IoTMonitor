@@ -3,9 +3,8 @@ from src.utils.misc_fcts import str_frame
 
 class Panel:
 
-    def __init__(self, netmap=None, logger=None):
+    def __init__(self, netmap=None):
         self.netmap = netmap
-        self.logger = logger
 
         self.set = []
         self.is_running = False

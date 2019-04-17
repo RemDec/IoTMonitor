@@ -4,10 +4,9 @@ from src.utils.misc_fcts import str_frame, str_multiframe
 
 class Queue(TimerInterface):
 
-    def __init__(self, timer=None, netmap=None, logger=None):
+    def __init__(self, timer=None, netmap=None):
         self.timer = timer
         self.netmap = netmap
-        self.logger = logger
 
         self.set = []
         self.is_running = False
@@ -63,7 +62,7 @@ class Queue(TimerInterface):
         self.timer.subscribe(self)
         self.is_running = True
 
-    def pause(self, kill_thmods=False):
+    def pause(self, kill_thmods=True):
         # for queue pause means stop decrementing launching countdown, kill_thmods kill also threads launched newly
         self.is_running = False
         if kill_thmods:

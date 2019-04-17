@@ -4,10 +4,10 @@ from src.routine.queueActive import *
 
 class Routine:
 
-    def __init__(self, modules=[], timer=None, netmap=None, logger=None):
+    def __init__(self, modules=[], timer=None, netmap=None):
         self.MAX_ID_LGTH = 15
-        self.panel = Panel(netmap, logger)
-        self.queue = Queue(timer=timer, netmap=netmap, logger=logger)
+        self.panel = Panel(netmap=netmap)
+        self.queue = Queue(timer=timer, netmap=netmap)
         # routine is running if at least panel or queue is running
         self.is_running = False
         self.add_modules(modules)
@@ -32,8 +32,23 @@ class Routine:
                 mod, id, interv = any_mod
                 self.add_module(mod, id, 0 if interv is None else interv)
 
-    def remove_module(self, mod):
-        return self.get_corresp_set(mod).remove_module(mod)
+    def remove_module(self, setid_or_mod):
+        return self.get_corresp_set(setid_or_mod).remove_module(setid_or_mod)
+
+    def get_mod_by_setid(self, setid):
+        mod_inst = self.panel.get_mod_by_id(setid)
+        if mod_inst is not None:
+            return mod_inst
+        mod_inst = self.queue.get_mod_by_id(setid)
+        return mod_inst
+
+    def change_mod_params(self, setid, new_params):
+        set = self.get_corresp_set(setid)
+        if set is not None:
+            mod = set.get_mod_by_id(setid)
+            mod.pause()
+            mod.set_params(new_params)
+            mod.launch()
 
     def pause(self, kill_thpanel=True, kill_thqueue=False):
         # can pause whatever is running or not, worst case it does nothing because no module thread alive
@@ -49,6 +64,36 @@ class Routine:
             self.queue.resume()
         self.is_running = True
 
+    def stop(self):
+        # stop all threads activity
+        self.pause(kill_thpanel=True, kill_thqueue=True)
+
+    def pause_it(self, target):
+        t = self.str_to_target(target)
+        t.pause()
+        self.correct_state()
+
+    def resume_it(self, target):
+        t = self.str_to_target(target)
+        if not t.is_running:
+            t.pause()
+            self.correct_state()
+
+    # --- Internal methods and misc ---
+
+    def get_corresp_set(self, mod):
+        # Get which structure is/should be module in, where module either setid or module instance.
+        if isinstance(mod, str):
+            mod_inst = self.queue.get_mod_by_id(mod)
+            if mod_inst is not None:
+                return self.queue
+            mod_inst = self.panel.get_mod_by_id(mod)
+            if mod_inst is not None:
+                return self.panel
+            else:
+                return None
+        return self.queue if mod.is_active() else self.panel
+
     def str_to_target(self, s):
         if s == "routine":
             return self
@@ -59,16 +104,6 @@ class Routine:
 
     def correct_state(self):
         self.is_running = self.panel.is_running or self.queue.is_running
-
-    def pause_it(self, target):
-        t = self.str_to_target(target)
-        t.pause()
-        self.correct_state()
-
-    # --- Internal methods and misc ---
-
-    def get_corresp_set(self, mod):
-        return self.queue if mod.is_active() else self.panel
 
     def check_unique_ids(self):
         # unique ids are guaranteed in each set, but not crossing both
@@ -110,7 +145,7 @@ if __name__ == '__main__':
     from src.utils.timer import *
     from src.utils.logger import *
 
-    Logger("../../svd/configs/default_logger.yaml")
+    Logger()
     t = TimerThread()
     nmap = AModNmapExplorer()
     ping = PModPing(timer=t)
@@ -122,6 +157,6 @@ if __name__ == '__main__':
         sleep(5)
         logging.getLogger("debug").debug(f"\n##########################\n{rout.detail_str(level=1)}")
     logging.getLogger("debug").debug(f"\n\n########## Before Pausing ##########\n{rout.detail_str(2)}")
-    rout.pause()
+    rout.stop()
     t.stop()
     logging.getLogger("debug").debug(f"\n\n########## Paused ##########\n{rout.detail_str(2)}")
