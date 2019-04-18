@@ -21,15 +21,19 @@ class Core:
 
     # ----- Modules library interactions -----
 
-    def create_module(self, mod_id):
+    def instantiate_module(self, mod_id):
         return self.modmanager.get_mod_from_id(mod_id)
 
-    def get_available_mods(self):
+    def get_available_mods(self, stringed=False):
+        # All modules referenced by current used modules library
+        if stringed:
+            actives, passives = self.modmanager.list_all_modid()
+            return f"Actives : {actives} | Passives : {passives}"
         return self.modmanager.get_all_desc()
 
     # ----- Independant running modules -----
 
-    def launch_indep_module(self, new_module, launch_it=True):
+    def add_indep_module(self, new_module, launch_it=True):
         self.indep_mods.append(new_module)
         if launch_it:
             new_module.launch()
@@ -48,7 +52,7 @@ class Core:
 
     def add_to_routine(self, id_or_mod, given_setid=None, given_timer=None):
         if isinstance(id_or_mod, str):
-            id_or_mod = self.create_module(id_or_mod)
+            id_or_mod = self.instantiate_module(id_or_mod)
         self.routine.add_module(id_or_mod, given_setid, given_timer)
 
     def change_mod_params(self, setid, new_params):
@@ -96,7 +100,7 @@ class Core:
 
     # ----- Utilities -----
 
-    def interrupt_handler(self, sig, frame):
+    def quit(self):
         if self.timer is not None:
             self.timer.stop()
         if self.indep_mods is not None:
@@ -104,14 +108,17 @@ class Core:
         if self.routine is not None:
             self.routine.stop()
 
+    def interrupt_handler(self, sig, frame):
+        self.quit()
+
     def __str__(self):
         actives, passives = self.modmanager.list_all_modid()
         indeps = [mod.m_id for mod in self.indep_mods]
         s = f"=++====== Core application =========\n"
         s += f" || Using logger {self.logger}\n"
         s += f" || Main timer : {self.timer}\n"
-        s += f" || Available AModules : {','.join(actives)}\n"
-        s += f" || Available PModules : {','.join(passives)}\n"
+        s += f" || Available AModules : {', '.join(actives)}\n"
+        s += f" || Available PModules : {', '.join(passives)}\n"
         s += f" || Routine independent modules added :\n || {','.join(indeps)}\n"
         s += f" ++------- ROUTINE -------\n"
         s += f"{self.routine.detail_str()}"

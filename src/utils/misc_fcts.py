@@ -23,7 +23,11 @@ def str_param_comp(defaults, current):
     s = ""
     for code, (defval, mand, pref) in defaults.items():
         mand = "T" if mand else "F"
-        s += f"~{code}({mand}): {pref} {defval}"
+        defval = "[empty default value]" if defval == "" else defval
+        if pref != "":
+            s += f"~{code}({mand}): {pref} {defval}"
+        else:
+            s += f"~{code}({mand}): {defval}"
         repl = current.get(code)
         if repl is not None:
             s += f" but current value {repl}"

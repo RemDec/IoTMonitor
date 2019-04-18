@@ -8,7 +8,9 @@ dflt_dirs = {
                     "logs": 'logs',
                     "configs": 'svd/configs',
                     "netmaps": 'svd/netmaps',
-                    "routines": 'svd/routines'
+                    "routines": 'svd/routines',
+                    "tests": 'tests',
+                    "div_outputs": 'tests/test_outputs'
                 }
 
 dflt_files = {
@@ -17,8 +19,10 @@ dflt_files = {
             }
 
 
-def get_dflt_entry(index):
-    return FilesManager().get_res_path(index)
+def get_dflt_entry(index, suffix=None):
+    if suffix is None:
+        return FilesManager().get_res_path(index)
+    return str(Path(FilesManager().get_res_path(index)) / suffix)
 
 
 class FilesManager:

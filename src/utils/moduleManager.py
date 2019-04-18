@@ -34,7 +34,7 @@ class ModManager:
         with open(self.modlib_file, 'r') as f:
             tree = etree.parse(f)
         root = tree.getroot()
-        infoslist = root.findall("actmod") + root.findall("passmod")
+        infoslist = root.find("actives").findall("actmod") + root.find("passives").findall("passmod")
         for mod in infoslist:
             self.available_mods.append(ModDescriptor(xml_tree=mod))
 
@@ -185,6 +185,8 @@ class ModDescriptor:
 
     def parse_modinfos(self, xml_tree, saved_params=True):
         # xml sign should be element 'actmod' or 'passmod' as returned by modinfos_xml()
+        if xml_tree.tag == "actmod":
+            self.m_active = True
         self.m_id = xml_tree.get("modid")
         self.pymod = xml_tree.get("pymod")
         self.pyclass = xml_tree.get("pyclass")
@@ -244,7 +246,7 @@ if __name__ == '__main__':
     from modules.actives.nmapExplorer import *
     nmap = AModNmapExplorer(params={"IP": "MODIFIED PARAM"})
     desc = ModDescriptor(mod_inst=nmap, include_nondefault_param=True)
-    print(f"Got descriptor :\n{desc}")
+    print(f"## Got descriptor from nmap instance : ##\n{desc}")
     nmap2 = desc.get_mod_instance()
     print(f"Parameters of instance from desc :\n{nmap2.params}")
     nmap2 = desc.get_mod_instance(default_params=False)
@@ -255,7 +257,7 @@ if __name__ == '__main__':
 
     from modules.passives.pingTarget import *
     ping = PModPing()
-    manager = ModManager("test.xml")
+    manager = ModManager(get_dflt_entry("div_outputs", suffix="test.xml"))
     manager.create_modlib([nmap, nmap2, ping], True)
     manager.load_modlib()
     print("## Create and reload modlib ##")
