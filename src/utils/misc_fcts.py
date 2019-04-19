@@ -63,7 +63,7 @@ def str_frame(str_to_frame):
     """
     str_to_frame = f"| {str_to_frame} |"
     lim = bound_frame(str_to_frame)
-    return f"{lim}\n{str_to_frame}\n{lim}"
+    return f"{lim}\n{str_to_frame}\n{lim}\n"
 
 
 def str_multiframe(str_to_frame):
@@ -80,7 +80,7 @@ def str_multiframe(str_to_frame):
     adjusted = [f"| {line}{' '*(max_l-len(line))} |" for line in sep]
     top = bound_frame(adjusted[0])
     bot = bound_frame(adjusted[-1])
-    return '\n'.join([top] + adjusted + [bot])
+    return '\n'.join([top] + adjusted + [bot]) + '\n'
 
 
 def get_root_path():

@@ -249,7 +249,9 @@ class CommunicationThread(threading.Thread, TimerInterface):
         self.must_read = run
         if run:
             if self.timer is None:
-                self.timer = TimerThread(autostart=True)
+                logging.getLogger("debug").warning(f"No timer provided to comm thread {self}")
+                self.timer = TimerThread(autostart=True, name="InstantiatedTimer")
+            print("ALLO", self.timer)
             self.timer.subscribe(self)
 
     def interrupt(self):

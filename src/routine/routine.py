@@ -46,7 +46,7 @@ class Routine:
         set = self.get_corresp_set(setid)
         if set is not None:
             mod = set.get_mod_by_id(setid)
-            mod.pause()
+            mod.stop()
             mod.set_params(new_params)
             mod.launch()
 
@@ -131,7 +131,7 @@ class Routine:
 
     def detail_str(self, level=0):
         s = f"\nRoutine in current state : {'RUNNING' if self.is_running else 'PAUSED'}\n" \
-            f"\n      <[[ CURRENT PANEL ]]>\n{self.panel.detail_str(level)}\n" \
+            f"\n      <[[ CURRENT PANEL ]]>\n{self.panel.detail_str(level)}" \
             f"\n      <[[ CURRENT QUEUE ]]>\n{self.queue.detail_str(level)}"
         return s
 

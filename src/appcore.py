@@ -11,7 +11,7 @@ class Core:
         signal.signal(signal.SIGINT, self.interrupt_handler)
         self.modmanager = ModManager()
         self.timer = TimerThread()
-        self.netmap = []
+        self.netmap = ["Virtual Instances"]
         self.routine = Routine(timer=self.timer, netmap=self.netmap)
         self.logger = Logger() if logger is None else logger
 
@@ -22,7 +22,7 @@ class Core:
     # ----- Modules library interactions -----
 
     def instantiate_module(self, mod_id):
-        return self.modmanager.get_mod_from_id(mod_id)
+        return self.modmanager.get_mod_from_id(mod_id, timer=self.timer, netmap=self.netmap)
 
     def get_available_mods(self, stringed=False):
         # All modules referenced by current used modules library
@@ -64,8 +64,14 @@ class Core:
     def remove_from_routine(self, setid_or_mod):
         return self.routine.remove_module(setid_or_mod)
 
+    def pause(self):
+        self.routine.pause()
+
     def pause_it(self, target):
         self.routine.pause_it(target)
+
+    def resume(self):
+        self.routine.resume()
 
     def resume_it(self, target):
         self.routine.resume_it(target)
@@ -120,7 +126,7 @@ class Core:
         s += f" || Available AModules : {', '.join(actives)}\n"
         s += f" || Available PModules : {', '.join(passives)}\n"
         s += f" || Routine independent modules added :\n || {','.join(indeps)}\n"
-        s += f" ++------- ROUTINE -------\n"
+        s += f" ++------- ROUTINE -------"
         s += f"{self.routine.detail_str()}"
         s += f" ||\n ++------- NETMAP -------\n"
         s += f"{str(self.netmap)}"

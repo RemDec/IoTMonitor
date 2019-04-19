@@ -51,11 +51,11 @@ class ModManager:
     def clear_modlib(self):
         self.available_mods.clear()
 
-    def get_mod_from_id(self, id):
+    def get_mod_from_id(self, id, timer=None, netmap=None):
         # from mod_id and current module descriptors list, instantiate a fresh module instance
         for mod_desc in self.available_mods:
             if mod_desc.m_id == id:
-                return mod_desc.get_mod_instance()
+                return mod_desc.get_mod_instance(timer=timer, netmap=netmap)
 
     def is_available(self, mod_id, reload_lib=False):
         # check for presence and dependencies of the given module
@@ -222,9 +222,13 @@ class ModDescriptor:
 
     # ----- To module instance -----
 
-    def get_mod_instance(self, default_params=True):
+    def get_mod_instance(self, default_params=True, timer=None, netmap=None):
         from importlib import import_module
-        mod_inst = getattr(import_module(self.pymod), self.pyclass)()
+        modclass = getattr(import_module(self.pymod), self.pyclass)
+        if self.m_active:
+            mod_inst = modclass(netmap=netmap)
+        else:
+            mod_inst = modclass(timer=timer, netmap=netmap)
         if default_params:
             return mod_inst
         mod_inst.set_params(self.curr_params)

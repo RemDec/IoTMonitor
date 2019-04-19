@@ -58,7 +58,7 @@ class AModNmapExplorer(ActiveModule):
         super().terminate_threads()
 
     def get_script_thread(self):
-        return ScriptThread(callback_fct=self.distrib_output, max_exec_time=60)
+        return ScriptThread(callback_fct=self.distrib_output, max_exec_time=10)
 
     def get_default_timer(self):
         return 60

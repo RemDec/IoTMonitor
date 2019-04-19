@@ -35,7 +35,7 @@ class AModArbitraryCmd(ActiveModule):
             code, popen = script_output
             output = popen.stdout.read()
             # if code OK, should parse results to integrate in app (netmap, alert threats, ..)
-            logging.getLogger("debug").debug(f"Module [{self.m_id}] arbitrary execution of {popen.args} returned (code {code}):\n{output}")
+            logging.getLogger("debug").debug(f"Module [{self.m_id}] arbitrary execution of {' '.join(popen.args)} returned (code {code}):\n{output}")
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             # pull info from exception
