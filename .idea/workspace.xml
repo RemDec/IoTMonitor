@@ -2,15 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="918ec42b-cf6e-41c1-817f-810176477867" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/abcActiveModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/abcActiveModule.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/abcPassiveModule.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/abcPassiveModule.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/actives/activeModuleSkeleton.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/actives/activeModuleSkeleton.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/actives/arbitraryCmd.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/actives/arbitraryCmd.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/modules/actives/nmapExplorer.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/actives/nmapExplorer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/appcore.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/appcore.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routine/routine.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/routine/routine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/misc_fcts.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/misc_fcts.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/moduleManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/moduleManager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/appcorerun.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/appcorerun.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/passives/arbitraryCmdBg.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/passives/arbitraryCmdBg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/passives/passiveModuleSkeleton.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/passives/passiveModuleSkeleton.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/passives/pingTarget.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/passives/pingTarget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/appCLI.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/appCLI.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,85 +20,17 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/utils/moduleManager.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="540">
-                  <caret line="57" column="69" selection-start-line="57" selection-start-column="69" selection-end-line="57" selection-end-column="69" />
-                  <folding>
-                    <element signature="e#0#22#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/modules/abcActiveModule.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="709">
-                  <caret line="80" column="34" selection-start-line="80" selection-start-column="34" selection-end-line="80" selection-end-column="34" />
-                  <folding>
-                    <element signature="e#0#31#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/modules/abcPassiveModule.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="709">
-                  <caret line="253" column="26" selection-start-line="253" selection-start-column="26" selection-end-line="253" selection-end-column="26" />
-                  <folding>
-                    <element signature="e#0#31#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/tests/appcorerun.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="465">
-                  <caret line="31" column="28" selection-start-line="31" selection-start-column="28" selection-end-line="31" selection-end-column="28" />
-                  <folding>
-                    <element signature="e#0#25#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/appcore.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="105">
-                  <caret line="13" column="41" selection-start-line="13" selection-start-column="41" selection-end-line="13" selection-end-column="41" />
-                  <folding>
-                    <element signature="e#0#33#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/modules/passives/pingTarget.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="75">
-                  <caret line="12" column="26" lean-forward="true" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/appCLI.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="165">
+              <caret line="11" column="29" lean-forward="true" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -139,7 +72,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/appCLI.py" />
         <option value="$PROJECT_DIR$/src/parserCLI.py" />
         <option value="$PROJECT_DIR$/src/net/netmap.py" />
         <option value="$PROJECT_DIR$/src/net/virtualInstance.py" />
@@ -151,10 +83,6 @@
         <option value="$PROJECT_DIR$/src/moduleManager.py" />
         <option value="$PROJECT_DIR$/modules/__init__.py" />
         <option value="$PROJECT_DIR$/src/test.py" />
-        <option value="$PROJECT_DIR$/modules/actives/activeModuleSkeleton.py" />
-        <option value="$PROJECT_DIR$/modules/passives/arbitraryCmdBg.py" />
-        <option value="$PROJECT_DIR$/modules/passives/passiveModuleSkeleton.py" />
-        <option value="$PROJECT_DIR$/modules/passives/pingTarget.py" />
         <option value="$PROJECT_DIR$/src/utils/timer.py" />
         <option value="$PROJECT_DIR$/svd/configs/default_logger.yaml" />
         <option value="$PROJECT_DIR$/modules/actives/__init__.py" />
@@ -164,14 +92,19 @@
         <option value="$PROJECT_DIR$/src/utils/logger.py" />
         <option value="$PROJECT_DIR$/src/utils/filesManager.py" />
         <option value="$PROJECT_DIR$/src/utils/misc_fcts.py" />
-        <option value="$PROJECT_DIR$/modules/actives/arbitraryCmd.py" />
-        <option value="$PROJECT_DIR$/modules/abcActiveModule.py" />
-        <option value="$PROJECT_DIR$/modules/actives/nmapExplorer.py" />
         <option value="$PROJECT_DIR$/src/routine/routine.py" />
-        <option value="$PROJECT_DIR$/modules/abcPassiveModule.py" />
         <option value="$PROJECT_DIR$/src/appcore.py" />
         <option value="$PROJECT_DIR$/src/utils/moduleManager.py" />
         <option value="$PROJECT_DIR$/tests/appcorerun.py" />
+        <option value="$PROJECT_DIR$/modules/abcActiveModule.py" />
+        <option value="$PROJECT_DIR$/modules/actives/arbitraryCmd.py" />
+        <option value="$PROJECT_DIR$/modules/actives/nmapExplorer.py" />
+        <option value="$PROJECT_DIR$/modules/actives/activeModuleSkeleton.py" />
+        <option value="$PROJECT_DIR$/modules/passives/pingTarget.py" />
+        <option value="$PROJECT_DIR$/modules/abcPassiveModule.py" />
+        <option value="$PROJECT_DIR$/modules/passives/passiveModuleSkeleton.py" />
+        <option value="$PROJECT_DIR$/modules/passives/arbitraryCmdBg.py" />
+        <option value="$PROJECT_DIR$/src/appCLI.py" />
       </list>
     </option>
   </component>
@@ -297,8 +230,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.appcorerun">
-    <configuration name="appcorerun" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.appCLI">
+    <configuration name="appCLI" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="IoTMonitor" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -306,11 +239,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/appcorerun.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/appCLI.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -340,7 +273,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="moduleManager" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="panelPassive" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="IoTMonitor" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -348,11 +281,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/utils" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/routine" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/utils/moduleManager.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/routine/panelPassive.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -382,7 +315,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="queueActive" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="routine" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="IoTMonitor" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -394,7 +327,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/routine/queueActive.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/routine/routine.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -405,11 +338,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.appcorerun" />
+        <item itemvalue="Python.appCLI" />
+        <item itemvalue="Python.panelPassive" />
         <item itemvalue="Python.arbitraryCmdBg" />
         <item itemvalue="Python.pingTarget" />
-        <item itemvalue="Python.queueActive" />
-        <item itemvalue="Python.moduleManager" />
+        <item itemvalue="Python.routine" />
       </list>
     </recent_temporary>
   </component>
@@ -494,25 +427,11 @@
     <entry file="file://$PROJECT_DIR$/src/test.xml" />
     <entry file="file://$PROJECT_DIR$/modules/__init__.py" />
     <entry file="file://$PROJECT_DIR$/src/test.py" />
-    <entry file="file://$PROJECT_DIR$/modules/actives/activeModuleSkeleton.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-587">
-          <caret column="13" selection-start-column="13" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/net/netmap.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/src/net/virtualInstance.py">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modules/passives/passiveModuleSkeleton.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="13" selection-start-column="13" selection-end-column="13" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/modules/actives/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -525,13 +444,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="24" selection-start-line="2" selection-start-column="24" selection-end-line="2" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/routine/panelPassive.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1020">
-          <caret line="68" selection-start-line="68" selection-end-line="68" />
         </state>
       </provider>
     </entry>
@@ -571,36 +483,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/modules/actives/arbitraryCmd.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="37" column="112" selection-start-line="37" selection-start-column="112" selection-end-line="37" selection-end-column="112" />
-          <folding>
-            <element signature="e#0#37#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/routine/queueActive.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="172">
-          <caret line="167" column="30" selection-start-line="167" selection-start-column="30" selection-end-line="167" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/routine/routine.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="32">
-          <caret line="48" column="20" selection-start-line="48" selection-start-column="20" selection-end-line="48" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/appCLI.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/utils/logger.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="422">
@@ -628,57 +510,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/modules/actives/nmapExplorer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="900">
-          <caret line="60" column="77" selection-start-line="60" selection-start-column="77" selection-end-line="60" selection-end-column="77" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modules/passives/arbitraryCmdBg.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="21" lean-forward="true" selection-start-line="21" selection-end-line="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modules/abcActiveModule.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="709">
-          <caret line="80" column="34" selection-start-line="80" selection-start-column="34" selection-end-line="80" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modules/abcPassiveModule.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="709">
-          <caret line="253" column="26" selection-start-line="253" selection-start-column="26" selection-end-line="253" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modules/passives/pingTarget.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="12" column="26" lean-forward="true" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/appcore.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="13" column="41" selection-start-line="13" selection-start-column="41" selection-end-line="13" selection-end-column="41" />
-          <folding>
-            <element signature="e#0#33#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/utils/moduleManager.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="540">
@@ -696,6 +527,112 @@
           <folding>
             <element signature="e#0#25#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/appcore.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="13" column="41" selection-start-line="13" selection-start-column="41" selection-end-line="13" selection-end-column="41" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/abcActiveModule.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-765">
+          <caret line="9" column="28" selection-start-line="9" selection-start-column="28" selection-end-line="9" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/actives/nmapExplorer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="615">
+          <caret line="41" column="37" lean-forward="true" selection-start-line="41" selection-start-column="37" selection-end-line="41" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/routine/queueActive.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="413">
+          <caret line="182" column="12" lean-forward="true" selection-start-line="182" selection-start-column="12" selection-end-line="182" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/actives/arbitraryCmd.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="356">
+          <caret line="31" column="102" selection-start-line="31" selection-start-column="48" selection-end-line="31" selection-end-column="102" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/actives/activeModuleSkeleton.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="59" selection-start-line="24" selection-start-column="59" selection-end-line="24" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/routine/routine.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="56" column="31" lean-forward="true" selection-start-line="56" selection-start-column="31" selection-end-line="56" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/passives/pingTarget.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="491">
+          <caret line="89" column="28" lean-forward="true" selection-start-line="89" selection-start-column="28" selection-end-line="89" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/abcPassiveModule.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3716">
+          <caret line="255" column="37" selection-start-line="255" selection-start-column="37" selection-end-line="255" selection-end-column="37" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/passives/passiveModuleSkeleton.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="36" column="8" lean-forward="true" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/modules/passives/arbitraryCmdBg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1155">
+          <caret line="78" lean-forward="true" selection-start-line="78" selection-end-line="78" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/routine/panelPassive.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-679">
+          <caret line="61" column="31" lean-forward="true" selection-start-line="61" selection-start-column="31" selection-end-line="61" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/appCLI.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="29" lean-forward="true" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
         </state>
       </provider>
     </entry>

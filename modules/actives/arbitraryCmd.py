@@ -6,13 +6,12 @@ import shlex
 class AModArbitraryCmd(ActiveModule):
 
     def __init__(self, params=None, netmap=None):
-        super().__init__()
+        super().__init__(netmap)
         self.m_id = "arbcmd"
         self.PARAMS = {"prog": ("echo", True, ""),
                        "args": ("No or bad command given to arbitrary module [arbcmd]", False, "")}
         self.desc_PARAMS = {"prog": "A command to execute available on the system",
                             "args": "CLI arguments to pass as one string (all in it)"}
-        self.netmap = netmap
 
         self.set_params(params)
 
@@ -30,7 +29,7 @@ class AModArbitraryCmd(ActiveModule):
         pass
 
     def distrib_output(self, script_output):
-        # function called by ending exec thread
+        # function called by ending exec thread with script_output as a tuple summarizing how it ended
         if isinstance(script_output[0], int):
             code, popen = script_output
             output = popen.stdout.read()

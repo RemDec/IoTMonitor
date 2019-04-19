@@ -10,7 +10,7 @@ desc_PARAMS = {"IP": "Target IP adress(es) acceptable as Nmap syntax",
 class AModNmapExplorer(ActiveModule):
 
     def __init__(self, params=None, netmap=None):
-        super().__init__()
+        super().__init__(netmap)
         self.m_id = "nmapexplo"
         self.CMD = "nmap -sn"
         self.PARAMS = {"options": ("", False, ""),
@@ -19,7 +19,6 @@ class AModNmapExplorer(ActiveModule):
                        "IP": ("192.168.1.0/24", True, "")
                        }
         self.desc_PARAMS = desc_PARAMS
-        self.netmap = netmap
 
         self.set_params(params)
 

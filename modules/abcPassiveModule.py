@@ -8,7 +8,9 @@ import subprocess
 
 class PassiveModule(Module):
 
-    def __init__(self):
+    def __init__(self, timer, netmap):
+        self.timer = timer
+        self.netmap = netmap
         # thlist of instancied pairs at launch call (bg_thread, comm_thread)
         self.pair_threads = []
         self.max_shutdown_time = 5
@@ -251,7 +253,6 @@ class CommunicationThread(threading.Thread, TimerInterface):
             if self.timer is None:
                 logging.getLogger("debug").warning(f"No timer provided to comm thread {self}")
                 self.timer = TimerThread(autostart=True, name="InstantiatedTimer")
-            print("ALLO", self.timer)
             self.timer.subscribe(self)
 
     def interrupt(self):

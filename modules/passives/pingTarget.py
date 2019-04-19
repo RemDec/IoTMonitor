@@ -10,7 +10,7 @@ desc_PARAMS = {"IP": "Target IP adress(es) in ping command syntax",
 class PModPing(PassiveModule):
 
     def __init__(self, read_interval=10, params=None, timer=None, netmap=None):
-        super().__init__()
+        super().__init__(timer, netmap)
         self.m_id = "pingit"
         self.CMD = "ping"
         self.PARAMS = {"nbr": ("", False, "-c"),
@@ -19,8 +19,6 @@ class PModPing(PassiveModule):
                        "IP": ("192.168.1.1", True, "")}
         self.desc_PARAMS = desc_PARAMS
         self.read_interval = read_interval
-        self.timer = timer
-        self.netmap = netmap
 
         self.set_params(params)
 
@@ -40,6 +38,7 @@ class PModPing(PassiveModule):
     def new_comm_thread(self, timer=None, read_interv=0):
         if read_interv == 0:
             read_interv = self.read_interval
+        timer = timer if timer is not None else self.timer
         return CommunicationThread(self.distrib_output, timer, read_interv)
 
     def set_read_interval(self, duration):

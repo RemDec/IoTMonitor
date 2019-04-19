@@ -6,7 +6,8 @@ import subprocess
 
 class ActiveModule(Module):
 
-    def __init__(self):
+    def __init__(self, netmap):
+        self.netmap = netmap
         self.curr_threads = []
 
     @abc.abstractmethod

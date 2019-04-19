@@ -4,7 +4,7 @@ from modules.abcPassiveModule import *
 class PModNameMod(PassiveModule):
 
     def __init__(self, params=None, timer=None, netmap=None):
-        super().__init__()
+        super().__init__(timer, netmap)
         self.m_id = "default"
         self.CMD = ""
         self.PARAMS = {}
@@ -13,9 +13,6 @@ class PModNameMod(PassiveModule):
         # where mapping param_name -> string_description
         self.read_interval = 60
         # time between each reading on the output of background subprocess running cmd
-
-        self.timer = timer
-        self.netmap = netmap
 
         self.set_params(params)
 
@@ -37,6 +34,7 @@ class PModNameMod(PassiveModule):
         # a comm_thread reading in bg_thread cmd output and parsing it regularly (triggered by timer)
         if read_interv == 0:
             read_interv = self.read_interval
+        timer = timer if timer is not None else self.timer
         return CommunicationThread(self.distrib_output, timer, read_interv)
 
     def set_read_interval(self, duration):

@@ -5,21 +5,24 @@ from modules.abcActiveModule import *
 class AModNameMod(ActiveModule):
 
     def __init__(self, params=None, netmap=None):
-        super().__init__()
+        super().__init__(netmap)
         self.m_id = "default"
         self.CMD = ""
         self.PARAMS = {}
         # where mapping param_name -> (defaultValue, isMandatory, prefix)
         self.desc_PARAMS = {}
         # where mapping param_name -> string_description
-        self.netmap = netmap
-
         self.set_params(params)
 
+        self.max_exec_time = 60
+        # how long should be an execution of the cmd underlying program (max in secs)
+
     def get_cmd(self):
+        # module underlying program as it would be called in CLI (string used as command)
         return self.CMD
 
     def get_params(self):
+        # additional parameters given following the command
         return self.params, self.PARAMS, self.desc_PARAMS
 
     def set_params(self, params):
@@ -32,7 +35,7 @@ class AModNameMod(ActiveModule):
         pass
 
     def distrib_output(self, script_output):
-        # function called by ending exec thread
+        # function called by ending exec thread with script_output as a tuple summarizing how it ended
         if isinstance(script_output[0], int):
             code, popen = script_output
             output = popen.stdout.read()
@@ -57,11 +60,12 @@ class AModNameMod(ActiveModule):
         super().register_thread(s_thread)
 
     def stop(self):
+        # kill all threads (running cmd in a subprocess) instantiated from this instance
         super().terminate_threads()
 
     def get_script_thread(self):
         # instancing generic thread defined in superclass for active modules
-        return ScriptThread(callback_fct=self.distrib_output, max_exec_time=60)
+        return ScriptThread(callback_fct=self.distrib_output, max_exec_time=self.max_exec_time)
 
     def get_default_timer(self):
         # how frequent should be executed in automated queue of routine

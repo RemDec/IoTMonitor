@@ -5,15 +5,13 @@ import shlex
 class PModArbitraryCmdBg(PassiveModule):
 
     def __init__(self, params=None, timer=None, netmap=None):
-        super().__init__()
+        super().__init__(timer, netmap)
         self.m_id = "arbcmd_bg"
         self.PARAMS = {"prog": ("watch", True, ""),
                        "args": ("-t -n1 echo repeated_text_default_arbcmd_bg", False, "")}
         self.desc_PARAMS = {"prog": "A command to execute available on the system",
                             "args": "CLI arguments to pass as one string (all in it)"}
         self.read_interval = 60
-        self.timer = timer
-        self.netmap = netmap
 
         self.set_params(params)
 
@@ -33,6 +31,7 @@ class PModArbitraryCmdBg(PassiveModule):
 
     def new_comm_thread(self, timer=None, read_interv=0):
         # a comm_thread reading in bg_thread cmd output and parsing it regularly (triggered by timer)
+        timer = timer if timer is not None else self.timer
         return CommunicationThread(self.distrib_output, timer, read_interv)
 
     def set_read_interval(self, duration):
