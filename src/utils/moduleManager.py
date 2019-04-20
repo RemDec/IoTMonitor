@@ -51,11 +51,19 @@ class ModManager:
     def clear_modlib(self):
         self.available_mods.clear()
 
-    def get_mod_from_id(self, id, timer=None, netmap=None):
+    def get_mod_from_id(self, id, curr_params=None, timer=None, netmap=None):
         # from mod_id and current module descriptors list, instantiate a fresh module instance
         for mod_desc in self.available_mods:
             if mod_desc.m_id == id:
-                return mod_desc.get_mod_instance(timer=timer, netmap=netmap)
+                mod_inst = mod_desc.get_mod_instance(timer=timer, netmap=netmap)
+                if curr_params is not None:
+                    mod_inst.set_params(curr_params)
+                return mod_inst
+
+    def get_mod_desc_params(self, id):
+        desc = self.get_mod_desc(id)
+        if desc is not None:
+            return desc.get_all_params()
 
     def is_available(self, mod_id, reload_lib=False):
         # check for presence and dependencies of the given module
@@ -84,6 +92,11 @@ class ModManager:
             mod_inst.set_params(mod_desc.curr_params)
             return mod_inst, mod_desc.setid
 
+    def get_mod_desc(self, id):
+        for desc in self.available_mods:
+            if desc.m_id == id:
+                return desc
+
     def get_all_desc(self):
         # return a list with all module descriptors of registered modules in modlib_file
         return self.available_mods
@@ -92,6 +105,14 @@ class ModManager:
         act = [desc.m_id for desc in self.available_mods if desc.m_active]
         pas = [desc.m_id for desc in self.available_mods if not desc.m_active]
         return act, pas
+
+    def __str__(self):
+        act, pas = self.list_all_modid()
+        s = f"Module manager (library) loaded from {self.modlib_file}\n" \
+            f"listing current available modules from this file:\n" \
+            f"Actives: {', '.join(act)}\n" \
+            f"Passives: {', '.join(pas)}\n"
+        return s
 
 
 class ModDescriptor:
@@ -237,6 +258,9 @@ class ModDescriptor:
         return mod_inst
 
     # ----- Misc -----
+
+    def get_all_params(self):
+        return self.curr_params, self.PARAMS, self.desc_params
 
     def __str__(self):
         modtype = "A" if self.m_active else "P"
