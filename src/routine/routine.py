@@ -35,13 +35,6 @@ class Routine:
     def remove_module(self, setid_or_mod):
         return self.get_corresp_set(setid_or_mod).remove_module(setid_or_mod)
 
-    def get_mod_by_setid(self, setid):
-        mod_inst = self.panel.get_mod_by_id(setid)
-        if mod_inst is not None:
-            return mod_inst
-        mod_inst = self.queue.get_mod_by_id(setid)
-        return mod_inst
-
     def change_mod_params(self, setid, new_params):
         set = self.get_corresp_set(setid)
         if set is not None:
@@ -74,12 +67,26 @@ class Routine:
         self.correct_state()
 
     def resume_it(self, target):
+        print("CALL :", target)
         t = self.str_to_target(target)
         if not t.is_running:
-            t.pause()
+            t.resume()
             self.correct_state()
 
+    def correct_state(self):
+        self.is_running = self.panel.is_running or self.queue.is_running
+
     # --- Internal methods and misc ---
+
+    def get_mod_by_setid(self, setid):
+        mod_inst = self.panel.get_mod_by_id(setid)
+        if mod_inst is not None:
+            return mod_inst
+        mod_inst = self.queue.get_mod_by_id(setid)
+        return mod_inst
+
+    def get_all_setids(self):
+        return self.queue.get_idlist(), self.panel.get_idlist()
 
     def get_corresp_set(self, mod):
         # Get which structure is/should be module in, where module either setid or module instance.
@@ -101,9 +108,6 @@ class Routine:
             return self.panel
         elif s == "queue":
             return self.queue
-
-    def correct_state(self):
-        self.is_running = self.panel.is_running or self.queue.is_running
 
     def check_unique_ids(self):
         # unique ids are guaranteed in each set, but not crossing both

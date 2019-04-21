@@ -85,6 +85,9 @@ class Core:
     def clear_routine(self):
         pass
 
+    def get_all_setids(self):
+        return self.routine.get_all_setids()
+
     # ----- Netmap interactions -----
 
     def add_to_netmap(self, iv):

@@ -229,7 +229,8 @@ class ModDescriptor:
         params = defaults.findall("param")
         for param in params:
             code = param.get("code")
-            dflt_paramtuple = (param.get("default"), param.get("mandatory"), param.get("prefix"))
+            mand = True if param.get("mandatory") == "True" else False
+            dflt_paramtuple = (param.get("default"), mand, param.get("prefix"))
             self.PARAMS[code] = dflt_paramtuple
             self.desc_params[code] = param.text
         return self.PARAMS, self.desc_params

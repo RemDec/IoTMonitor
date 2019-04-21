@@ -103,6 +103,9 @@ class CLIparser:
     def get_availbale_mod(self):
         return self.core.get_available_mods(only_names=True)
 
+    def get_routine_setids(self):
+        return self.core.get_all_setids()
+
     # Functions called after a choice is taken (given as a string in arg)
 
     def transit_menu(self, menu_input_name):
@@ -110,7 +113,6 @@ class CLIparser:
         self.curr_menu = self.index_menus[target_menu_index]
 
     def after_mod_slct(self, mod_id):
-        print("Selected :", mod_id)
         dflts = self.get_user_confirm(f"[{mod_id}] use defaults params (Y/n)? ")
         in_rout = self.get_user_confirm(f"[{mod_id}] append it in routine (Y/n) ?")
         if dflts:
@@ -142,7 +144,19 @@ class CLIparser:
         print(self.core.get_display(res_to_show, level=self.curr_display_lvl))
         self.clear_cls = False
 
+    def after_delmod_slct(self, mod_setid):
+        self.core.remove_from_routine(mod_setid)
+        self.back_main_menu()
+
+    def after_resume_slct(self, to_resume):
+        target = self.get_choice_val(to_resume)
+        self.core.resume_it(target)
+        self.back_main_menu()
+
     # Menus configurations
+
+    def get_choice_val(self, choice_code):
+        return self.curr_menu['choices'][choice_code]
 
     def setup_menus(self):
         # -- Main menus --
@@ -156,11 +170,15 @@ class CLIparser:
                              'disp_choice': False}
 
         self.create = {'desc': "Instantiate an object and integrate it",
-                       'choices': {'routine module': "newMod",
+                       'choices': {'module': "newMod",
                                    'virtual instance': "newVI"},
                        'fct_choice': self.transit_menu}
 
-        self.remove = {'desc': "", 'marker': ">>", 'choices': []}
+        self.remove = {'desc': "Remove an existing object in the app",
+                       'choices': {'module': "delMod",
+                                   'independent module': "delIndepMod",
+                                   'virtual instance': "delVI"},
+                       'fct_choice': self.transit_menu}
 
         self.show = {'desc': "Display current state of resources",
                      'choices': {'routine': "routine",
@@ -172,7 +190,11 @@ class CLIparser:
 
         self.pause = {'desc': "", 'marker': ">>", 'choices': []}
 
-        self.resume = {'desc': "", 'marker': ">>", 'choices': []}
+        self.resume = {'desc': "Resume or start routine or its components",
+                       'choices': {'entire routine': "routine",
+                                   'panel only': "panel",
+                                   'queue only': "queue"},
+                       'fct_choice': self.after_resume_slct}
 
         # -- Secondary menu --
         self.create_mod = {'desc': "Choose a module in the current library",
@@ -181,12 +203,21 @@ class CLIparser:
 
         self.create_VI = {'desc': "", 'marker': ">>", 'choices': []}
 
+        self.remove_mod = {'desc': "Remove a module from routine by its setid",
+                           'marker': "[setid] :", 'choices': self.get_routine_setids,
+                           'fct_choice': self.after_delmod_slct}
+
+        self.remove_indep_mod = {'desc': "Remove a module from routine independent running module"}
+
+        self.remove_VI = {'desc': "Remove a virtual instance from the netmap"}
+
         # Association between choice code and real objects
         self.index_menus = {"main": self.main_menu,
                             "create": self.create, "remove": self.remove,
                             "pause": self.pause, "resume": self.resume,
                             "show": self.show,
-                            "newVI": self.create_VI, "newMod": self.create_mod}
+                            "newVI": self.create_VI, "newMod": self.create_mod,
+                            "delMod": self.remove_mod, "delIndepMod": self.remove_indep_mod, "delVI": self.remove_VI}
 
 
 if __name__ == "__main__":
