@@ -16,10 +16,12 @@ class TimerThread(Thread):
         if autostart:
             self.launch()
 
-    def launch(self, auto_start=True):
-        self.stopped = False
-        if auto_start:
+    def launch(self):
+        if self.stopped:
+            self.stopped = False
             super().start()
+        else:
+            logging.getLogger("debug").debug("Trying to relaunch timer when running" + str(self))
 
     def stop(self):
         self.stopped = True
@@ -102,8 +104,11 @@ class PrototypeSubscriber(TimerInterface):
 
 if __name__ == '__main__':
     import threading as thr
+    import time
     timer = TimerThread()
     obj = PrototypeSubscriber()
     timer.subscribe(obj)
     timer.launch()
     print(f"{timer.name} started, {thr.active_count()} threads currently : timer {timer} and main :{thr.current_thread()}")
+    time.sleep(10)
+    timer.stop()

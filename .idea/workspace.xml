@@ -2,10 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="918ec42b-cf6e-41c1-817f-810176477867" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/appCLI.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/appCLI.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/appcore.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/appcore.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/parserCLI.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/parserCLI.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routine/routine.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/routine/routine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/moduleManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/moduleManager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/timer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/timer.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,23 +15,26 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
+    <splitter split-orientation="horizontal" split-proportion="0.5842839">
       <split-first>
         <leaf>
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/appCLI.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="165">
-                  <caret line="11" column="29" lean-forward="true" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
+                <state relative-caret-position="240">
+                  <caret line="19" column="37" lean-forward="true" selection-start-line="19" selection-start-column="37" selection-end-line="19" selection-end-column="37" />
+                  <folding>
+                    <element signature="e#0#27#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/routine/routine.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="225">
-                  <caret line="72" column="22" selection-start-line="72" selection-start-column="22" selection-end-line="72" selection-end-column="22" />
+                <state relative-caret-position="165">
+                  <caret line="68" column="32" selection-start-line="68" selection-start-column="32" selection-end-line="68" selection-end-column="32" />
                   <folding>
                     <element signature="e#0#38#0" expanded="true" />
                   </folding>
@@ -41,8 +45,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/parserCLI.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="164">
-                  <caret line="170" lean-forward="true" selection-start-line="170" selection-end-line="170" />
+                <state relative-caret-position="90">
+                  <caret line="9" column="24" lean-forward="true" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
                   <folding>
                     <element signature="e#0#25#0" expanded="true" />
                   </folding>
@@ -50,20 +54,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/echo_input.sh">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="90">
-                  <caret line="6" selection-start-line="6" selection-end-line="6" selection-end-column="4" />
-                </state>
-              </provider>
-            </entry>
-          </file>
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/tests/appcorerun.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="465">
-                  <caret line="31" column="28" selection-start-line="31" selection-start-column="28" selection-end-line="31" selection-end-column="28" />
+                <state relative-caret-position="450">
+                  <caret line="30" column="11" lean-forward="true" selection-start-line="30" selection-start-column="11" selection-end-line="30" selection-end-column="11" />
                   <folding>
                     <element signature="e#0#25#0" expanded="true" />
                   </folding>
@@ -87,13 +82,25 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/appcore.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="405">
-                  <caret line="36" lean-forward="true" selection-start-line="36" selection-end-line="36" />
+                <state relative-caret-position="-1152">
+                  <caret line="34" column="40" lean-forward="true" selection-start-line="34" selection-start-column="40" selection-end-line="34" selection-end-column="40" />
                   <folding>
                     <element signature="e#0#33#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/utils/timer.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="583">
+                  <caret line="114" selection-start-line="114" selection-end-line="114" />
+                  <folding>
+                    <element signature="e#0#10#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -163,7 +170,6 @@
         <option value="$PROJECT_DIR$/src/moduleManager.py" />
         <option value="$PROJECT_DIR$/modules/__init__.py" />
         <option value="$PROJECT_DIR$/src/test.py" />
-        <option value="$PROJECT_DIR$/src/utils/timer.py" />
         <option value="$PROJECT_DIR$/svd/configs/default_logger.yaml" />
         <option value="$PROJECT_DIR$/modules/actives/__init__.py" />
         <option value="$PROJECT_DIR$/modules/passives/__init__.py" />
@@ -181,12 +187,13 @@
         <option value="$PROJECT_DIR$/modules/abcPassiveModule.py" />
         <option value="$PROJECT_DIR$/modules/passives/passiveModuleSkeleton.py" />
         <option value="$PROJECT_DIR$/modules/passives/arbitraryCmdBg.py" />
-        <option value="$PROJECT_DIR$/src/appCLI.py" />
         <option value="$PROJECT_DIR$/src/utils/moduleManager.py" />
-        <option value="$PROJECT_DIR$/src/appcore.py" />
-        <option value="$PROJECT_DIR$/src/parserCLI.py" />
-        <option value="$PROJECT_DIR$/src/routine/routine.py" />
         <option value="$PROJECT_DIR$/echo_input.sh" />
+        <option value="$PROJECT_DIR$/src/appcore.py" />
+        <option value="$PROJECT_DIR$/src/utils/timer.py" />
+        <option value="$PROJECT_DIR$/src/parserCLI.py" />
+        <option value="$PROJECT_DIR$/src/appCLI.py" />
+        <option value="$PROJECT_DIR$/src/routine/routine.py" />
       </list>
     </option>
   </component>
@@ -273,7 +280,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.parserCLI">
+  <component name="RunManager" selected="Python.appCLI">
     <configuration name="appCLI" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="IoTMonitor" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -295,7 +302,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="arbitraryCmdBg" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="appcore" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="IoTMonitor" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -303,11 +310,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/modules/passives" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/modules/passives/arbitraryCmdBg.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/appcore.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -316,7 +323,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="panelPassive" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="appcorerun" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="IoTMonitor" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -324,11 +331,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/routine" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/routine/panelPassive.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/appcorerun.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -358,7 +365,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="pingTarget" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="timer" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="IoTMonitor" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -366,11 +373,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/modules/passives" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/utils" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/modules/passives/pingTarget.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/utils/timer.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -381,11 +388,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.parserCLI" />
         <item itemvalue="Python.appCLI" />
-        <item itemvalue="Python.panelPassive" />
-        <item itemvalue="Python.arbitraryCmdBg" />
-        <item itemvalue="Python.pingTarget" />
+        <item itemvalue="Python.timer" />
+        <item itemvalue="Python.appcorerun" />
+        <item itemvalue="Python.appcore" />
+        <item itemvalue="Python.parserCLI" />
       </list>
     </recent_temporary>
   </component>
@@ -404,13 +411,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="64" y="-4" width="1857" height="1085" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13817586" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13817586" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32878152" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.26680672" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.26680672" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -418,7 +426,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32925585" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="10" visible="true" weight="0.32878152" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32878152" />
       <window_info anchor="bottom" id="Inspection Results" order="11" weight="0.3291536" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -532,16 +540,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/utils/timer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-45">
-          <caret line="48" column="81" selection-start-line="48" selection-start-column="81" selection-end-line="48" selection-end-column="81" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/modules/abcActiveModule.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-765">
@@ -638,45 +636,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/appCLI.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="29" lean-forward="true" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/routine/routine.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="72" column="22" selection-start-line="72" selection-start-column="22" selection-end-line="72" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#38#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/appcorerun.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="31" column="28" selection-start-line="31" selection-start-column="28" selection-end-line="31" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/parserCLI.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="170" lean-forward="true" selection-start-line="170" selection-end-line="170" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/echo_input.sh">
       <provider selected="true" editor-type-id="text-editor">
@@ -687,10 +648,60 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/appcore.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="36" lean-forward="true" selection-start-line="36" selection-end-line="36" />
+        <state relative-caret-position="-1152">
+          <caret line="34" column="40" lean-forward="true" selection-start-line="34" selection-start-column="40" selection-end-line="34" selection-end-column="40" />
           <folding>
             <element signature="e#0#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/appcorerun.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="30" column="11" lean-forward="true" selection-start-line="30" selection-start-column="11" selection-end-line="30" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/utils/timer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="583">
+          <caret line="114" selection-start-line="114" selection-end-line="114" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/parserCLI.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="9" column="24" lean-forward="true" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/appCLI.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="19" column="37" lean-forward="true" selection-start-line="19" selection-start-column="37" selection-end-line="19" selection-end-column="37" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/routine/routine.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="68" column="32" selection-start-line="68" selection-start-column="32" selection-end-line="68" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#38#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -5,7 +5,8 @@ import os
 
 class CLIparser:
 
-    def __init__(self, core):
+    def __init__(self, core, core_controller=None):
+        self.core_ctrl = core_controller
         self.core = core
         self.setup_menus()
         self.get_input = False
@@ -71,6 +72,9 @@ class CLIparser:
         matches = []
         for choice_line in self.curr_choices:
             for choice in choice_line:
+                if choice == user_in:
+                    # exact match, consider only this choice as unambiguous
+                    return [choice]
                 if choice.startswith(user_in):
                     matches.append(choice)
         return matches
@@ -93,8 +97,12 @@ class CLIparser:
         self.clear_cls = True
         self.curr_menu = self.main_menu
 
-    def exit(self, kill_app=True):
-        self.get_input = False
+    def exit(self, kill_app=False):
+        if self.core_ctrl is not None:
+            # exiting app delegated to controller
+            self.core_ctrl.stop_app()
+            return
+        self.stop_parsing()
         if kill_app:
             self.core.quit()
 

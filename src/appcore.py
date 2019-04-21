@@ -8,17 +8,17 @@ import signal
 
 class Core:
 
-    def __init__(self, logger=None):
+    def __init__(self, timer=None, logger=None):
         signal.signal(signal.SIGINT, self.interrupt_handler)
         self.modmanager = ModManager()
-        self.timer = TimerThread()
+        self.timer = TimerThread() if timer is None else timer
         self.netmap = ["Virtual Instances"]
         self.routine = Routine(timer=self.timer, netmap=self.netmap)
         self.logger = Logger() if logger is None else logger
+        self.indep_mods = []
 
         self.modmanager.load_modlib()
         self.timer.launch()
-        self.indep_mods = []
 
     # ----- Modules library interactions -----
 

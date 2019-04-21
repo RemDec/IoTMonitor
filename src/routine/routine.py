@@ -67,7 +67,6 @@ class Routine:
         self.correct_state()
 
     def resume_it(self, target):
-        print("CALL :", target)
         t = self.str_to_target(target)
         if not t.is_running:
             t.resume()
