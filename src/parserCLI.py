@@ -12,10 +12,13 @@ class CLIparser:
         self.get_input = False
         self.curr_menu = {}
         self.curr_choices = []
-        self.reserved = {'main()': self.back_main_menu, 'prev()': "",
-                         'exit()': self.exit}
+        self.reserved = {'main': self.back_main_menu, 'prev': "",
+                         'exit': self.exit, 'help': self.ask_help, 'choices': self.ask_choices}
+        self.display_header = True
         self.clear_cls = True
-        self.curr_display_lvl = 0
+        self.curr_display_lvl = 1
+
+    # ----- Parsing execution flow -----
 
     def start_parsing(self):
         self.get_input = True
@@ -27,12 +30,15 @@ class CLIparser:
 
     def loop_parsing(self):
         while self.get_input:
-            self.curr_choices = self.compute_choices()
-            header = self.header_from_menu()
+            self.curr_choices = self.compute_curr_choices()
+            header = self.header_from_menu(include_header=self.display_header)
             user_in = input(header)
-            if user_in in self.reserved:
-                self.handle_reserved_kw(user_in)
+            self.display_header = True
+            if user_in.startswith('$'):
+                self.handle_reserved_kw(user_in[1:])
             else:
+                if user_in == "" and self.curr_menu.get('dflt_choice', False):
+                    user_in = self.curr_menu['dflt_choice']
                 completed_in = self.match_input_to_choice(user_in)
                 if len(completed_in) == 0:
                     print("No corresponding command for this menu")
@@ -46,25 +52,55 @@ class CLIparser:
                 self.clear_console()
                 self.clear_cls = True
 
-    def compute_choices(self):
-        choices = self.curr_menu['choices']
+    # ----- Internal utilities functions -----
+
+    def compute_curr_choices(self):
+        return self.compute_choices(self.curr_menu)
+
+    def compute_choices(self, menu):
+        choices = menu['choices']
         # treated choices format [[ch1, ch2, ..], [ch3, ch4, ..], ...] (1 list per newline)
         if callable(choices):
             return choices()
         if isinstance(choices, dict):
             return [choices.keys()]
 
-    def header_from_menu(self):
+    def str_curr_choices(self):
+        return self.str_choices(self.curr_menu, 0)
+
+    def str_choices(self, menu, detail_lvl=None):
+        detail_lvl = self.curr_display_lvl if detail_lvl is None else detail_lvl
+        s = ""
+        dflt_choice = menu.get('dflt_choice', None)
+        if detail_lvl == 0:
+            for choice_line in self.compute_choices(menu):
+                with_indic_dflt = [choice if choice != dflt_choice else f"< {choice} >" for choice in choice_line]
+                s += ' | '.join(with_indic_dflt) + '\n'
+        else:
+            for choice_list in self.compute_choices(menu):
+                for choice in choice_list:
+                    s += f"{choice if choice != dflt_choice else '<' + choice + '>'} : "
+                    if not(isinstance(menu['choices'], dict)) or menu['choices'].get(choice) is None:
+                        s += "generated choice without description\n"
+                    else:
+                        choice_code = menu['choices'][choice]
+                        corresp_menu = self.index_menus.get(choice_code)
+                        if corresp_menu is not None and corresp_menu.get('desc', "") != "":
+                            s += corresp_menu['desc'] + '\n'
+                        else:
+                            s += f"undefined description in menu [{choice_code}]\n"
+        return s
+
+    def header_from_menu(self, include_header=True):
         disp_desc = self.curr_menu.get('disp_desc', True)
         disp_choice = self.curr_menu.get('disp_choice', True)
         marker = self.curr_menu.get('marker', ">>>")
         s = ""
-        if disp_desc and self.curr_menu['desc'] != "":
-            s = str_multiframe(self.curr_menu['desc'])
-        if disp_choice:
-            s += "Following commands/choices are available :\n"
-            for choice_line in self.curr_choices:
-                s += ' | '.join(choice_line) + '\n'
+        if include_header:
+            if disp_desc and self.curr_menu['desc'] != "":
+                s = str_multiframe(f"[{self.get_currmenu_index()}] {self.curr_menu['desc']}")
+            if disp_choice:
+                s += "Following commands/choices are available :\n" + self.str_curr_choices()
         s += '\n' + marker
         return s
 
@@ -80,7 +116,9 @@ class CLIparser:
         return matches
 
     def handle_reserved_kw(self, keyword):
-        self.reserved[keyword]()
+        # keyword is all command without the '$' prefix
+        cmd = list(filter(None, keyword.split(' ')))
+        self.reserved[cmd.pop(0)](args=cmd)
 
     def get_user_confirm(self, marker="Confirm ? (Y/n) ", val=('', 'y', 'o', 'yes', 'oui', 'ok')):
         res = input(marker)
@@ -90,14 +128,14 @@ class CLIparser:
         if self.clear_cls:
             os.system('cls' if os.name == 'nt' else 'clear')
 
-    # Functions related to reserved keywords
+    # ----- Functions related to reserved keywords -----
 
-    def back_main_menu(self):
+    def back_main_menu(self, args=[]):
         self.clear_console()
         self.clear_cls = True
         self.curr_menu = self.main_menu
 
-    def exit(self, kill_app=False):
+    def exit(self, kill_app=True, args=[]):
         if self.core_ctrl is not None:
             # exiting app delegated to controller
             self.core_ctrl.stop_app()
@@ -106,7 +144,37 @@ class CLIparser:
         if kill_app:
             self.core.quit()
 
-    # Functions to get available command choices
+    def ask_help(self, args=[]):
+        # help for current menu by default (no menu id given)
+        target_menu = self.curr_menu
+        if len(args) >= 1:
+            target_menu = self.index_menus.get(args[0])
+        if target_menu is None:
+            print("Invalid target menu\n")
+            return
+        if target_menu.get('help', False):
+            print(f"help[{self.get_menu_index(target_menu)}]\n {target_menu['help']}")
+        elif target_menu.get('desc', "") != "":
+            print(f"[{self.get_menu_index(target_menu)}]description (no help available)\n {target_menu['desc']}")
+        else:
+            print(f"No help provided for this menu ([{self.get_menu_index(target_menu)}])\n")
+        self.display_header = False
+
+    def ask_choices(self, args=[]):
+        target_menu = self.curr_menu
+        if len(args) >= 1:
+            target_menu = self.index_menus.get(args[0])
+        if target_menu is None:
+            print("Invalid target menu\n")
+            return
+        if target_menu.get('choices') is not None:
+            str_choices = self.str_choices(target_menu)
+            print(f"List of available choices/command for menu [{self.get_menu_index(target_menu)}] :\n\n{str_choices}")
+        else:
+            print(f"No available choices list for menu [{self.get_menu_index(target_menu)}]")
+        self.display_header = False
+
+    # ----- Functions to get available command choices -----
 
     def get_availbale_mod(self):
         return self.core.get_available_mods(only_names=True)
@@ -114,7 +182,7 @@ class CLIparser:
     def get_routine_setids(self):
         return self.core.get_all_setids()
 
-    # Functions called after a choice is taken (given as a string in arg)
+    # ----- Functions called after a choice is taken (given as a string in arg) -----
 
     def transit_menu(self, menu_input_name):
         target_menu_index = self.curr_menu['choices'][menu_input_name]
@@ -151,6 +219,7 @@ class CLIparser:
         res_to_show = self.curr_menu['choices'][show_input_name]
         print(self.core.get_display(res_to_show, level=self.curr_display_lvl))
         self.clear_cls = False
+        self.display_header = False
 
     def after_delmod_slct(self, mod_setid):
         self.core.remove_from_routine(mod_setid)
@@ -161,23 +230,38 @@ class CLIparser:
         self.core.resume_it(target)
         self.back_main_menu()
 
-    # Menus configurations
+    def after_pause_slct(self, to_resume):
+        target = self.get_choice_val(to_resume)
+        self.core.pause_it(target)
+        self.back_main_menu()
+
+    # ----- Menus configurations -----
 
     def get_choice_val(self, choice_code):
         return self.curr_menu['choices'][choice_code]
 
-    def setup_menus(self):
-        # -- Main menus --
-        self.main_menu = {'desc': "",
-                             'choices': {'create': "create",
-                                         'remove': "remove",
-                                         'show': "show",
-                                         'pause': "pause",
-                                         'resume': "resume"},
-                             'fct_choice': self.transit_menu,
-                             'disp_choice': False}
+    def get_currmenu_index(self):
+        return self.get_menu_index(self.curr_menu)
 
-        self.create = {'desc': "Instantiate an object and integrate it",
+    def get_menu_index(self, menu):
+        for menu_id, menu_dict in self.index_menus.items():
+            if menu is menu_dict:
+                return menu_id
+
+    def setup_menus(self):
+
+        # -- Main menus --
+        self.main_menu = {'desc': "Main menu. Type $help for explanations and $choices to display\n"
+                                  " which commands are available to navigate through menus",
+                          'choices': {'create': "create",
+                                     'remove': "remove",
+                                     'show': "show",
+                                     'pause': "pause",
+                                     'resume': "resume"},
+                          'fct_choice': self.transit_menu,
+                          'disp_choice': False}
+
+        self.create = {'desc': "Instantiate an object and integrate it in the application",
                        'choices': {'module': "newMod",
                                    'virtual instance': "newVI"},
                        'fct_choice': self.transit_menu}
@@ -186,22 +270,32 @@ class CLIparser:
                        'choices': {'module': "delMod",
                                    'independent module': "delIndepMod",
                                    'virtual instance': "delVI"},
+                       'dflt_choice': 'module',
                        'fct_choice': self.transit_menu}
 
-        self.show = {'desc': "Display current state of resources",
+        self.show = {'desc': "Display current state of application resources",
+                     'help': "Print here the current state of selected resource with the current detail level "
+                             "(settable with $set level [int]).",
                      'choices': {'routine': "routine",
                                  'netmap': "netmap",
                                  'module library': "library",
                                  'main timer': "timer",
                                  'independent modules': "indep"},
+                     'dflt_choice': 'routine',
                      'fct_choice': self.after_show_select}
 
-        self.pause = {'desc': "", 'marker': ">>", 'choices': []}
+        self.pause = {'desc': "Pause (interrupt running module threads) routine or its components",
+                      'choices': {'entire routine': "routine",
+                           'panel only': "panel",
+                           'queue only': "queue"},
+                      'dflt_choice': 'entire routine',
+                      'fct_choice': self.after_pause_slct}
 
         self.resume = {'desc': "Resume or start routine or its components",
                        'choices': {'entire routine': "routine",
                                    'panel only': "panel",
                                    'queue only': "queue"},
+                       'dflt_choice': 'entire routine',
                        'fct_choice': self.after_resume_slct}
 
         # -- Secondary menu --
@@ -219,7 +313,7 @@ class CLIparser:
 
         self.remove_VI = {'desc': "Remove a virtual instance from the netmap"}
 
-        # Association between choice code and real objects
+        # Association between choice code value and real menu objects
         self.index_menus = {"main": self.main_menu,
                             "create": self.create, "remove": self.remove,
                             "pause": self.pause, "resume": self.resume,

@@ -108,6 +108,7 @@ class ConsoleOutput:
         if self.popen is not None:
             self.popen.terminate()
 
+
 class TkinterOutput:
 
     def __init__(self, appcli):
