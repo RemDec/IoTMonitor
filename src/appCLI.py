@@ -1,6 +1,4 @@
-from src.parserCLI import *
-from src.utils.timer import *
-from src.utils.logger import *
+from src.parsers.parserCLI import *
 from src.appcore import *
 import subprocess, os
 
@@ -51,6 +49,13 @@ class AppCLI(TimerInterface):
     def set_current_todisplay(self, target):
         self.to_disp = target
 
+    def set_level(self, new_lvl):
+        if 0 <= new_lvl <= 2:
+            self.level = new_lvl
+
+    def get_level(self):
+        return self.level
+
     def get_current_todisplay(self):
         if self.to_disp == "app":
             return self.get_todisplay_app()
@@ -77,6 +82,11 @@ class AppCLI(TimerInterface):
         self.output.write(to_disp)
         self.output.pull_output()
 
+    def __str__(self):
+        return f"Controller of application in CLI mode, app view handled by\n" \
+               f"{self.output}\n" \
+               f"displaying {self.to_disp} (working:{self.output.is_reading})"
+
 
 class ConsoleOutput:
 
@@ -84,6 +94,7 @@ class ConsoleOutput:
         self.PIPE_PATH = "/tmp/output_monitor"
         self.is_reading = False
         self.popen = None
+        self.terminal = 'xterm'
 
     def write(self, to_output):
         # print("Before write", to_output)
@@ -98,7 +109,7 @@ class ConsoleOutput:
         self.is_reading = True
         os.remove(self.PIPE_PATH)
         os.mkfifo(self.PIPE_PATH)
-        self.popen = subprocess.Popen(['xterm', '-e', 'watch', '-n 0,5', 'cat %s' % self.PIPE_PATH])
+        self.popen = subprocess.Popen([self.terminal, '-e', 'watch', '-n 0,5', 'cat %s' % self.PIPE_PATH])
 
     def stop_reading(self):
         self.is_reading = False
@@ -107,6 +118,10 @@ class ConsoleOutput:
         self.stop_reading()
         if self.popen is not None:
             self.popen.terminate()
+
+    def __str__(self):
+        return f"ConsoleOutput spawning {self.terminal} monitoring app state pulling info from pipe\n" \
+               f"{self.PIPE_PATH} using watch command to regularly display it"
 
 
 class TkinterOutput:

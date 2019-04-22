@@ -1,5 +1,6 @@
 from src.appcore import *
 from src.utils.misc_fcts import str_multiframe
+from src.parsers.parser_res import get_res_CLI
 import os
 
 
@@ -13,7 +14,8 @@ class CLIparser:
         self.curr_menu = {}
         self.curr_choices = []
         self.reserved = {'main': self.back_main_menu, 'prev': "",
-                         'exit': self.exit, 'help': self.ask_help, 'choices': self.ask_choices}
+                         'exit': self.exit, 'help': self.ask_help, 'choices': self.ask_choices,
+                         'output': self.ctrl_output}
         self.display_header = True
         self.clear_cls = True
         self.curr_display_lvl = 1
@@ -174,6 +176,20 @@ class CLIparser:
             print(f"No available choices list for menu [{self.get_menu_index(target_menu)}]")
         self.display_header = False
 
+    def ctrl_output(self, args=[]):
+        if self.core_ctrl is None:
+            print("No application view instance currently working")
+            self.display_header = False
+            return
+        arg_l = len(args)
+        if arg_l == 0:
+            print(self.core_ctrl)
+            self.display_header = False
+        elif args[0] in ['l', 'lvl', 'level']:
+            if arg_l == 2:
+                self.core_ctrl.set_level(int(args[1]))
+            print("Current detail level for application view :", self.core_ctrl.get_level())
+
     # ----- Functions to get available command choices -----
 
     def get_availbale_mod(self):
@@ -251,13 +267,14 @@ class CLIparser:
     def setup_menus(self):
 
         # -- Main menus --
-        self.main_menu = {'desc': "Main menu. Type $help for explanations and $choices to display\n"
-                                  " which commands are available to navigate through menus",
+        self.main_menu = {'desc': "Main menu. Type $help for explanations and $choices to display which\n"
+                                  "commands are available to navigate through menus and their description",
+                          'help': get_res_CLI('main_help'),
                           'choices': {'create': "create",
-                                     'remove': "remove",
-                                     'show': "show",
-                                     'pause': "pause",
-                                     'resume': "resume"},
+                                      'remove': "remove",
+                                      'show': "show",
+                                      'pause': "pause",
+                                      'resume': "resume"},
                           'fct_choice': self.transit_menu,
                           'disp_choice': False}
 
