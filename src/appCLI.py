@@ -8,6 +8,7 @@ class AppCLI(TimerInterface):
     def __init__(self, mode=1, level=0, spawn_display=True):
         self.mode = mode
         self.level = level
+        self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library"]
         self.to_disp = "app"
         self.output = self.config_output()
         self.timer = TimerThread(name="MainTimer")
@@ -46,9 +47,6 @@ class AppCLI(TimerInterface):
     def stop_display_output(self):
         self.output.stop_reading()
 
-    def set_current_todisplay(self, target):
-        self.to_disp = target
-
     def set_level(self, new_lvl):
         if 0 <= new_lvl <= 2:
             self.level = new_lvl
@@ -56,20 +54,17 @@ class AppCLI(TimerInterface):
     def get_level(self):
         return self.level
 
+    def set_current_todisplay(self, target):
+        if target in self.poss_display:
+            self.to_disp = target
+            return True
+        return False
+
     def get_current_todisplay(self):
         if self.to_disp == "app":
-            return self.get_todisplay_app()
-        elif self.to_disp == "routine":
-            pass
-        elif self.to_disp == "netmap":
-            pass
-        elif self.to_disp == "indep":
-            pass
-        elif self.to_disp == "library":
-            pass
-
-    def get_todisplay_app(self):
-        return self.core.__str__()
+            return self.core.__str__()
+        else:
+            return self.core.get_display(self.to_disp, level=self.level)
 
     # ----- Using timer to regenerate display content and refresh displayed output -----
 
@@ -78,7 +73,6 @@ class AppCLI(TimerInterface):
 
     def decr(self):
         to_disp = self.get_current_todisplay()
-        # print("Decr appCLI to send output", to_disp)
         self.output.write(to_disp)
         self.output.pull_output()
 
@@ -109,7 +103,7 @@ class ConsoleOutput:
         self.is_reading = True
         os.remove(self.PIPE_PATH)
         os.mkfifo(self.PIPE_PATH)
-        self.popen = subprocess.Popen([self.terminal, '-e', 'watch', '-n 0,5', 'cat %s' % self.PIPE_PATH])
+        self.popen = subprocess.Popen([self.terminal, '-e', 'watch', '-t', '-n 0,5', 'cat %s' % self.PIPE_PATH])
 
     def stop_reading(self):
         self.is_reading = False

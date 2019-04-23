@@ -101,18 +101,39 @@ class ModManager:
         # return a list with all module descriptors of registered modules in modlib_file
         return self.available_mods
 
+    def list_all_mod_desc(self):
+        actives = [desc for desc in self.available_mods if desc.m_active]
+        passives = [desc for desc in self.available_mods if not desc.m_active]
+        return actives, passives
+
     def list_all_modid(self):
         act = [desc.m_id for desc in self.available_mods if desc.m_active]
         pas = [desc.m_id for desc in self.available_mods if not desc.m_active]
         return act, pas
 
-    def __str__(self):
-        act, pas = self.list_all_modid()
-        s = f"Module manager (library) loaded from {self.modlib_file}\n" \
-            f"listing current available modules from this file:\n" \
-            f"Actives: {', '.join(act)}\n" \
-            f"Passives: {', '.join(pas)}\n"
+    def detail_str(self, level=0):
+        s = f"Module manager (library) loaded from {self.modlib_file}\n"
+        if level == 0:
+            s += f"currently maintaining {len(self.available_mods)} modules"
+        elif level == 1:
+            act, pas = self.list_all_modid()
+            s += f"listing current available modules from this file:\n" \
+                 f"Actives: {', '.join(act)}\n" \
+                 f"Passives: {', '.join(pas)}\n"
+        elif level == 2:
+            act, pas = self.list_all_mod_desc()
+            s += f"created following module descriptors :\n"
+            s += f"\n      <[[ {len(act)} ACTIVE MODULES ]]>\n"
+            for desc in act:
+                s += f" < {desc.m_id} >\n{desc}\n"
+
+            s += f"\n      <[[ {len(pas)} PASSIVE MODULES ]]>\n"
+            for desc in pas:
+                s += f" < {desc.m_id} >\n{desc}\n"
         return s
+
+    def __str__(self):
+        return self.detail_str(level=1)
 
 
 class ModDescriptor:

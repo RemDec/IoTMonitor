@@ -13,8 +13,8 @@ class CLIparser:
         self.get_input = False
         self.curr_menu = {}
         self.curr_choices = []
-        self.reserved = {'main': self.back_main_menu, 'prev': "",
-                         'exit': self.exit, 'help': self.ask_help, 'choices': self.ask_choices,
+        self.reserved = {'main': self.back_main_menu, 'exit': self.exit,
+                         'help': self.ask_help, 'choices': self.ask_choices, 'cmds': self.ask_cmds,
                          'output': self.ctrl_output}
         self.display_header = True
         self.clear_cls = True
@@ -43,11 +43,11 @@ class CLIparser:
                     user_in = self.curr_menu['dflt_choice']
                 completed_in = self.match_input_to_choice(user_in)
                 if len(completed_in) == 0:
-                    print("No corresponding command for this menu")
-                    self.clear_cls = False
+                    print("No corresponding choice for this menu (type $choices)")
+                    self.no_wipe_next()
                 elif len(completed_in) > 1:
                     print("Ambiguous choice between", ', '.join(completed_in))
-                    self.clear_cls = False
+                    self.no_wipe_next()
                 else:
                     user_in = completed_in[0]
                     self.curr_menu['fct_choice'](user_in)
@@ -126,6 +126,10 @@ class CLIparser:
         res = input(marker)
         return res.lower() in val
 
+    def no_wipe_next(self):
+        self.display_header = False
+        self.clear_cls = False
+
     def clear_console(self):
         if self.clear_cls:
             os.system('cls' if os.name == 'nt' else 'clear')
@@ -160,7 +164,7 @@ class CLIparser:
             print(f"[{self.get_menu_index(target_menu)}]description (no help available)\n {target_menu['desc']}")
         else:
             print(f"No help provided for this menu ([{self.get_menu_index(target_menu)}])\n")
-        self.display_header = False
+        self.no_wipe_next()
 
     def ask_choices(self, args=[]):
         target_menu = self.curr_menu
@@ -174,21 +178,30 @@ class CLIparser:
             print(f"List of available choices/command for menu [{self.get_menu_index(target_menu)}] :\n\n{str_choices}")
         else:
             print(f"No available choices list for menu [{self.get_menu_index(target_menu)}]")
-        self.display_header = False
+        self.no_wipe_next()
+
+    def ask_cmds(self, args=[]):
+        print(get_res_CLI('cmds_help', 'No description for special commands'))
+        self.no_wipe_next()
 
     def ctrl_output(self, args=[]):
         if self.core_ctrl is None:
             print("No application view instance currently working")
-            self.display_header = False
+            self.no_wipe_next()
             return
         arg_l = len(args)
         if arg_l == 0:
             print(self.core_ctrl)
-            self.display_header = False
         elif args[0] in ['l', 'lvl', 'level']:
             if arg_l == 2:
                 self.core_ctrl.set_level(int(args[1]))
             print("Current detail level for application view :", self.core_ctrl.get_level())
+        elif args[0] in ['v', 'view']:
+            if arg_l == 2:
+                if not self.core_ctrl.set_current_todisplay(args[1]):
+                    print("Error, give a viewable resource name :", ','.join(self.core_ctrl.poss_display))
+            print("Current viewed resource :", self.core_ctrl.to_disp)
+        self.no_wipe_next()
 
     # ----- Functions to get available command choices -----
 
@@ -234,8 +247,7 @@ class CLIparser:
     def after_show_select(self, show_input_name):
         res_to_show = self.curr_menu['choices'][show_input_name]
         print(self.core.get_display(res_to_show, level=self.curr_display_lvl))
-        self.clear_cls = False
-        self.display_header = False
+        self.no_wipe_next()
 
     def after_delmod_slct(self, mod_setid):
         self.core.remove_from_routine(mod_setid)
