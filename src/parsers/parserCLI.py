@@ -291,6 +291,7 @@ class CLIparser:
                           'disp_choice': False}
 
         self.create = {'desc': "Instantiate an object and integrate it in the application",
+                       'help': get_res_CLI('create_help'),
                        'choices': {'module': "newMod",
                                    'virtual instance': "newVI"},
                        'fct_choice': self.transit_menu}

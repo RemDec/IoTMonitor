@@ -16,6 +16,8 @@ CLIparser = {
                  "redirect in the corresponding menu (if no ambiguity first choice letters suffice)(if defined,\n"
                  "default choice is < > surrounded and selected pressing enter). Each menu is identified by an id.\n\n"
                  + spec_cmds,
+    'create_help': "Build diverse elements to append in the application environment : virtual instance, module, etc.\n"
+                   "Redirect to an interactive form taking parameters for the new instance, or defaults.",
     'cmds_help': spec_cmds
 }
 
