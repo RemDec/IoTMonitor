@@ -62,7 +62,7 @@ class TimerThread(Thread):
             return f"{self.name} (timer state : {state}, interval {self.t}s) ~ {len(self.subs)} subscribers"
         else:
             if len(self.subs) == 0:
-                return f"Timer ({state}) with no subscribed object"
+                return f"Timer {self.name} ({state}) with no subscribed object"
             subs_str = '\n  > ' + '\n  > '.join([f"[{i+1}] {obj}" for i, obj in enumerate(self.subs)])
             return f"{self.name} ({state}) with {len(self.subs)} subscribed objects:{subs_str}"
 

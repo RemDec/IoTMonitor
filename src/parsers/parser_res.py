@@ -10,16 +10,27 @@ spec_cmds =  "There are some commands callable everywhere (not menu choices rela
              "      + view [resource] : print or set current app resource displayed in the output view\n" \
              "                  L type 'any' to display possible code values for available resources\n" \
              "   -cmds : display above special commands description"
-
 CLIparser = {
     'main_help': "This interactive CLI works as a menus navigation system where typing one of the proposed choice\n"
                  "redirect in the corresponding menu (if no ambiguity first choice letters suffice)(if defined,\n"
                  "default choice is < > surrounded and selected pressing enter). Each menu is identified by an id.\n\n"
                  + spec_cmds,
     'create_help': "Build diverse elements to append in the application environment : virtual instance, module, etc.\n"
-                   "Redirect to an interactive form taking parameters for the new instance, or defaults.",
+                   "Redirect to an interactive form taking parameters for the new element instance, or defaults.",
+    'remove_help': "Remove an element already present in the application, like a routine or a virtual instance.\n"
+                   "The target is specified by id, either a setid for the routine or a mapid for a VI.",
+    'show_help': "Print in this console the current state of selected resource considering the current detail level\n"
+                 " level (settable with $set level [0<= int <= 2]).",
+    'pause_help': "Control the routine execution state, pause the panel kill all working background processes and \n"
+                  "pause the queue suspends its timer so no more module working thread will be launched. Pause the\n"
+                  "entire routine is equivalent to pause both.",
+    'resume_help': "Control routine execution state, starting or restarting it. Start panel equals to call launch()\n"
+                   "on every module sitting in (spawning two threads managing underlying cmd subprocess), start queue\n"
+                   "rerun its timer that will decrement every expiration time of modules (spawning a thread at this\n"
+                   "moment running underlying scanning program).",
     'cmds_help': spec_cmds
 }
+
 
 
 def get_res_CLI(resource, dflt=None):
