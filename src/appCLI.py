@@ -8,7 +8,8 @@ class AppCLI(TimerInterface):
     def __init__(self, mode=1, level=0, spawn_display=True):
         self.mode = mode
         self.level = level
-        self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library"]
+        self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library",
+                             "outputs", "threats"]
         self.to_disp = "app"
         self.output = self.config_output()
         self.timer = TimerThread(name="MainTimer")
