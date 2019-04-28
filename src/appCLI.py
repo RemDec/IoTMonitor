@@ -8,7 +8,8 @@ class AppCLI(TimerInterface):
     def __init__(self, mode=1, level=0, spawn_display=True):
         self.mode = mode
         self.level = level
-        self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library"]
+        self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library",
+                             "outputs", "threats"]
         self.to_disp = "app"
         self.output = self.config_output()
         self.timer = TimerThread(name="MainTimer")
@@ -101,7 +102,8 @@ class ConsoleOutput:
 
     def start_reading(self):
         self.is_reading = True
-        os.remove(self.PIPE_PATH)
+        if os.path.exists(self.PIPE_PATH):
+            os.remove(self.PIPE_PATH)
         os.mkfifo(self.PIPE_PATH)
         self.popen = subprocess.Popen([self.terminal, '-e', 'watch', '-t', '-n 0,5', 'cat %s' % self.PIPE_PATH])
 

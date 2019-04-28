@@ -1,6 +1,6 @@
 from src.routine.routine import *
 from src.utils.moduleManager import *
-from src.utils.logger import *
+from src.logging.logger import *
 from src.utils.timer import *
 from src.utils.misc_fcts import has_method
 import signal
