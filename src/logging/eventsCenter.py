@@ -7,6 +7,7 @@ class EventsCenter:
 
     def __init__(self, loggers):
         self.loggers = loggers if isinstance(loggers, list) else [loggers]
+
         self.MAX_THREATS = 20
         self.MAX_MODIFS = 20
         self.threats = []
@@ -33,6 +34,7 @@ class EventsCenter:
 
         modif = ModifEvent(modified_res, obj_type, obj_id, modificator, old_state, new_state)
         self.register_modif_event(modif)
+        self.register_threat_event(modif)
         if logit_with_lvl > 0:
             self.log_event(modif, logit_with_lvl, target_logger)
 
@@ -114,4 +116,4 @@ if __name__ == '__main__':
     center.register_threat("mymodule", 3, "netmapVI_id", "Alert raised by module!")
     center.register_modif("instance MAC field", "virt_inst", "myinst_id", "scanmodule", "unknown", "1C:39:47:12:AA:B3")
     #print(center)
-    print("\n\n##### ordred ####\n", str(center.get_ordered_events()))
+    print("\n\n##### ordered ####\n", str(center.get_ordered_events()))

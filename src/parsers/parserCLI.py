@@ -15,7 +15,7 @@ class CLIparser:
         self.curr_choices = []
         self.reserved = {'main': self.back_main_menu, 'exit': self.exit,
                          'help': self.ask_help, 'choices': self.ask_choices, 'cmds': self.ask_cmds,
-                         'output': self.ctrl_output}
+                         'output': self.ctrl_output, 'set': self.set_cfg_param}
         self.display_header = True
         self.clear_cls = True
         self.curr_display_lvl = 1
@@ -126,6 +126,10 @@ class CLIparser:
         res = input(marker)
         return res.lower() in val
 
+    def get_user_in_or_dflt(self, default, marker=">>>"):
+        user_in = input(marker)
+        return default if user_in == "" else user_in
+
     def no_wipe_next(self):
         self.display_header = False
         self.clear_cls = False
@@ -134,7 +138,7 @@ class CLIparser:
         if self.clear_cls:
             os.system('cls' if os.name == 'nt' else 'clear')
 
-    # ----- Functions related to reserved keywords -----
+    # ----- Functions related to reserved keywords (called when entered) -----
 
     def back_main_menu(self, args=[]):
         self.clear_console()
@@ -203,6 +207,16 @@ class CLIparser:
             print("Current viewed resource :", self.core_ctrl.to_disp)
         self.no_wipe_next()
 
+    def set_cfg_param(self, args=[]):
+        arg_l = len(args)
+        if arg_l == 0:
+            print("Current config")
+        elif args[0] in ['l', 'lvl', 'level']:
+            if arg_l == 2:
+                self.curr_display_lvl = int(args[1])
+            print("Current display level :", self.curr_display_lvl)
+        self.no_wipe_next()
+
     # ----- Functions to get available command choices -----
 
     def get_availbale_mod(self):
@@ -223,7 +237,6 @@ class CLIparser:
         if dflts:
             mod_inst = mod_id
         else:
-            print("Get params entries from desc")
             input_params = {}
             _, PARAMS, desc_params = self.core.modmanager.get_mod_desc_params(mod_id)
             for code_param, (dflt, mand, pref) in PARAMS.items():
@@ -231,7 +244,7 @@ class CLIparser:
                 perm = "mandatory" if mand else "optional"
                 flag = f"flag {pref}" if pref != "" else "no prefix"
                 header = f"Parameter {code_param} ({perm}, {flag}) : {desc}"
-                marker = f"[default:{dflt}] :"
+                marker = f"[default:{dflt if dflt != '' else '<empty>'}] :"
                 user_in = input(f"{header}\n{marker}")
                 if user_in == "":
                     input_params[code_param] = dflt
@@ -239,7 +252,8 @@ class CLIparser:
                     input_params[code_param] = user_in
             mod_inst = self.core.instantiate_module(mod_id, curr_params=input_params)
         if in_rout:
-            self.core.add_to_routine(mod_inst)
+            setid = self.get_user_in_or_dflt(None, marker="Give a setid if desired (alphanumeric)\n[setid] :")
+            self.core.add_to_routine(mod_inst, given_setid=setid)
         else:
             self.core.add_indep_module(mod_inst)
         self.back_main_menu()
@@ -297,6 +311,7 @@ class CLIparser:
                        'fct_choice': self.transit_menu}
 
         self.remove = {'desc': "Remove an existing object in the app",
+                       'help': get_res_CLI('remove_help'),
                        'choices': {'module': "delMod",
                                    'independent module': "delIndepMod",
                                    'virtual instance': "delVI"},
@@ -304,8 +319,7 @@ class CLIparser:
                        'fct_choice': self.transit_menu}
 
         self.show = {'desc': "Display current state of application resources",
-                     'help': "Print here the current state of selected resource with the current detail level "
-                             "(settable with $set level [int]).",
+                     'help': get_res_CLI('show_help'),
                      'choices': {'routine': "routine",
                                  'netmap': "netmap",
                                  'module library': "library",
@@ -315,13 +329,15 @@ class CLIparser:
                      'fct_choice': self.after_show_select}
 
         self.pause = {'desc': "Pause (interrupt running module threads) routine or its components",
+                      'help': get_res_CLI('pause_help'),
                       'choices': {'entire routine': "routine",
-                           'panel only': "panel",
-                           'queue only': "queue"},
+                                  'panel only': "panel",
+                                  'queue only': "queue"},
                       'dflt_choice': 'entire routine',
                       'fct_choice': self.after_pause_slct}
 
         self.resume = {'desc': "Resume or start routine or its components",
+                       'help': get_res_CLI('resume_help'),
                        'choices': {'entire routine': "routine",
                                    'panel only': "panel",
                                    'queue only': "queue"},
