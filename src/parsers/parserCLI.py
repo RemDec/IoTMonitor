@@ -43,7 +43,8 @@ class CLIparser:
                     user_in = self.curr_menu['dflt_choice']
                 completed_in = self.match_input_to_choice(user_in)
                 if len(completed_in) == 0:
-                    print("No corresponding choice for this menu (type $choices)")
+                    print(f"No corresponding choice for this menu [id:{self.get_currmenu_index()}]"
+                          f" (type $choices or $help)")
                     self.no_wipe_next()
                 elif len(completed_in) > 1:
                     print("Ambiguous choice between", ', '.join(completed_in))

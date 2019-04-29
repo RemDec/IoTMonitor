@@ -34,7 +34,6 @@ class EventsCenter:
 
         modif = ModifEvent(modified_res, obj_type, obj_id, modificator, old_state, new_state)
         self.register_modif_event(modif)
-        self.register_threat_event(modif)
         if logit_with_lvl > 0:
             self.log_event(modif, logit_with_lvl, target_logger)
 
@@ -98,7 +97,7 @@ class EventsCenter:
             s += f"    | Threats events logged in history ({len(self.threats)}/{self.MAX_THREATS})\n"
             for _, threat in reversed(self.threats):
                 s += f"    + {threat.detail_str(level=0)}"
-            s += f"    |\n    | Modifications events logged in history {len(self.modifs)}/{self.MAX_MODIFS}\n"
+            s += f"    |\n    | Modifications events logged in history ({len(self.modifs)}/{self.MAX_MODIFS})\n"
             for _, modif in reversed(self.modifs):
                 s += f"    + {modif.detail_str(level=0)}"
         else:
@@ -110,10 +109,14 @@ class EventsCenter:
 
 
 if __name__ == '__main__':
-    from src.logging.logger import *
-    l = Logger()
+    from src.logging.logger_setup import *
+    l = CustomLoggerSetup()
     center = EventsCenter(logging.getLogger("debug"))
     center.register_threat("mymodule", 3, "netmapVI_id", "Alert raised by module!")
     center.register_modif("instance MAC field", "virt_inst", "myinst_id", "scanmodule", "unknown", "1C:39:47:12:AA:B3")
-    #print(center)
-    print("\n\n##### ordered ####\n", str(center.get_ordered_events()))
+    center.register_threat("second_module", 5, "another_mapid", "Very SERIOUS alert!")
+    center.register_threat("mymodule", 1, "another_mapid", "Same module raised easy alert")
+    print(center)
+    print("\n\n##### all event ordered ####\n")
+    for event in center.get_ordered_events():
+        print(event)

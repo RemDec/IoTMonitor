@@ -1,6 +1,6 @@
 from src.routine.routine import *
 from src.utils.moduleManager import *
-from src.logging.logger import *
+from src.logging.logger_setup import *
 from src.utils.timer import *
 from src.utils.misc_fcts import has_method
 import signal
@@ -8,13 +8,13 @@ import signal
 
 class Core:
 
-    def __init__(self, timer=None, logger=None):
+    def __init__(self, timer=None, logger_setup=None):
         signal.signal(signal.SIGINT, self.interrupt_handler)
         self.modmanager = ModManager()
         self.timer = TimerThread() if timer is None else timer
         self.netmap = ["Virtual Instances"]
         self.routine = Routine(timer=self.timer, netmap=self.netmap)
-        self.logger = Logger() if logger is None else logger
+        self.logger_setup = CustomLoggerSetup() if logger_setup is None else logger_setup
         self.indep_mods = []
 
         self.modmanager.load_modlib()
@@ -102,16 +102,18 @@ class Core:
     def get_netmap(self):
         return self.netmap
 
-    # ----- Output -----
+    # ----- Output visualisation -----
 
     def get_diagram_view(self):
         pass
 
-    def get_threats_logs(self):
-        pass
+    # ----- Logging and events -----
 
-    def set_handler(self, for_logger, handler_cfg):
-        pass
+    def get_logger_setup(self):
+        return self.logger_setup
+
+    def get_event_center(self):
+        return self.logger_setup.event_center
 
     # ----- Utilities -----
 
@@ -127,7 +129,9 @@ class Core:
         self.quit()
 
     def corresp_target(self, target_str):
-        if target_str == "routine":
+        if target_str == "app":
+            return self
+        elif target_str == "routine":
             return self.routine
         elif target_str == "netmap":
             return self.netmap
@@ -137,11 +141,25 @@ class Core:
             return self.indep_mods
         elif target_str == "library":
             return self.modmanager
+        elif target_str == "events":
+            return self.get_event_center()
+        elif target_str == "threats":
+            return self.get_event_center().get_threat_events()
+        elif target_str == "modifs":
+            return self.get_event_center().get_modif_events()
 
     def get_display(self, target, level=0):
         obj = self.corresp_target(target)
+        if isinstance(obj, list):
+            all_display = ""
+            for indiv_obj in obj:
+                if has_method(indiv_obj, 'detail_str'):
+                    all_display += indiv_obj.detail_str(level=level)
+                else:
+                    all_display += str(indiv_obj)
+            return all_display
         if has_method(obj, 'detail_str'):
-            return obj.detail_str(level)
+            return obj.detail_str(level=level)
         else:
             return obj.__str__()
 
@@ -149,7 +167,7 @@ class Core:
         actives, passives = self.modmanager.list_all_modid()
         indeps = [mod.m_id for mod in self.indep_mods]
         s = f"=++====== Core application =========\n"
-        s += f" || Using logger {self.logger}\n"
+        s += f" || Using logger {self.logger_setup}\n"
         s += f" || Main timer : {self.timer}\n"
         s += f" || Available AModules : {', '.join(actives)}\n"
         s += f" || Available PModules : {', '.join(passives)}\n"

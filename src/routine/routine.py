@@ -146,9 +146,9 @@ if __name__ == '__main__':
     from modules.actives.nmapExplorer import *
     from modules.passives.pingTarget import *
     from src.utils.timer import *
-    from src.logging.logger import *
+    from src.logging.logger_setup import *
 
-    Logger()
+    CustomLoggerSetup()
     t = TimerThread()
     nmap = AModNmapExplorer()
     ping = PModPing(timer=t)

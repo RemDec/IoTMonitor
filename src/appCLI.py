@@ -1,6 +1,7 @@
 from src.parsers.parserCLI import *
 from src.appcore import *
-import subprocess, os
+import subprocess
+import os
 
 
 class AppCLI(TimerInterface):
@@ -9,7 +10,7 @@ class AppCLI(TimerInterface):
         self.mode = mode
         self.level = level
         self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library",
-                             "outputs", "threats"]
+                             "events", "threats", "modifs"]
         self.to_disp = "app"
         self.output = self.config_output()
         self.timer = TimerThread(name="MainTimer")
@@ -62,10 +63,8 @@ class AppCLI(TimerInterface):
         return False
 
     def get_current_todisplay(self):
-        if self.to_disp == "app":
-            return self.core.__str__()
-        else:
-            return self.core.get_display(self.to_disp, level=self.level)
+        str_to_disp = self.core.get_display(self.to_disp, level=self.level)
+        return str_to_disp if str_to_disp != '' else f"< blank display returned for {self.to_disp}>"
 
     # ----- Using timer to regenerate display content and refresh displayed output -----
 
@@ -89,7 +88,7 @@ class ConsoleOutput:
         self.PIPE_PATH = "/tmp/output_monitor"
         self.is_reading = False
         self.popen = None
-        self.terminal = 'xterm'
+        self.terminal = 'x-terminal-emulator'
 
     def write(self, to_output):
         # print("Before write", to_output)
