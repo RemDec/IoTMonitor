@@ -24,6 +24,11 @@ class ModifEvent:
             return False
         return app_id == self.obj_id
 
+    def rel_to_vi(self):
+        if self.obj_id is None or self.obj_id == "":
+            return False
+        return self.obj_id
+
     def detail_str(self, level=1):
         id = f"id in app:{self.obj_id}, " if self.obj_id is not None else ""
         typ = f"object type:{self.obj_type}"

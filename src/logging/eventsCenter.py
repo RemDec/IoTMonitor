@@ -56,7 +56,7 @@ class EventsCenter:
     def log_event(self, event, logit_with_lvl, target_logger):
         logging.getLogger(target_logger).log(level=logit_with_lvl, msg=str(event))
 
-    def get_ordered_events(self, filter_fct=lambda x: True):
+    def get_ordered_events(self, filter_fct=lambda x: True, keep_temp=False):
         threats_list = self.get_threat_events(filter_fct=filter_fct, keep_temp=True)
         modifs_list = self.get_modif_events(filter_fct=filter_fct, keep_temp=True)
         events = []
@@ -66,16 +66,22 @@ class EventsCenter:
             temp_i, threat = threats_list[i]
             while j >= 0 and modifs_list[j][0] < temp_i:
                 # modif event is older than current i threat event
-                events.insert(0, modifs_list[j][1])
+                event = modifs_list[j] if keep_temp else modifs_list[j][1]
+                events.insert(0, event)
                 j -= 1
-            events.insert(0, threat)
+            event = (temp_i, threat) if keep_temp else threat
+            events.insert(0, event)
         while j >= 0:
-            events.insert(0, modifs_list[j][1])
+            event = modifs_list[j] if keep_temp else modifs_list[j][1]
+            events.insert(0, event)
             j -= 1
         return events
 
-    def filter_events(self, target, filter_fct=lambda x: True, keep_temp=False):
-        target = self.threats if target == "threats" else self.modifs
+    def filter_events(self, target='all', filter_fct=lambda x: True, keep_temp=False):
+        if target == 'all':
+            target = self.get_ordered_events(filter_fct=filter_fct, keep_temp=True)
+        else:
+            target = self.threats if target == "threats" else self.modifs
         filtered = []
         for temp, event in target:
             if filter_fct(event):
@@ -109,7 +115,7 @@ class EventsCenter:
 
 
 if __name__ == '__main__':
-    from src.logging.logger_setup import *
+    from src.logging.logger_setup import CustomLoggerSetup
     l = CustomLoggerSetup()
     center = EventsCenter(logging.getLogger("debug"))
     center.register_threat("mymodule", 3, "netmapVI_id", "Alert raised by module!")
