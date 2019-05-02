@@ -66,7 +66,7 @@ def str_frame(str_to_frame):
     return f"{lim}\n{str_to_frame}\n{lim}\n"
 
 
-def str_multiframe(str_to_frame):
+def str_lines_frame(str_to_frame):
     """Nice formatting for a given multiline string (framing it).
 
     For str\nlonger returns
@@ -81,6 +81,33 @@ def str_multiframe(str_to_frame):
     top = bound_frame(adjusted[0])
     bot = bound_frame(adjusted[-1])
     return '\n'.join([top] + adjusted + [bot]) + '\n'
+
+
+def str_multiframe(strlist, by_pack_of=3):
+    """Nice formatting for several multilines str at the same level
+
+    Adjust multilines strings on same horizontal basis
+    For [str1, str2] where str1="+-----+\n+| str    |\n..." etc. returns
+    +--------+  +--------+
+    | str    |  | str2   |
+    | longer |  | same l |
+    +--------+  +--------+
+    """
+    final = ""
+    pack = 0
+    while pack < len(strlist):
+        pack_to = min(pack+by_pack_of, len(strlist))
+        frames = [s.split('\n') for s in strlist[pack:pack_to]]
+        deepest = max(list(map(len, frames)))
+        for frame in frames:
+            frame.remove('')
+            if len(frame) < deepest:
+                frame_wide = max(list(map(len, frame)))
+                frame.extend([' '*frame_wide]*(deepest-len(frame)))
+        for level in range(deepest):
+            final += '  '.join([lvl_str[level] for lvl_str in frames]) + '\n'
+        pack += by_pack_of
+    return final
 
 
 def get_root_path():
@@ -108,8 +135,8 @@ if __name__ == '__main__':
     print(str_frame("simple|frame"))
     print(str_frame("test with \n carriage"))
     print("\n-----------------\n")
-    print(str_multiframe("with one | only | line"))
-    print(str_multiframe("str\nstr a bit longer\nmark|here"))
+    print(str_lines_frame("with one | only | line"))
+    print(str_lines_frame("str\nstr a bit longer\nmark|here"))
 
     a = {0: 1, 1: {}, 2: {0: "b", 1: "c"}, 3: {0: {}}}
     replace_in_dicts(a, 0, "a")

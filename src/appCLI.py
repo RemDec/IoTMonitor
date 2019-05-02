@@ -6,7 +6,7 @@ import os
 
 class AppCLI(TimerInterface):
 
-    def __init__(self, mode=1, level=0, spawn_display=True):
+    def __init__(self, mode=1, level=1, spawn_display=True):
         self.mode = mode
         self.level = level
         self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library",

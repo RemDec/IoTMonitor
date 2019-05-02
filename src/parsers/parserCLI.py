@@ -1,5 +1,6 @@
 from src.appcore import *
-from src.utils.misc_fcts import str_multiframe
+from src.net.virtualInstance import *
+from src.utils.misc_fcts import str_lines_frame
 from src.parsers.parser_res import get_res_CLI
 import os
 
@@ -67,6 +68,7 @@ class CLIparser:
             return choices()
         if isinstance(choices, dict):
             return [choices.keys()]
+        return choices
 
     def str_curr_choices(self):
         return self.str_choices(self.curr_menu, 0)
@@ -101,7 +103,7 @@ class CLIparser:
         s = ""
         if include_header:
             if disp_desc and self.curr_menu['desc'] != "":
-                s = str_multiframe(f"[{self.get_currmenu_index()}] {self.curr_menu['desc']}")
+                s = str_lines_frame(f"[{self.get_currmenu_index()}] {self.curr_menu['desc']}")
             if disp_choice:
                 s += "Following commands/choices are available :\n" + self.str_curr_choices()
         s += '\n' + marker
@@ -220,10 +222,14 @@ class CLIparser:
 
     # ----- Functions to get available command choices -----
 
-    def get_availbale_mod(self):
+    def get_available_mods(self):
+        # Get all available mods in the current library, actives and passives
+        # [[actives m_id] , [passives m_id]]
         return self.core.get_available_mods(only_names=True)
 
     def get_routine_setids(self):
+        # Get all modules in the current routine as their set_id
+        # [[mod in panel pid] , [mod in queue qid]]
         return self.core.get_all_setids()
 
     # ----- Functions called after a choice is taken (given as a string in arg) -----
@@ -276,6 +282,29 @@ class CLIparser:
     def after_pause_slct(self, to_resume):
         target = self.get_choice_val(to_resume)
         self.core.pause_it(target)
+        self.back_main_menu()
+
+    def iv_creation(self, preset):
+        if preset in ['basic', 'scratch']:
+            mac = self.get_user_in_or_dflt(default=None, marker="[MAC address]: ")
+            ip = self.get_user_in_or_dflt(default=None, marker="[IP address]: ")
+            hostname = self.get_user_in_or_dflt(default=None, marker="[hostname]: ")
+            vi = VirtualInstance(mac=mac, ip=ip, hostname=hostname, user_created=True)
+            if preset == 'scratch':
+                print("Add known port infos entries")
+                port = self.get_user_in_or_dflt(default=None, marker="[used port]: ")
+                while port is not None:
+                    vi.get_ports_table().set_port(int(port))
+                    port = self.get_user_in_or_dflt(default=None, marker="[used port]: ")
+                print("Additional divers fields")
+                for field in vi.unused_div_fields():
+                    field_val = self.get_user_in_or_dflt(default=None, marker=f"[{field}]: ")
+                    if field_val is not None:
+                        vi.add_divinfo(field, field_val)
+        mapid = self.get_user_in_or_dflt(default=None, marker="[map id?]: ")
+        print(vi.detail_str(level=2))
+        if self.get_user_confirm(f"Confirm [{mapid}] adding to netmap ? (Y/n)"):
+            self.core.add_to_netmap(vi, mapid)
         self.back_main_menu()
 
     # ----- Menus configurations -----
@@ -346,11 +375,14 @@ class CLIparser:
                        'fct_choice': self.after_resume_slct}
 
         # -- Secondary menu --
-        self.create_mod = {'desc': "Choose a module in the current library",
-                           'marker': "[mod_id] :", 'choices': self.get_availbale_mod,
+        self.create_mod = {'desc': "Choose a module in the current library and instantiate it",
+                           'marker': "[mod_id] :", 'choices': self.get_available_mods,
                            'fct_choice': self.after_mod_slct}
 
-        self.create_VI = {'desc': "", 'marker': ">>", 'choices': []}
+        self.create_VI = {'desc': "Create a new 'virtual instance' ie a network equipment",
+                          'choices': [['basic', 'scratch']],
+                          'dflt_choice': 'basic',
+                          'fct_choice': self.iv_creation}
 
         self.remove_mod = {'desc': "Remove a module from routine by its setid",
                            'marker': "[setid] :", 'choices': self.get_routine_setids,

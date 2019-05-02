@@ -2,6 +2,7 @@ from src.routine.routine import *
 from src.utils.moduleManager import *
 from src.logging.logger_setup import *
 from src.utils.timer import *
+from src.net.netmap import *
 from src.utils.misc_fcts import has_method
 import signal
 
@@ -12,7 +13,7 @@ class Core:
         signal.signal(signal.SIGINT, self.interrupt_handler)
         self.modmanager = ModManager()
         self.timer = TimerThread() if timer is None else timer
-        self.netmap = ["Virtual Instances"]
+        self.netmap = Netmap()
         self.routine = Routine(timer=self.timer, netmap=self.netmap)
         self.logger_setup = CustomLoggerSetup() if logger_setup is None else logger_setup
         self.indep_mods = []
@@ -90,13 +91,13 @@ class Core:
 
     # ----- Netmap interactions -----
 
-    def add_to_netmap(self, iv):
-        pass
+    def add_to_netmap(self, vi, mapid=None):
+        self.netmap.add_VI(vi, mapid)
 
-    def get_from_netmap(self, index):
-        pass
+    def get_from_netmap(self, mapid):
+        self.netmap.get_VI(mapid)
 
-    def remove_from_netmap(self, index):
+    def remove_from_netmap(self, mapid):
         pass
 
     def get_netmap(self):
@@ -175,5 +176,5 @@ class Core:
         s += f" ++------- ROUTINE -------"
         s += f"{self.routine.detail_str()}"
         s += f" ||\n ++------- NETMAP -------\n"
-        s += f"{str(self.netmap)}"
+        s += f"{self.netmap.detail_str(level=2)}"
         return s

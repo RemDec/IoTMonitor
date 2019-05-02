@@ -1,5 +1,5 @@
 from src.utils.timer import *
-from src.utils.misc_fcts import str_frame, str_multiframe
+from src.utils.misc_fcts import str_frame, str_lines_frame
 
 
 class Queue(TimerInterface):

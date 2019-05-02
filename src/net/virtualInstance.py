@@ -1,4 +1,4 @@
-from src.utils.misc_fcts import str_multiframe
+from src.utils.misc_fcts import str_lines_frame
 
 
 div_fields = {'manufacturer': "",
@@ -16,12 +16,15 @@ class VirtualInstance:
         self.ports_table = ports if isinstance(ports, PortTable) else PortTable(ports)
         self.user_created = user_created
 
-    def used_div_fields(self):
+    def used_div_fields(self, keep_val=False):
         used = []
         for field, value in self.div.items():
             if value != "" and value is not None:
-                used.append(field)
+                used.append((field, value) if keep_val else field)
         return used
+
+    def unused_div_fields(self):
+        return [field for field in self.div if self.div.get(field) is not None]
 
     def revelant_field(self):
         if self.mac is not None:
@@ -50,10 +53,32 @@ class VirtualInstance:
                 return True
         return False
 
+    # --- Misc ---
+
+    def get_mac(self, dflt="< empty >"):
+        return dflt if self.mac is None else self.mac
+
+    def get_ip(self, dflt="< empty >"):
+        return dflt if self.ip is None else self.ip
+
+    def get_hostname(self, dflt="< empty >"):
+        return dflt if self.hostname is None else self.hostname
+
+    def get_ports_table(self):
+        return self.ports_table
+
+    def get_defined_fields(self):
+        s = f"{'' if self.mac is None else 'MAC, '}" \
+            f"{'' if self.ip is None else 'IP, '}" \
+            f"{'' if self.hostname is None else 'hostname, '}" \
+            f"{', '.join(self.used_div_fields())}"
+        return s
+
     def detail_str(self, level=0):
         s = f"Virtual Instance {'created manually' if self.user_created else ''}: {self.revelant_field()}\n"
         if level == 0:
-            return s
+            defined = f" | fields: {self.get_defined_fields()}\n"
+            return s + defined
         elif level == 1:
             s += f" | MAC: {self.mac} - IP: {self.ip} - hostname: {self.hostname}\n"
             s += f" | Other available fields : {', '.join(self.used_div_fields())}\n"
@@ -72,7 +97,7 @@ class VirtualInstance:
             return s
 
     def __str__(self):
-        pass
+        return self.detail_str()
 
 
 class PortTable:
@@ -90,16 +115,24 @@ class PortTable:
             return self.table.keys()
         return [port for port in self.table.keys() if self.table[port][2] not in ['unknown', 'closed']]
 
+    def is_empty(self):
+        return self.table == {}
+
+    def str_ports_list(self, header=None):
+        s = "Registered ports with <service, protocol, state>\n" if header is None else header
+        ports = sorted(self.table.keys())
+        for port in ports:
+            (service, prot, state) = self.table[port]
+            s += f" | {port} : < {service}, {prot}, {state} >\n"
+        return s
+
     def detail_str(self, level=0):
+        if self.is_empty():
+            return "Empty ports table\n"
         if level == 0:
             return f"Registered ports in table : {', '.join(map(str,self.list_ports()))}"
         elif level == 1:
-            s = "Registered ports with <service, protocol, state>\n"
-            ports = sorted(self.table.keys())
-            for port in ports:
-                (service, prot, state) = self.table[port]
-                s += f" | {port} : < {service}, {prot}, {state} >\n"
-            return s
+            return self.str_ports_list()
         else:
             ports = sorted(self.table.keys())
             services, prots, states = [], [], []
@@ -124,7 +157,7 @@ class PortTable:
                 s += '|'.join([s_port, s_serv, s_prot, s_state])
                 if i != len(ports)-1:
                     s += '\n'
-            return str_multiframe(s)
+            return str_lines_frame(s)
 
     def __str__(self):
         return self.detail_str(1)
@@ -137,4 +170,6 @@ if __name__ == '__main__':
     print(table.detail_str(level=2))
 
     vi = VirtualInstance(mac="50:B7:C3:4F:BE:8C", ip="192.168.1.1", hostname="testvi", ports=ports, user_created=True)
-    print(vi.detail_str(level=2))
+    print("\n ### print lvl 0 ###\n", vi.detail_str(level=0))
+    print("\n ### print lvl 1 ###\n", vi.detail_str(level=1))
+    print("\n ### print lvl 2 ###\n", vi.detail_str(level=2))
