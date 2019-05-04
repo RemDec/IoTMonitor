@@ -27,6 +27,7 @@ class EventsCenter:
         self.register_threat_event(threat)
         if logit_with_lvl > 0:
             self.log_event(threat, logit_with_lvl, target_logger)
+        return threat
 
     def register_modif(self, modified_res, obj_type='app_res', obj_id=None, modificator='app',
                        old_state=None, new_state=None,
@@ -36,6 +37,7 @@ class EventsCenter:
         self.register_modif_event(modif)
         if logit_with_lvl > 0:
             self.log_event(modif, logit_with_lvl, target_logger)
+        return modif
 
     def register_threat_event(self, threat_event):
         self.threats.insert(0, (self.temp_ind, threat_event))

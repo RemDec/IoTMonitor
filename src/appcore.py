@@ -98,10 +98,13 @@ class Core:
         self.netmap.get_VI(mapid)
 
     def remove_from_netmap(self, mapid):
-        pass
+        self.netmap.remove_VI(mapid)
 
     def get_netmap(self):
         return self.netmap
+
+    def get_all_mapids(self):
+        return self.netmap.get_VI_mapids()
 
     # ----- Output visualisation -----
 

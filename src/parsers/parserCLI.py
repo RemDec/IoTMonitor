@@ -232,6 +232,9 @@ class CLIparser:
         # [[mod in panel pid] , [mod in queue qid]]
         return self.core.get_all_setids()
 
+    def get_map_mapids(self):
+        return [self.core.get_all_mapids()]
+
     # ----- Functions called after a choice is taken (given as a string in arg) -----
 
     def transit_menu(self, menu_input_name):
@@ -270,7 +273,7 @@ class CLIparser:
         print(self.core.get_display(res_to_show, level=self.curr_display_lvl))
         self.no_wipe_next()
 
-    def after_delmod_slct(self, mod_setid):
+    def after_remove_mod_slct(self, mod_setid):
         self.core.remove_from_routine(mod_setid)
         self.back_main_menu()
 
@@ -305,6 +308,10 @@ class CLIparser:
         print(vi.detail_str(level=2))
         if self.get_user_confirm(f"Confirm [{mapid}] adding to netmap ? (Y/n)"):
             self.core.add_to_netmap(vi, mapid)
+        self.back_main_menu()
+
+    def after_remove_vi_slct(self, vi_mapid):
+        self.core.remove_from_netmap(vi_mapid)
         self.back_main_menu()
 
     # ----- Menus configurations -----
@@ -386,11 +393,13 @@ class CLIparser:
 
         self.remove_mod = {'desc': "Remove a module from routine by its setid",
                            'marker': "[setid] :", 'choices': self.get_routine_setids,
-                           'fct_choice': self.after_delmod_slct}
+                           'fct_choice': self.after_remove_mod_slct}
 
         self.remove_indep_mod = {'desc': "Remove a module from routine independent running module"}
 
-        self.remove_VI = {'desc': "Remove a virtual instance from the netmap"}
+        self.remove_VI = {'desc': "Remove a virtual instance from the netmap by mapid",
+                          'marker': "[mapid] :", 'choices': self.get_map_mapids,
+                          'fct_choice': self.after_remove_vi_slct}
 
         # Association between choice code value and real menu objects
         self.index_menus = {"main": self.main_menu,

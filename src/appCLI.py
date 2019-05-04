@@ -88,7 +88,7 @@ class ConsoleOutput:
         self.PIPE_PATH = "/tmp/output_monitor"
         self.is_reading = False
         self.popen = None
-        self.terminal = 'x-terminal-emulator'
+        self.terminal = 'xterm'
 
     def write(self, to_output):
         # print("Before write", to_output)
@@ -113,6 +113,8 @@ class ConsoleOutput:
         self.stop_reading()
         if self.popen is not None:
             self.popen.terminate()
+            if self.popen.poll() is None:
+                self.popen.kill()
 
     def __str__(self):
         return f"ConsoleOutput spawning {self.terminal} monitoring app state pulling info from pipe\n" \
