@@ -1,5 +1,5 @@
 from modules.abcActiveModule import *
-
+from src.utils.misc_fcts import get_ip
 
 desc_PARAMS = {"IP": "Target IP adress(es) acceptable as Nmap syntax",
                "SYNports": "Ports targeted for SYN probing",
@@ -11,12 +11,13 @@ class AModNmapExplorer(ActiveModule):
 
     def __init__(self, params=None, netmap=None):
         super().__init__(netmap)
+        subnetwork = get_ip(mask='24')
         self.m_id = "nmapexplo"
         self.CMD = "nmap -sn"
         self.PARAMS = {"options": ("", False, ""),
                        "SYNports": ("21,22,23,80,443,3389", True, "-PS"),
                        "UDPports": ("53,135,137,161", True, "-PU"),
-                       "IP": ("192.168.1.0/24", True, "")
+                       "IP": (subnetwork, True, "")
                        }
         self.desc_PARAMS = desc_PARAMS
 

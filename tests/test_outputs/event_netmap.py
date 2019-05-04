@@ -30,7 +30,7 @@ netmap = Netmap(event_center=center)
 fill_netmap(netmap)
 print("### After filling netmap ###\n", netmap.detail_str(level=1))
 register_events(netmap)
-print("### After registering events ###\n", netmap.detail_str(level=3))
+print("### After registering events ###\n", netmap.detail_str(level=2))
 events_vi1 = netmap.get_all_events_for_vi('VirtInst1')
 
 print("### Retrieving saved events for 1 virtual instance ###\n\n")
