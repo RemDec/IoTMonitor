@@ -1,4 +1,6 @@
 from src.net.virtualInstance import *
+from src.logging.modifEvent import *
+from src.logging.threatEvent import *
 from src.utils.misc_fcts import str_multiframe
 
 
@@ -7,6 +9,9 @@ class Netmap:
     def __init__(self, map=None, event_center=None):
         self.map = {} if map is None else map
         self.event_center = event_center
+        self.svd_events = {}
+
+    # ----- Interactions with the network map maintaining Virtual Instances -----
 
     def add_VI(self, vi, given_mapid=None):
         mapid = self.get_unique_id(given_mapid)
@@ -22,6 +27,47 @@ class Netmap:
             self.add_VI(vi, given_mapid=mapid)
         return mapid, vi
 
+    def get_VI(self, mapid):
+        return self.map.get(mapid)
+
+    def vi_present(self, mapid):
+        if isinstance(mapid, str):
+            return mapid in self.map
+
+    def get_VI_mapids(self, filter_fct=lambda vi_inst: True):
+        ids = []
+        for mapid in self.map:
+            if filter_fct(self.get_VI(mapid)):
+               ids.append(mapid)
+        return ids
+
+    def get_similar_VI(self, mac=None, ip=None, hostname=None, div={}):
+        for mapid in self.map:
+            vi = self.map[mapid]
+            if vi.repr_same_device(mac, ip, hostname, div):
+                return mapid
+
+    # ----- Events interactions (saved for VI and logged in event center) -----
+
+    # -- with saved events in this netmap instance --
+
+    def get_saved_events_for_vi(self, mapid, target='all'):
+        events = self.svd_events.get(mapid, [])
+        if target == 'all':
+            return events
+        elif target == 'threats':
+            return [threat for threat in events if isinstance(threat, ThreatEvent)]
+        else:
+            return [modif for modif in events if isinstance(modif, ModifEvent)]
+
+    def get_saved_threats_for_vi(self, mapid):
+        return self.get_saved_events_for_vi(mapid, 'threats')
+
+    def get_saved_modifs_for_vi(self, mapid):
+        return self.get_saved_events_for_vi(mapid, 'modifs')
+
+    # -- with events in eventcenter memory --
+
     def get_events_for_vi(self, mapid, target='all'):
         vi = self.get_VI(mapid)
         if self.event_center is None or vi is None:
@@ -36,21 +82,58 @@ class Netmap:
     def get_modifs_for_vi(self, mapid):
         return self.get_events_for_vi(mapid, target='modifs')
 
-    def get_VI(self, mapid):
-        return self.map.get(mapid)
+    # -- with both simultaneously --
 
-    def get_VI_mapids(self, filter_fct=lambda vi_inst: True):
-        ids = []
-        for mapid in self.map:
-            if filter_fct(self.get_VI(mapid)):
-               ids.append(mapid)
-        return ids
+    def get_all_events_for_vi(self, mapid, target='all'):
+        return self.get_events_for_vi(mapid, target) + self.get_saved_events_for_vi(mapid, target)
 
-    def get_similar_VI(self, mac=None, ip=None, hostname=None, div={}):
-        for mapid in self.map:
-            vi = self.map[mapid]
-            if vi.repr_same_device(mac, ip, hostname, div):
-                return mapid
+    # ----- Registering events through this map -----
+
+    def add_vi_event(self, mapid, event):
+        vi_ev_list = self.svd_events.get(mapid)
+        if vi_ev_list is None:
+            self.svd_events[mapid] = [event]
+        else:
+            vi_ev_list.insert(0, event)
+
+    def register_threat(self, from_module, level=1, mapid=None, msg=None, patch=None,
+                        logit_with_lvl=-1, target_logger="threat",
+                        save_vi_event=True):
+
+        if self.event_center is None:
+            return False
+        event = self.event_center.register_threat(from_module, level, mapid, msg, patch,
+                                                  logit_with_lvl, target_logger)
+        if save_vi_event:
+            self.register_threat_event(event)
+
+    def register_modif(self, modified_res, obj_type='app_res', obj_id=None, modificator='app',
+                       old_state=None, new_state=None,
+                       logit_with_lvl=-1, target_logger="modif",
+                       save_vi_event=True):
+
+        if self.event_center is None:
+            return False
+        event = self.event_center.register_modif(modified_res, obj_type, obj_id, modificator,
+                                                 old_state, new_state,
+                                                 logit_with_lvl, target_logger)
+        if save_vi_event:
+            self.register_modif_event(event)
+
+    def register_event(self, event):
+        vi_relative = event.rel_to_vi()
+        if vi_relative and self.vi_present(vi_relative):
+            self.add_vi_event(vi_relative, event)
+            return True
+        return False
+
+    def register_threat_event(self, threat_event):
+        self.register_event(threat_event)
+
+    def register_modif_event(self, modif_event):
+        self.register_event(modif_event)
+
+    # ----- Misc and printing -----
 
     def check_unique_id(self, mapid):
         return not(mapid in self.map)
@@ -66,18 +149,22 @@ class Netmap:
             new_mapid = mapid + str(i)
         return new_mapid
 
+    def vi_icons(self, mapid):
+        nbr_threats = len(self.get_saved_threats_for_vi(mapid))
+        nbr_modifs = len(self.get_saved_modifs_for_vi(mapid))
+        state = self.get_VI(mapid).str_state()
+        return f"[{state}]    {nbr_threats} /!\\  {nbr_modifs} -o-"
+
     def vi_frame_str(self, mapid, max_char=25):
         vi = self.get_VI(mapid)
-        header = f" {mapid} [state] "
+        header = f" {mapid} {self.vi_icons(mapid)} "
         l = max(max_char, len(header))
-        cut = lambda s:s if len(s)<l else s[:l]
+        cut = lambda s: s if len(s)<l else s[:l]
         s = header + '\n' + '='*l + '\n'
         s += cut(f" MAC: {vi.get_mac()}") + '\n'
         s += cut(f" IP: {vi.get_ip()}") + '\n'
         s += cut(f" Hostname:{vi.get_hostname()}") + '\n'
         ports = vi.get_ports_table().str_ports_list("Ports table:\n").split('\n')
-        if len(ports) == 0:
-            s += f"  < empty ports table >\n"
         s += '\n'.join([cut(portline) for portline in ports])
         for field, val in vi.used_div_fields(keep_val=True):
             s += cut(f" {field}: {val}") + '\n'
@@ -85,16 +172,25 @@ class Netmap:
 
     def detail_str(self, level=0):
         s = f"Netmap maintaining {len(self.map)} virtual instances" \
-            f"{'' if self.event_center is None else 'and ref to an EventCenter'}\n"
+            f"{'' if self.event_center is None else ' and ref to an EventCenter'}\n"
         if level == 0:
             return s + ', '.join(self.get_VI_mapids()) + '\n'
         elif level == 1:
             for mapid, vi in self.map.items():
-                s += f"   <<<[{mapid}]>>>\n{vi.detail_str(1)}"
+                s += f"      <<<[{mapid}]>>>\n{vi.detail_str(1)}"
             return s
-        else:
+        elif level == 2:
             vi_frames = [self.vi_frame_str(mapid) for mapid in self.get_VI_mapids()]
             return s + str_multiframe(vi_frames)
+        else:
+            for mapid, vi in self.map.items():
+                s += f"\n      <<<[{mapid}]>>>\n{vi.detail_str(2)}"
+                saved_events = self.get_saved_events_for_vi(mapid)
+                if len(saved_events) > 0:
+                    s += "  +-Saved events attached to this VI\n"
+                    for event in saved_events:
+                        s += "  |" + event.detail_str(level=0)
+            return s
 
     def __str__(self):
         return self.detail_str()

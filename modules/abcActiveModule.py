@@ -71,18 +71,19 @@ class ActiveModule(Module):
 
 class ScriptThread(threading.Thread):
 
-    def __init__(self, callback_fct=None, max_exec_time=120):
+    def __init__(self, callback_fct=None, max_exec_time=120, cmd_as_shell=False):
         threading.Thread.__init__(self)
         self.callback_fct = callback_fct
         self.max_exec_time = max_exec_time
         self.cmd = []
         self.popen = None
+        self.cmd_as_shell = cmd_as_shell
 
     def run(self):
         logging.getLogger("debug").debug(f"Starting thread : {super().getName()}")
         self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE,
-                                  stderr=subprocess.STDOUT,
-                                  universal_newlines=True)
+                                      stderr=subprocess.STDOUT, universal_newlines=True,
+                                      shell=self.cmd_as_shell)
         try:
             return_code = self.popen.wait(timeout=self.max_exec_time)
             if self.callback_fct is not None:
@@ -93,7 +94,7 @@ class ScriptThread(threading.Thread):
 
     def start(self, cmd):
         self.cmd = cmd
-        super().setName(f"Thread ({threading.currentThread().ident}) running {' '.join(cmd)}")
+        super().setName(f"Thread ({threading.currentThread().ident}) running {self.cmd_to_str()}")
         super().start()
 
     def interrupt(self):
@@ -111,10 +112,18 @@ class ScriptThread(threading.Thread):
         else:
             return True, ret
 
+    def cmd_to_str(self):
+        if isinstance(self.cmd, str):
+            return self.cmd
+        elif isinstance(self.cmd, list):
+            return ' '.join(self.cmd)
+        else:
+            return str(self.cmd)
+
     def __str__(self):
         ended, code_or_pid = self.under_proc_state()
         fname, modname = get_infoname_py(self.callback_fct)
-        s = f"Script thread (max duration:{self.max_exec_time}s) for cmd {' '.join(self.cmd)}"
+        s = f"Script thread (max duration:{self.max_exec_time}s) for cmd {self.cmd_to_str()}"
         if ended:
             s += f"\n  |_ script subprocess exited with return code {code_or_pid}"
         else:

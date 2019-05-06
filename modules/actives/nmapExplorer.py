@@ -1,9 +1,11 @@
 from modules.abcActiveModule import *
-
+from src.utils.misc_fcts import get_ip
+from lxml import etree
 
 desc_PARAMS = {"IP": "Target IP adress(es) acceptable as Nmap syntax",
                "SYNports": "Ports targeted for SYN probing",
                "UDPports": "Ports targeted for UDP probing",
+               "XMLfile": "The temp file where scan output will be written",
                "options": "other options compatible with -sn to pass to nmap"}
 
 
@@ -13,10 +15,12 @@ class AModNmapExplorer(ActiveModule):
         super().__init__(netmap)
         self.m_id = "nmapexplo"
         self.CMD = "nmap -sn"
+        subnetwork = get_ip(mask='24')
         self.PARAMS = {"options": ("", False, ""),
                        "SYNports": ("21,22,23,80,443,3389", True, "-PS"),
                        "UDPports": ("53,135,137,161", True, "-PU"),
-                       "IP": ("192.168.1.0/24", True, "")
+                       "XMLfile": ("/tmp/xml_nmapexplo.xml", True, "-oX "),
+                       "IP": (subnetwork, True, "")
                        }
         self.desc_PARAMS = desc_PARAMS
 
@@ -32,13 +36,31 @@ class AModNmapExplorer(ActiveModule):
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
     def parse_output(self, output):
-        pass
+        root = etree.parse(output).getroot()
+        hosts = root.findall('host')
+        for host in hosts:
+            state = host.find('status').get('state')
+            addrs = host.findall('address')
+            ip, mac, manuf = None, None, None
+            for addr in addrs:
+                t, a = addr.get('addrtype'), addr.get('addr')
+                if t == 'ipv4':
+                    ip = a
+                elif t == 'mac':
+                    mac = a
+                    manuf = addr.get('vendor')
+            if self.netmap is not None:
+                mapid = self.netmap.get_similar_VI(mac=mac, ip=ip)
+                if mapid is None:
+                    self.netmap.create_VI(mac=mac, ip=ip, div={'manufacturer': manuf})[1].set_state(state)
+                else:
+                    pass
 
     def distrib_output(self, script_output):
         if isinstance(script_output[0], int):
             code, popen = script_output
-            output = popen.stdout.read()
-            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution returned (code {code}):\n{output}")
+            output = popen.stdout
+            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution returned (code {code})")
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             py_except, popen = script_output
@@ -46,9 +68,10 @@ class AModNmapExplorer(ActiveModule):
 
     def launch(self):
         super().purge_threadlist()
-        cmd = self.CMD.split(' ')
+        cmd = self.CMD + ' '
         for param, val in self.params.items():
-            cmd.append(self.PARAMS[param][2] + val)
+            cmd += self.PARAMS[param][2] + val + ' '
+        cmd += '> /dev/null && cat ' + self.params['XMLfile']
         s_thread = self.get_script_thread()
         s_thread.start(cmd)
         super().register_thread(s_thread)
@@ -57,7 +80,7 @@ class AModNmapExplorer(ActiveModule):
         super().terminate_threads()
 
     def get_script_thread(self):
-        return ScriptThread(callback_fct=self.distrib_output, max_exec_time=10)
+        return ScriptThread(callback_fct=self.distrib_output, max_exec_time=60, cmd_as_shell=True)
 
     def get_default_timer(self):
         return 60

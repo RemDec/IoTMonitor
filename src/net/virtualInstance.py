@@ -15,6 +15,11 @@ class VirtualInstance:
         self.div = div if div is not None else div_fields
         self.ports_table = ports if isinstance(ports, PortTable) else PortTable(ports)
         self.user_created = user_created
+        self.STATES = ['unknown', 'up', 'down']
+        self.state = 'unknown'
+
+    def add_divinfo(self, key, value):
+        self.div[key] = value
 
     def used_div_fields(self, keep_val=False):
         used = []
@@ -34,9 +39,6 @@ class VirtualInstance:
         elif self.hostname is not None:
             return self.hostname
 
-    def add_divinfo(self, key, value):
-        self.div[key] = value
-
     def repr_same_device(self, mac=None, ip=None, hostname=None, div={}):
         if mac is not None:
             return self.mac == mac
@@ -53,6 +55,12 @@ class VirtualInstance:
                 return True
         return False
 
+    def set_state(self, new_state):
+        if new_state in self.STATES:
+            self.state = new_state
+            return True
+        return False
+
     # --- Misc ---
 
     def get_mac(self, dflt="< empty >"):
@@ -67,6 +75,14 @@ class VirtualInstance:
     def get_ports_table(self):
         return self.ports_table
 
+    def str_state(self):
+        if self.state == 'unknown':
+            return '?'
+        elif self.state == 'up':
+            return 'v'
+        elif self.state == 'down':
+            return 'n'
+
     def get_defined_fields(self):
         s = f"{'' if self.mac is None else 'MAC, '}" \
             f"{'' if self.ip is None else 'IP, '}" \
@@ -75,7 +91,8 @@ class VirtualInstance:
         return s
 
     def detail_str(self, level=0):
-        s = f"Virtual Instance {'created manually' if self.user_created else ''}: {self.revelant_field()}\n"
+        manual = 'created manually' if self.user_created else ''
+        s = f"Virtual Instance (state:{self.state}) {manual}: {self.revelant_field()}\n"
         if level == 0:
             defined = f" | fields: {self.get_defined_fields()}\n"
             return s + defined
@@ -118,7 +135,9 @@ class PortTable:
     def is_empty(self):
         return self.table == {}
 
-    def str_ports_list(self, header=None):
+    def str_ports_list(self, header=None, empty_str="Empty ports table\n"):
+        if self.is_empty():
+            return empty_str
         s = "Registered ports with <service, protocol, state>\n" if header is None else header
         ports = sorted(self.table.keys())
         for port in ports:

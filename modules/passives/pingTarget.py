@@ -16,7 +16,7 @@ class PModPing(PassiveModule):
         self.PARAMS = {"nbr": ("", False, "-c"),
                        "interv": ("", False, "-i"),
                        "divargs": ("", False, ""),
-                       "IP": ("192.168.1.1", True, "")}
+                       "IP": ("8.8.8.8", True, "")}
         self.desc_PARAMS = desc_PARAMS
         self.read_interval = read_interval
 

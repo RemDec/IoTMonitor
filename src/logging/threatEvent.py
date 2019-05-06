@@ -31,7 +31,7 @@ class ThreatEvent:
 
     def detail_str(self, level=1):
         for_vi = self.rel_to_vi()
-        s = f"/!\\ [{self.level}] threat declared by {self.from_module}{' for '+for_vi if for_vi else ''}\n"
+        s = f"/!\\ [{self.level}] threat declared by {self.from_module}{' for '+str(for_vi) if for_vi else ''}\n"
         if level == 1:
             if self.msg is None:
                 s += f"    no description provided\n"
