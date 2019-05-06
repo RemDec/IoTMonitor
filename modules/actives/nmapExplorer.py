@@ -2,6 +2,7 @@ from modules.abcActiveModule import *
 from src.utils.misc_fcts import get_ip
 from lxml import etree
 
+
 desc_PARAMS = {"IP": "Target IP adress(es) acceptable as Nmap syntax",
                "SYNports": "Ports targeted for SYN probing",
                "UDPports": "Ports targeted for UDP probing",
@@ -13,6 +14,7 @@ class AModNmapExplorer(ActiveModule):
 
     def __init__(self, params=None, netmap=None):
         super().__init__(netmap)
+        subnetwork = get_ip(mask='24')
         self.m_id = "nmapexplo"
         self.CMD = "nmap -sn"
         subnetwork = get_ip(mask='24')
