@@ -3,7 +3,7 @@ from src.utils.misc_fcts import get_ip
 from lxml import etree
 
 
-desc_PARAMS = {"IP": "Target IP adress(es) acceptable as Nmap syntax",
+desc_PARAMS = {"IP": "Target IP address(es) acceptable as Nmap syntax",
                "SYNports": "Ports targeted for SYN probing",
                "UDPports": "Ports targeted for UDP probing",
                "XMLfile": "The temp file where scan output will be written",
@@ -56,7 +56,7 @@ class AModNmapExplorer(ActiveModule):
                 if mapid is None:
                     self.netmap.create_VI(mac=mac, ip=ip, div={'manufacturer': manuf})[1].set_state(state)
                 else:
-                    pass
+                    self.netmap.get_VI(mapid).complete_fields(mac=mac, ip=ip, div={'manufacturer': manuf})
 
     def distrib_output(self, script_output):
         if isinstance(script_output[0], int):
@@ -88,7 +88,8 @@ class AModNmapExplorer(ActiveModule):
         return 60
 
     def get_description(self):
-        return f"[{self.m_id}] Nmap scan to discover hosts (-sn mode) by SYN/UDP probing on common ports (need sudo)"
+        return f"[{self.m_id}] Nmap scan to discover hosts (-sn mode, no port scanning)" \
+               f" by SYN/UDP probing on common ports (need sudo)"
 
     def get_module_id(self):
         return self.m_id

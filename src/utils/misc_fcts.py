@@ -14,7 +14,7 @@ def get_ip(dflt_ip='127.0.0.1', mask=None):
         ip = dflt_ip
     finally:
         s.close()
-    return ip if mask is None else ip + '/' + mask
+    return ip if mask is None else ip + '/' + str(mask)
 
 
 def has_method(obj, name):
