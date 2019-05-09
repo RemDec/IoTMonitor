@@ -241,7 +241,8 @@ class CommunicationThread(threading.Thread, TimerInterface):
 
     def start(self, pipe_output):
         self.pipe_r = pipe_output
-        super().setName(f"Communication thread ({threading.currentThread().ident}) with pipe {self.pipe_r} as given param (read every {self.read_t}s)")
+        super().setName(f"Communication thread ({threading.currentThread().ident}) with pipe {self.pipe_r}"
+                        f" as given param (read every {self.read_t}s)")
         super().start()
 
     def set_reading(self, run=True, t=None):

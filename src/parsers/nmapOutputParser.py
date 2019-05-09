@@ -38,7 +38,7 @@ class NmapParser:
                     kept_attrs[attr_key] = attr_val
         return kept_attrs
 
-    def addr_from_host(self, host_elmt):
+    def addr_from_host(self, host_elmt, add_info_fct=lambda addr_elmt: []):
         ip, mac, others = None, None, {}
         for addr in host_elmt.findall('address'):
             ad, adtype = addr.get('addr'), addr.get('addrtype')
@@ -46,4 +46,7 @@ class NmapParser:
                 ip = ad
             elif adtype == 'mac':
                 mac = ad
+            list_pairs = add_info_fct(addr)
+            for key, got_val in list_pairs:
+                others[key] = got_val
         return ip, mac, others

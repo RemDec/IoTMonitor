@@ -182,6 +182,8 @@ class PortTable:
             if creating:
                 self.set_port(num, infos)
             return
+        if isinstance(infos, tuple):
+            infos = self.tupleinfo_to_dict(infos)
         for field, val in infos.items():
             if field in entry:
                 # Main field

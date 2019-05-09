@@ -245,6 +245,38 @@ class CLIparser:
         dflts = self.get_user_confirm(f"[{mod_id}] use defaults params (Y/n)? ")
         in_rout = self.get_user_confirm(f"[{mod_id}] append it in routine (Y/n) ?")
         if dflts:
+            mod_inst = self.core.instantiate_module(mod_id)
+        else:
+            input_params = {}
+            _, PARAMS, desc_params = self.core.modmanager.get_mod_desc_params(mod_id)
+            for code_param, (dflt, mand, pref) in PARAMS.items():
+                desc = desc_params.get(code_param, "No parameter description")
+                perm = "mandatory" if mand else "optional"
+                flag = f"flag {pref}" if pref != "" else "no prefix"
+                header = f"Parameter {code_param} ({perm}, {flag}) : {desc}"
+                marker = f"[default:{dflt if dflt != '' else '<empty>'}] :"
+                user_in = input(f"{header}\n{marker}")
+                if user_in == "":
+                    input_params[code_param] = dflt
+                else:
+                    input_params[code_param] = user_in
+            mod_inst = self.core.instantiate_module(mod_id, curr_params=input_params)
+        is_mod_act = mod_inst.is_active()
+        timer_name = f"{'queue expiration' if is_mod_act else 'reading'} interval timer"
+        dflt_val = mod_inst.get_default_timer() if is_mod_act else mod_inst.get_read_interval()
+        input_timer = self.get_user_in_or_dflt(dflt_val,
+                                               marker=f"Set {timer_name} if desired (numeric)\n[default:{dflt_val}] :")
+        if in_rout:
+            setid = self.get_user_in_or_dflt(None, marker="Give a setid if desired (alphanumeric)\n[setid] :")
+            self.core.add_to_routine(mod_inst, given_setid=setid, given_timer=abs(int(input_timer)))
+        else:
+            self.core.add_indep_module(mod_inst)
+        self.back_main_menu()
+
+    def after_mod_slctOld(self, mod_id):
+        dflts = self.get_user_confirm(f"[{mod_id}] use defaults params (Y/n)? ")
+        in_rout = self.get_user_confirm(f"[{mod_id}] append it in routine (Y/n) ?")
+        if dflts:
             mod_inst = mod_id
         else:
             input_params = {}

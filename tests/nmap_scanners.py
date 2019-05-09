@@ -19,8 +19,8 @@ print(netmap.detail_str(level=3))
 
 # Launching modules
 print("#### Launching scanning modules ####")
-nmapexplo.launch()
-nmap_ports.launch()
+for mod in mods:
+    mod.launch()
 
 # After
 

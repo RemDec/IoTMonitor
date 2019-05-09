@@ -1,6 +1,6 @@
 from modules.abcActiveModule import *
 from src.utils.misc_fcts import get_ip
-from src.parsers.nmapOutputParser import *
+from src.parsers.nmapOutputParser import NmapParser
 from src.net.virtualInstance import PortTable
 
 
@@ -14,7 +14,7 @@ class AModNmapPortDisc(ActiveModule):
                        'nbrports': ("50", True, "--top-ports "),
                        'version': ("true", True, "-sV"),
                        'XMLfile': ("/tmp/xml_nmap_portdisc.xml", True, "-oX "),
-                       'IP': (get_ip(mask=30), True, "")
+                       'IP': (get_ip(mask=24), True, "")
                        }
         self.desc_PARAMS = {'options': "Others options to pass to nmap scan",
                             'nbrports': "How many of top most used ports should be probed",

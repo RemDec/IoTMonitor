@@ -1,5 +1,6 @@
 from modules.abcActiveModule import *
 from src.utils.misc_fcts import get_ip
+from src.parsers.nmapOutputParser import NmapParser
 from lxml import etree
 
 
@@ -38,6 +39,20 @@ class AModNmapExplorer(ActiveModule):
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
     def parse_output(self, output):
+        parser = NmapParser(output)
+        hosts = parser.get_hosts()
+        for host in hosts:
+            state = host.find('status').get('state')
+            ip, mac, other = parser.addr_from_host(host, lambda a: [('manuf', a.get('vendor'))])
+            manuf = other['manuf']
+            if self.netmap is not None:
+                mapid = self.netmap.get_similar_VI(mac=mac, ip=ip)
+                if mapid is None:
+                    self.netmap.create_VI(mac=mac, ip=ip, div={'manufacturer': manuf})[1].set_state(state)
+                else:
+                    self.netmap.get_VI(mapid).complete_fields(mac=mac, ip=ip, div={'manufacturer': manuf})
+
+    def parse_outputold(self, output):
         root = etree.parse(output).getroot()
         hosts = root.findall('host')
         for host in hosts:

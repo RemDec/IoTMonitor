@@ -11,12 +11,25 @@
       <dependencies/>
     </actmod>
     <actmod modid="nmapexplo" pymod="modules.actives.nmapExplorer" pyclass="AModNmapExplorer">
-      <desc>[nmapexplo] Nmap scan to discover hosts (-sn mode) by SYN/UDP probing on common ports (need sudo)</desc>
+      <desc>[nmapexplo] Nmap scan to discover hosts (-sn mode, no port scanning) by SYN/UDP probing on common ports (need sudo)</desc>
       <defparams>
         <param code="options" mandatory="False" default="" prefix="">other options compatible with -sn to pass to nmap</param>
         <param code="SYNports" mandatory="True" default="21,22,23,80,443,3389" prefix="-PS">Ports targeted for SYN probing</param>
         <param code="UDPports" mandatory="True" default="53,135,137,161" prefix="-PU">Ports targeted for UDP probing</param>
-        <param code="IP" mandatory="True" default="192.168.1.0/24" prefix="">Target IP adress(es) acceptable as Nmap syntax</param>
+        <param code="XMLfile" mandatory="True" default="/tmp/xml_nmapexplo.xml" prefix="-oX ">The temp file where scan output will be written</param>
+        <param code="IP" mandatory="True" default="192.168.0.4/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
+      </defparams>
+      <savedparams/>
+      <dependencies/>
+    </actmod>
+    <actmod modid="nmapports" pymod="modules.actives.nmapPortDiscovery" pyclass="AModNmapPortDisc">
+      <desc>[nmapports] Nmap scan focusing on used ports discovery, attempting on a nbr of top most common ports</desc>
+      <defparams>
+        <param code="options" mandatory="False" default="" prefix="">Others options to pass to nmap scan</param>
+        <param code="nbrports" mandatory="True" default="50" prefix="--top-ports ">How many of top most used ports should be probed</param>
+        <param code="version" mandatory="True" default="true" prefix="-sV">Should try to guess running version of services</param>
+        <param code="XMLfile" mandatory="True" default="/tmp/xml_nmap_portdisc.xml" prefix="-oX ">The temp file where scan output will be written</param>
+        <param code="IP" mandatory="True" default="192.168.0.4/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams/>
       <dependencies/>
@@ -38,7 +51,7 @@
         <param code="nbr" mandatory="False" default="" prefix="-c">Integer if should ping limited times</param>
         <param code="interv" mandatory="False" default="" prefix="-i">Interval between each ping</param>
         <param code="divargs" mandatory="False" default="" prefix="">Other acceptable args for ping command</param>
-        <param code="IP" mandatory="True" default="192.168.1.1" prefix="">Target IP adress(es) in ping command syntax</param>
+        <param code="IP" mandatory="True" default="8.8.8.8" prefix="">Target IP adress(es) in ping command syntax</param>
       </defparams>
       <savedparams/>
       <dependencies/>

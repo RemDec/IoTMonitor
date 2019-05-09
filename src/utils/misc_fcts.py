@@ -137,13 +137,14 @@ def get_root_path():
 
 
 def write_modlib(file_dest=None):
-    from modules.actives import arbitraryCmd, nmapExplorer
+    from modules.actives import arbitraryCmd, nmapExplorer, nmapPortDiscovery
     from modules.passives import arbitraryCmdBg, pingTarget
     from src.utils.moduleManager import ModManager
+    from src.utils.filesManager import get_dflt_entry
 
     if file_dest is None:
-        file_dest = get_root_path() / 'svd' / 'configs' / 'modlib.xml'
-    actives = [arbitraryCmd.AModArbitraryCmd(), nmapExplorer.AModNmapExplorer()]
+        file_dest = get_dflt_entry('lib')
+    actives = [arbitraryCmd.AModArbitraryCmd(), nmapExplorer.AModNmapExplorer(), nmapPortDiscovery.AModNmapPortDisc()]
     passives = [arbitraryCmdBg.PModArbitraryCmdBg(), pingTarget.PModPing()]
     mod_instances = actives + passives
     ModManager(str(file_dest)).create_modlib(mod_instances)

@@ -18,6 +18,8 @@ class Routine:
         if mod.is_active():
             well_added = self.queue.add_module(mod, given_timer=given_timer, given_id=given_id)
         else:
+            if given_timer > 0:
+                mod.set_read_interval(given_timer)
             well_added = self.panel.add_module(mod, given_id=given_id)
         if not well_added:
             # Raise exception
