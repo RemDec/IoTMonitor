@@ -83,12 +83,12 @@ class ModManager:
         # generate xml struct with module proper identifier and used params on it (not all general), to reinstance later
         return ModDescriptor(mod_inst=mod_instance).modconfig_to_xml(set_id)
 
-    def modinst_from_modconfig(self, xml_config):
-        # instanciate a module from its id and set params in config
+    def modinst_from_modconfig(self, xml_config, timer=None, netmap=None):
+        # instantiate a module from its xml modconfig element (as returned by modconfig_to_xm) and set params in config
         mod_desc = ModDescriptor()
         mod_desc.parse_modconfig(xml_config)
         if self.is_available(mod_desc.m_id):
-            mod_inst = self.get_mod_from_id(mod_desc.m_id)
+            mod_inst = self.get_mod_from_id(mod_desc.m_id, timer=timer, netmap=netmap)
             mod_inst.set_params(mod_desc.curr_params)
             return mod_inst, mod_desc.setid
 
@@ -110,6 +110,12 @@ class ModManager:
         act = [desc.m_id for desc in self.available_mods if desc.m_active]
         pas = [desc.m_id for desc in self.available_mods if not desc.m_active]
         return act, pas
+
+    def instantiate_all_available_mods(self, timer=None, netmap=None):
+        actives_desc, passives_desc = self.list_all_mod_desc()
+        act_instances = [mod_desc.get_mod_instance(timer=timer, netmap=netmap) for mod_desc in actives_desc]
+        pas_instances = [mod_desc.get_mod_instance(timer=timer, netmap=netmap) for mod_desc in passives_desc]
+        return act_instances, pas_instances
 
     def detail_str(self, level=0):
         s = f"Module manager (library) loaded from {self.modlib_file}\n"
@@ -268,10 +274,7 @@ class ModDescriptor:
     def get_mod_instance(self, default_params=True, timer=None, netmap=None):
         from importlib import import_module
         modclass = getattr(import_module(self.pymod), self.pyclass)
-        if self.m_active:
-            mod_inst = modclass(netmap=netmap)
-        else:
-            mod_inst = modclass(timer=timer, netmap=netmap)
+        mod_inst = modclass(netmap=netmap) if self.m_active else modclass(timer=timer, netmap=netmap)
         if default_params:
             return mod_inst
         mod_inst.set_params(self.curr_params)
@@ -307,7 +310,7 @@ if __name__ == '__main__':
 
     from modules.passives.pingTarget import *
     ping = PModPing()
-    manager = ModManager(get_dflt_entry("div_outputs", suffix="test.xml"))
+    manager = ModManager(get_dflt_entry("div_outputs", suffix="test_modManager.xml"))
     manager.create_modlib([nmap, nmap2, ping], True)
     manager.load_modlib()
     print("## Create and reload modlib ##")

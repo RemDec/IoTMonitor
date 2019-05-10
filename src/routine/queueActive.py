@@ -84,6 +84,9 @@ class Queue(TimerInterface):
     def is_empty(self):
         return len(self.set) == 0
 
+    def get_nbr_mods(self):
+        return len(self.set)
+
     def get_mod_by_id(self, qid):
         for entry in self.set:
             if entry.qid == qid:

@@ -6,9 +6,10 @@ import os
 
 class AppCLI(TimerInterface):
 
-    def __init__(self, mode=1, level=1, spawn_display=True):
+    def __init__(self, mode=1, level=1, spawn_display=True, save_on_exit=True):
         self.mode = mode
         self.level = level
+        self.save_on_exit = save_on_exit
         self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library",
                              "events", "threats", "modifs"]
         self.to_disp = "app"
@@ -31,6 +32,8 @@ class AppCLI(TimerInterface):
     def stop_app(self):
         self.cli.stop_parsing()
         self.output.exit()
+        if self.save_on_exit:
+
         self.core.quit()
 
     # ----- Managing independent display interface (other terminal, graphical text field, ..)

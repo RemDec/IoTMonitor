@@ -1,16 +1,17 @@
 from src.routine.panelPassive import *
 from src.routine.queueActive import *
-
+from modules.abcModule import Module
 
 class Routine:
 
-    def __init__(self, modules=[], timer=None, netmap=None):
+    def __init__(self, modules=[], timer=None, netmap=None, panel=None, queue=None):
         self.MAX_ID_LGTH = 15
-        self.panel = Panel(netmap=netmap)
-        self.queue = Queue(timer=timer, netmap=netmap)
+        self.panel = Panel(netmap=netmap) if panel is None else panel
+        self.queue = Queue(timer=timer, netmap=netmap) if queue is None else queue
         # routine is running if at least panel or queue is running
         self.is_running = False
         self.add_modules(modules)
+        self.correct_state()
 
     # --- Routine interactions ---
 
@@ -31,8 +32,9 @@ class Routine:
             if isinstance(any_mod, Module):
                 self.add_module(any_mod)
             elif isinstance(any_mod, tuple):
-                mod, id, interv = any_mod
-                self.add_module(mod, id, 0 if interv is None else interv)
+                mod, id = any_mod[2:]
+                interv = 0 if len(any_mod) < 3 else any_mod[2]
+                self.add_module(mod, id, interv)
 
     def remove_module(self, setid_or_mod):
         return self.get_corresp_set(setid_or_mod).remove_module(setid_or_mod)

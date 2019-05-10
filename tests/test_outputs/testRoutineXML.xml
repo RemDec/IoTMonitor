@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='ASCII'?>
+<xmlsave>
+  <routine running="False">
+    <queue running="False" nbr_mods="3">
+      <modconfig modid="nmapports" setid="nmapports">
+        <savedparams>
+          <param code="nbrports" value="50"/>
+          <param code="version" value="true"/>
+          <param code="XMLfile" value="/tmp/xml_nmap_portdisc.xml"/>
+          <param code="IP" value="192.168.1.33/24"/>
+        </savedparams>
+      </modconfig>
+      <modconfig modid="nmapexplo" setid="nmapexplo">
+        <savedparams>
+          <param code="SYNports" value="21,22,23,80,443,3389"/>
+          <param code="UDPports" value="53,135,137,161"/>
+          <param code="XMLfile" value="/tmp/xml_nmapexplo.xml"/>
+          <param code="IP" value="192.168.1.33/24"/>
+        </savedparams>
+      </modconfig>
+      <modconfig modid="arbcmd" setid="arbcmd">
+        <savedparams>
+          <param code="prog" value="echo"/>
+        </savedparams>
+      </modconfig>
+    </queue>
+    <panel running="False" nbr_mods="2">
+      <modconfig modid="arbcmd_bg" setid="arbcmd_bg">
+        <savedparams>
+          <param code="prog" value="watch"/>
+        </savedparams>
+      </modconfig>
+      <modconfig modid="pingit" setid="pingit">
+        <savedparams>
+          <param code="IP" value="8.8.8.8"/>
+        </savedparams>
+      </modconfig>
+    </panel>
+  </routine>
+</xmlsave>

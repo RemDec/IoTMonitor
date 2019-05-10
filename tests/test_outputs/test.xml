@@ -2,31 +2,35 @@
 <modlib>
   <actives>
     <actmod modid="nmapexplo" pymod="modules.actives.nmapExplorer" pyclass="AModNmapExplorer">
-      <desc>[nmapexplo] Nmap scan to discover hosts (-sn mode) by SYN/UDP probing on common ports (need sudo)</desc>
+      <desc>[nmapexplo] Nmap scan to discover hosts (-sn mode, no port scanning) by SYN/UDP probing on common ports (need sudo)</desc>
       <defparams>
         <param code="options" mandatory="False" default="" prefix="">other options compatible with -sn to pass to nmap</param>
         <param code="SYNports" mandatory="True" default="21,22,23,80,443,3389" prefix="-PS">Ports targeted for SYN probing</param>
         <param code="UDPports" mandatory="True" default="53,135,137,161" prefix="-PU">Ports targeted for UDP probing</param>
-        <param code="IP" mandatory="True" default="192.168.1.0/24" prefix="">Target IP adress(es) acceptable as Nmap syntax</param>
+        <param code="XMLfile" mandatory="True" default="/tmp/xml_nmapexplo.xml" prefix="-oX ">The temp file where scan output will be written</param>
+        <param code="IP" mandatory="True" default="127.0.0.1/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams>
         <param code="SYNports" value="21,22,23,80,443,3389"/>
         <param code="UDPports" value="53,135,137,161"/>
+        <param code="XMLfile" value="/tmp/xml_nmapexplo.xml"/>
         <param code="IP" value="MODIFIED PARAM"/>
       </savedparams>
       <dependencies/>
     </actmod>
     <actmod modid="nmapexplo" pymod="modules.actives.nmapExplorer" pyclass="AModNmapExplorer">
-      <desc>[nmapexplo] Nmap scan to discover hosts (-sn mode) by SYN/UDP probing on common ports (need sudo)</desc>
+      <desc>[nmapexplo] Nmap scan to discover hosts (-sn mode, no port scanning) by SYN/UDP probing on common ports (need sudo)</desc>
       <defparams>
         <param code="options" mandatory="False" default="" prefix="">other options compatible with -sn to pass to nmap</param>
         <param code="SYNports" mandatory="True" default="21,22,23,80,443,3389" prefix="-PS">Ports targeted for SYN probing</param>
         <param code="UDPports" mandatory="True" default="53,135,137,161" prefix="-PU">Ports targeted for UDP probing</param>
-        <param code="IP" mandatory="True" default="192.168.1.0/24" prefix="">Target IP adress(es) acceptable as Nmap syntax</param>
+        <param code="XMLfile" mandatory="True" default="/tmp/xml_nmapexplo.xml" prefix="-oX ">The temp file where scan output will be written</param>
+        <param code="IP" mandatory="True" default="127.0.0.1/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams>
         <param code="SYNports" value="21,22,23,80,443,3389"/>
         <param code="UDPports" value="53,135,137,161"/>
+        <param code="XMLfile" value="/tmp/xml_nmapexplo.xml"/>
         <param code="IP" value="MODIFIED PARAM"/>
       </savedparams>
       <dependencies/>
@@ -39,10 +43,10 @@
         <param code="nbr" mandatory="False" default="" prefix="-c">Integer if should ping limited times</param>
         <param code="interv" mandatory="False" default="" prefix="-i">Interval between each ping</param>
         <param code="divargs" mandatory="False" default="" prefix="">Other acceptable args for ping command</param>
-        <param code="IP" mandatory="True" default="192.168.1.1" prefix="">Target IP adress(es) in ping command syntax</param>
+        <param code="IP" mandatory="True" default="8.8.8.8" prefix="">Target IP adress(es) in ping command syntax</param>
       </defparams>
       <savedparams>
-        <param code="IP" value="192.168.1.1"/>
+        <param code="IP" value="8.8.8.8"/>
       </savedparams>
       <dependencies/>
     </passmod>
