@@ -2,6 +2,7 @@ from src.routine.panelPassive import *
 from src.routine.queueActive import *
 from modules.abcModule import Module
 
+
 class Routine:
 
     def __init__(self, modules=[], timer=None, netmap=None, panel=None, queue=None):

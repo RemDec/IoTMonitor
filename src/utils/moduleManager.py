@@ -3,12 +3,12 @@ from lxml.builder import E
 from src.utils.misc_fcts import str_param_comp
 from src.utils.filesManager import get_dflt_entry
 
-default_libfile = get_dflt_entry("lib")
+default_libfile = get_dflt_entry("dflt_lib")
 
 
 class ModManager:
 
-    def __init__(self, modlib_file=str(default_libfile), load_direct=False):
+    def __init__(self, modlib_file=default_libfile, load_direct=False):
         self.modlib_file = modlib_file
         self.available_mods = []
         if load_direct:

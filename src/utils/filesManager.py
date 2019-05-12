@@ -14,7 +14,7 @@ dflt_dirs = {
                 }
 
 dflt_files = {
-                "lib": ("configs", 'modlib.xml'),
+                "dflt_lib": ("configs", 'modlib.xml'),
                 "dflt_logger": ("configs", 'default_logger.yaml')
             }
 
@@ -52,6 +52,12 @@ class FilesManager:
             dirpath = self.assoc_dirs.get(res)
             if dirpath is not None:
                 return str(root / dirpath)
+
+    def check_file(self, path):
+        return True
+
+    def check_all_files(self):
+        return True
 
 
 if __name__ == '__main__':

@@ -1,5 +1,7 @@
-from src.parsers.parserCLI import *
-from src.appcore import *
+from src.coreConfig import CoreConfig
+from src.parsers.parserCLI import CLIparser
+from src.appcore import Core
+from src.utils.timer import TimerInterface, TimerThread
 import subprocess
 import os
 
@@ -16,7 +18,8 @@ class AppCLI(TimerInterface):
         self.output = self.config_output()
         self.timer = TimerThread(name="MainTimer")
         self.timer.subscribe(self)
-        self.core = Core(timer=self.timer)
+        self.coreconfig = CoreConfig(timer=self.timer)
+        self.core = Core(self.coreconfig)
 
         self.cli = CLIparser(self.core, core_controller=self)
         self.start_app(spawn_display)
@@ -33,7 +36,7 @@ class AppCLI(TimerInterface):
         self.cli.stop_parsing()
         self.output.exit()
         if self.save_on_exit:
-
+            pass
         self.core.quit()
 
     # ----- Managing independent display interface (other terminal, graphical text field, ..)

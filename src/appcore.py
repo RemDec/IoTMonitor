@@ -1,21 +1,17 @@
-from src.routine.routine import *
-from src.utils.moduleManager import *
-from src.logging.logger_setup import *
-from src.utils.timer import *
-from src.net.netmap import *
+from src.coreConfig import CoreConfig
 from src.utils.misc_fcts import has_method
 import signal
 
 
 class Core:
 
-    def __init__(self, timer=None, logger_setup=None):
+    def __init__(self, coreconfig=CoreConfig()):
         signal.signal(signal.SIGINT, self.interrupt_handler)
-        self.modmanager = ModManager()
-        self.timer = TimerThread() if timer is None else timer
-        self.netmap = Netmap()
-        self.routine = Routine(timer=self.timer, netmap=self.netmap)
-        self.logger_setup = CustomLoggerSetup() if logger_setup is None else logger_setup
+        self.logger_setup = coreconfig.logger_setup
+        self.modmanager = coreconfig.modmanager
+        self.timer = coreconfig.timer
+        self.netmap = coreconfig.netmap
+        self.routine = coreconfig.routine
         self.indep_mods = []
 
         self.modmanager.load_modlib()
