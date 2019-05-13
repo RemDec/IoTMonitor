@@ -24,6 +24,13 @@ def has_method(obj, name):
     return callable(getattr(obj, name, None))
 
 
+def obj_str(obj, level=0):
+    if has_method(obj, 'detail_str'):
+        return obj.detail_str(level=level)
+    else:
+        return obj.__str__()
+
+
 def get_infoname_py(fun):
     """Return tuple (fun_name, mod_name) if fun defined in python module mod_name
 

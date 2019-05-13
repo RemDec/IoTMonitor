@@ -2,13 +2,16 @@ from src.coreConfig import CoreConfig
 from src.parsers.parserCLI import CLIparser
 from src.appcore import Core
 from src.utils.timer import TimerInterface, TimerThread
+from src.coreConfig import get_coreconfig_from_file
+from src.utils.filesManager import FilesManager
 import subprocess
 import os
 
 
 class AppCLI(TimerInterface):
 
-    def __init__(self, mode=1, level=1, spawn_display=True, save_on_exit=True):
+    def __init__(self, mode=1, level=1, spawn_display=True, save_on_exit=True,
+                 use_last_coreconfig=True, target_coreconfig=None):
         self.mode = mode
         self.level = level
         self.save_on_exit = save_on_exit
@@ -16,9 +19,18 @@ class AppCLI(TimerInterface):
                              "events", "threats", "modifs"]
         self.to_disp = "app"
         self.output = self.config_output()
+        self.filemanager = FilesManager()
+        self.paths = {'config': self.filemanager.get_res_path('last_cfg'),
+                      'routine': self.filemanager.get_res_path('last_routine'),
+                      'netmap': self.filemanager.get_res_path('last_netmap')}
         self.timer = TimerThread(name="MainTimer")
         self.timer.subscribe(self)
-        self.coreconfig = CoreConfig(timer=self.timer)
+        if use_last_coreconfig:
+            self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.get_res_path("last_cfg"), timer=self.timer)
+        elif target_coreconfig is not None:
+            self.coreconfig = get_coreconfig_from_file(filepath=target_coreconfig, timer=self.timer)
+        else:
+            self.coreconfig = CoreConfig(timer=self.timer)
         self.core = Core(self.coreconfig)
 
         self.cli = CLIparser(self.core, core_controller=self)
@@ -36,8 +48,30 @@ class AppCLI(TimerInterface):
         self.cli.stop_parsing()
         self.output.exit()
         if self.save_on_exit:
-            pass
+            self.save_app_state()
         self.core.quit()
+
+    # ----- Save application components and config into files -----
+
+    def save_routine(self, filepath=None):
+        from src.parsers.routineParser import write_routine_XML
+        filepath = filepath if filepath is not None else self.paths['routine']
+        write_routine_XML(self.core.routine, filepath=filepath)
+
+    def save_netmap(self, filepath):
+        pass
+
+    def save_coreconfig(self, filepath=None, routine_path=None, netmap_path=None):
+        from src.parsers.coreConfigParser import config_to_YAML
+        routine_path = routine_path if routine_path is not None else self.paths['routine']
+        netmap_path = netmap_path if netmap_path is not None else self.paths['netmap']
+        filepath = filepath if filepath is not None else self.paths['config']
+        config_to_YAML(self.coreconfig, filepath=filepath, XML_path_routine=routine_path, XML_path_netmap=netmap_path)
+
+    def save_app_state(self, config_path=None, routine_path=None, netmap_path=None):
+        self.save_routine(routine_path)
+        self.save_netmap(netmap_path)
+        self.save_coreconfig(config_path, routine_path, netmap_path)
 
     # ----- Managing independent display interface (other terminal, graphical text field, ..)
 

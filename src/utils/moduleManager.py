@@ -310,7 +310,7 @@ if __name__ == '__main__':
 
     from modules.passives.pingTarget import *
     ping = PModPing()
-    manager = ModManager(get_dflt_entry("div_outputs", suffix="test_modManager.xml"))
+    manager = ModManager(get_dflt_entry("div_outputs", suffix="testModManager.xml"))
     manager.create_modlib([nmap, nmap2, ping], True)
     manager.load_modlib()
     print("## Create and reload modlib ##")

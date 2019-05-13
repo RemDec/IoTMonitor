@@ -15,7 +15,10 @@ dflt_dirs = {
 
 dflt_files = {
                 "dflt_lib": ("configs", 'modlib.xml'),
-                "dflt_logger": ("configs", 'default_logger.yaml')
+                "dflt_logger": ("configs", 'default_logger.yaml'),
+                "last_cfg": ("configs", 'last_coreconfig.yaml'),
+                "last_routine": ("routines", 'last_routine.xml'),
+                "last_netmap": ("netmaps", 'last_netmap.xml')
             }
 
 
@@ -58,6 +61,12 @@ class FilesManager:
 
     def check_all_files(self):
         return True
+
+    def __str__(self):
+        s = f"FileManager with following entries:\n"
+        s += f" | DIR : {','.join(self.assoc_dirs.keys())}\n"
+        s += f" | FILES : {','.join(self.assoc_f.keys())}\n"
+        return s
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 from src.coreConfig import CoreConfig
-from src.utils.misc_fcts import has_method
+from src.utils.misc_fcts import obj_str
 import signal
 
 
@@ -153,15 +153,9 @@ class Core:
         if isinstance(obj, list):
             all_display = ""
             for indiv_obj in obj:
-                if has_method(indiv_obj, 'detail_str'):
-                    all_display += indiv_obj.detail_str(level=level)
-                else:
-                    all_display += str(indiv_obj)
+                all_display += obj_str(indiv_obj, level)
             return all_display
-        if has_method(obj, 'detail_str'):
-            return obj.detail_str(level=level)
-        else:
-            return obj.__str__()
+        return obj_str(obj, level)
 
     def __str__(self):
         actives, passives = self.modmanager.list_all_modid()

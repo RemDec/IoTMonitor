@@ -7,7 +7,7 @@
           <param code="nbrports" value="50"/>
           <param code="version" value="true"/>
           <param code="XMLfile" value="/tmp/xml_nmap_portdisc.xml"/>
-          <param code="IP" value="192.168.1.33/24"/>
+          <param code="IP" value="127.0.0.1/24"/>
         </savedparams>
       </modconfig>
       <modconfig modid="nmapexplo" setid="nmapexplo">
@@ -15,7 +15,7 @@
           <param code="SYNports" value="21,22,23,80,443,3389"/>
           <param code="UDPports" value="53,135,137,161"/>
           <param code="XMLfile" value="/tmp/xml_nmapexplo.xml"/>
-          <param code="IP" value="192.168.1.33/24"/>
+          <param code="IP" value="127.0.0.1/24"/>
         </savedparams>
       </modconfig>
       <modconfig modid="arbcmd" setid="arbcmd">

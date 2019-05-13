@@ -1,3 +1,4 @@
+from src.utils.misc_fcts import obj_str
 from src.utils.filesManager import FilesManager
 from src.logging.logger_setup import CustomLoggerSetup
 from src.utils.moduleManager import ModManager
@@ -6,11 +7,28 @@ from src.routine.routine import Routine
 from src.net.netmap import Netmap
 
 
+def get_coreconfig_from_file(filepath, timer=None, netmap=None, routine=None,
+                             logger_setup=None, modmanager=None,
+                             filemanager=FilesManager(), check_files=True):
+    import pathlib
+    ext = pathlib.Path(filepath).suffix
+    if ext == '.yaml':
+        from src.parsers.coreConfigParser import YAML_to_config
+        coreconfig = YAML_to_config(filepath=filepath, timer=timer, netmap=Netmap(), routine=routine,
+                                    logger_setup=logger_setup, modmanager=modmanager,
+                                    filemanager=filemanager, check_files=check_files)
+    else:
+        coreconfig = CoreConfig(file_from=filepath)
+    return coreconfig
+
+
 class CoreConfig:
 
     def __init__(self, timer=None, netmap=None, routine=None,
                  logger_setup=None, modmanager=None,
-                 filemanager=FilesManager(), check_files=True):
+                 filemanager=FilesManager(), check_files=True,
+                 file_from=''):
+        self.file_from = file_from
         self.paths = {}
         self.timer, self.netmap, self.routine = (None, )*3
         self.logger_setup, self.modmanager= (None, )*2
@@ -39,9 +57,9 @@ class CoreConfig:
 
     def init_modmanager(self, modmanager):
         if modmanager is None:
-            self.modmanager = ModManager(modlib_file=self.filemanager.get_res_path('dflt_lib'))
+            self.modmanager = ModManager(modlib_file=self.filemanager.get_res_path('dflt_lib'), load_direct=True)
         elif isinstance(modmanager, str):
-            self.modmanager = ModManager(modlib_file=self.filemanager.get_res_path(modmanager))
+            self.modmanager = ModManager(modlib_file=self.filemanager.get_res_path(modmanager), load_direct=True)
             self.paths['modmanager'] = modmanager
         elif isinstance(modmanager, ModManager):
             self.modmanager = modmanager
@@ -79,7 +97,30 @@ class CoreConfig:
         else:
             pass
 
+    def set_file_from(self, filepath):
+        self.file_from = filepath
+        return self
+
     def check_file_tree(self, filemanager=None):
         if filemanager is None:
             filemanager = FilesManager()
         return filemanager
+
+    def detail_str(self, level=1):
+        use_paths = "non defaults values for some resource paths" if len(self.paths) > 0 else "all paths as defaults"
+        s = f"Core config maintaining {use_paths}\n"
+        s += f"Instantiated from file {self.file_from}\n"
+        if level > 0:
+            for obj, given_path in self.paths.items():
+                s += f"  | {obj} : {given_path}\n"
+            s += "Instantiated objects maintained :\n"
+            s += "   <--- Resources managers --->\n"
+            for obj in [self.filemanager, self.logger_setup, self.modmanager]:
+                s += obj_str(obj, level) + '\n--->\n'
+            s += "   <--- Application components --->\n"
+            for obj in [self.timer, self.routine, self.netmap]:
+                s += obj_str(obj, level) + '\n--->\n'
+        return s
+
+    def __str__(self):
+        return self.detail_str()
