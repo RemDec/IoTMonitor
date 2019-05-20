@@ -30,7 +30,7 @@ class ModManager:
 
     def load_modlib(self):
         # parse de module library file to build available modules descriptors
-        self.clear_modlib()
+        self.clear()
         with open(self.modlib_file, 'r') as f:
             tree = etree.parse(f)
         root = tree.getroot()
@@ -48,7 +48,7 @@ class ModManager:
         self.modlib_file = new_file
         self.load_modlib()
 
-    def clear_modlib(self):
+    def clear(self):
         self.available_mods.clear()
 
     def get_mod_from_id(self, id, curr_params=None, timer=None, netmap=None):

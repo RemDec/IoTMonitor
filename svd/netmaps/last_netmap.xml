@@ -39,37 +39,37 @@
           </port>
         </portstable>
       </virtinst>
-      <virtinst mapid="device4" usercreated="False">
+      <virtinst mapid="device4" usercreated="True">
         <mainfields mac="38:35:FB:56:16:BD" ip="192.168.1.1"/>
         <divfields/>
         <portstable/>
       </virtinst>
-      <virtinst mapid="device5" usercreated="False">
+      <virtinst mapid="device5" usercreated="True">
         <mainfields mac="DC:F5:05:1C:DE:01" ip="192.168.1.2"/>
         <divfields/>
         <portstable/>
       </virtinst>
-      <virtinst mapid="device6" usercreated="False">
+      <virtinst mapid="device6" usercreated="True">
         <mainfields mac="48:27:EA:47:FA:92" ip="192.168.1.4"/>
         <divfields/>
         <portstable/>
       </virtinst>
-      <virtinst mapid="device7" usercreated="False">
+      <virtinst mapid="device7" usercreated="True">
         <mainfields mac="08:EE:8B:6D:75:AB" ip="192.168.1.13"/>
         <divfields manufacturer="Samsung Electronics"/>
         <portstable/>
       </virtinst>
-      <virtinst mapid="device8" usercreated="False">
+      <virtinst mapid="device8" usercreated="True">
         <mainfields mac="E4:58:E7:3E:C4:C4" ip="192.168.1.37"/>
         <divfields manufacturer="Samsung Electronics"/>
         <portstable/>
       </virtinst>
-      <virtinst mapid="device9" usercreated="False">
+      <virtinst mapid="device9" usercreated="True">
         <mainfields ip="192.168.1.33"/>
         <divfields/>
         <portstable/>
       </virtinst>
-      <virtinst mapid="device10" usercreated="False">
+      <virtinst mapid="device10" usercreated="True">
         <mainfields ip="192.168.1.36"/>
         <divfields/>
         <portstable/>

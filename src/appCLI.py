@@ -56,7 +56,7 @@ class AppCLI(TimerInterface):
     def save_routine(self, filepath=None):
         from src.parsers.routineParser import write_routine_XML
         filepath = filepath if filepath is not None else self.paths['routine']
-        write_routine_XML(self.core.routine, filepath=filepath)
+        write_routine_XML(self.core.routine, filepath=self.filemanager.complete_path('routines', filepath))
 
     def save_netmap(self, filepath=None):
         from src.parsers.netmapParser import write_netmap_XML
@@ -74,6 +74,9 @@ class AppCLI(TimerInterface):
         self.save_routine(routine_path)
         self.save_netmap(netmap_path)
         self.save_coreconfig(config_path, routine_path, netmap_path)
+
+    def save_target(self, target, filepath):
+        pass
 
     # ----- Managing independent display interface (other terminal, graphical text field, ..)
 

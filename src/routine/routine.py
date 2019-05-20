@@ -48,6 +48,12 @@ class Routine:
             mod.set_params(new_params)
             mod.launch()
 
+    def clear(self):
+        self.panel.clear()
+        self.queue.clear()
+
+    # --- Execution state related methods ---
+
     def pause(self, kill_thpanel=True, kill_thqueue=False):
         # can pause whatever is running or not, worst case it does nothing because no module thread alive
         self.panel.pause(kill_thpanel)

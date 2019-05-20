@@ -20,6 +20,10 @@ class Netmap:
     def remove_VI(self, mapid):
         self.map.pop(mapid)
 
+    def clear(self):
+        self.map = {}
+        self.svd_events = {}
+
     def create_VI(self, mapid=None, append_netmap=True,
                   mac=None, ip=None, hostname=None, div=None, ports=None, user_created=False):
         vi = VirtualInstance(mac=mac, ip=ip, hostname=hostname, div=div, ports=ports, user_created=user_created)

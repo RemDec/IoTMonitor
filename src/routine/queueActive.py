@@ -29,6 +29,10 @@ class Queue(TimerInterface):
             return True
         return False
 
+    def clear(self):
+        self.pause(kill_thmods=True)
+        self.set = []
+
     def reorganize(self):
         self.set = sorted(self.set, key=lambda mod: mod.get_timer())
 

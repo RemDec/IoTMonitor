@@ -2,6 +2,7 @@ from src.appcore import *
 from src.net.virtualInstance import *
 from src.utils.misc_fcts import str_lines_frame
 from src.parsers.parser_res import get_res_CLI
+import readline
 import os
 
 
@@ -21,6 +22,13 @@ class CLIparser:
         self.clear_cls = True
         self.curr_display_lvl = 1
 
+        readline.set_completer_delims(' \t\n;')
+        readline.parse_and_bind("tab: complete")
+        readline.set_completer(self.complete)
+
+    def complete(self, text, state):
+        return (self.match_input_to_choice(text) + [None])[state]
+
     # ----- Parsing execution flow -----
 
     def start_parsing(self):
@@ -33,15 +41,19 @@ class CLIparser:
 
     def loop_parsing(self):
         while self.get_input:
+            # Entering current menu, compute available choices from corresponding menu dict, wait for an input choice
             self.curr_choices = self.compute_curr_choices()
             header = self.header_from_menu(include_header=self.display_header)
             user_in = input(header)
             self.display_header = True
             if user_in.startswith('$'):
+                # Handling special command invokable from everywhere (all prefixed by $)
                 self.handle_reserved_kw(user_in[1:])
             else:
+                # Handling regular input, try to match to an available current choice or taking default value if defined
                 if user_in == "" and self.curr_menu.get('dflt_choice', False):
                     user_in = self.curr_menu['dflt_choice']
+                # Select choice if no ambiguity with given letters
                 completed_in = self.match_input_to_choice(user_in)
                 if len(completed_in) == 0:
                     print(f"No corresponding choice for this menu [id:{self.get_currmenu_index()}]"
@@ -51,6 +63,7 @@ class CLIparser:
                     print("Ambiguous choice between", ', '.join(completed_in))
                     self.no_wipe_next()
                 else:
+                    # Correct choice, call corresponding menu function on the choice value, do process in it
                     user_in = completed_in[0]
                     self.curr_menu['fct_choice'](user_in)
                 self.clear_console()
@@ -59,6 +72,7 @@ class CLIparser:
     # ----- Internal utilities functions -----
 
     def compute_curr_choices(self):
+        # Transform current menu 'choices' arbitrary value (function, dict, list) into regular format
         return self.compute_choices(self.curr_menu)
 
     def compute_choices(self, menu):
@@ -71,17 +85,21 @@ class CLIparser:
         return choices
 
     def str_curr_choices(self):
+        # Get string to display for current formatted choices
         return self.str_choices(self.curr_menu, 0)
 
     def str_choices(self, menu, detail_lvl=None):
+        # Pretty display formatting for available choices of a given menu
         detail_lvl = self.curr_display_lvl if detail_lvl is None else detail_lvl
         s = ""
         dflt_choice = menu.get('dflt_choice', None)
         if detail_lvl == 0:
+            # Simply display choices codes and which is the default
             for choice_line in self.compute_choices(menu):
                 with_indic_dflt = [choice if choice != dflt_choice else f"< {choice} >" for choice in choice_line]
                 s += ' | '.join(with_indic_dflt) + '\n'
         else:
+            # Search for each choice if it corresponds to another menu and try to pull it's description
             for choice_list in self.compute_choices(menu):
                 for choice in choice_list:
                     s += f"{choice if choice != dflt_choice else '<' + choice + '>'} : "
@@ -119,6 +137,14 @@ class CLIparser:
                 if choice.startswith(user_in):
                     matches.append(choice)
         return matches
+
+    def check_reserved_kw(self, user_input, handle_it=True):
+        if user_input.startswith('$'):
+            if handle_it:
+                self.handle_reserved_kw(user_input[:1])
+            else:
+                return True
+        return False
 
     def handle_reserved_kw(self, keyword):
         # keyword is all command without the '$' prefix
@@ -273,33 +299,6 @@ class CLIparser:
             self.core.add_indep_module(mod_inst)
         self.back_main_menu()
 
-    def after_mod_slctOld(self, mod_id):
-        dflts = self.get_user_confirm(f"[{mod_id}] use defaults params (Y/n)? ")
-        in_rout = self.get_user_confirm(f"[{mod_id}] append it in routine (Y/n) ?")
-        if dflts:
-            mod_inst = mod_id
-        else:
-            input_params = {}
-            _, PARAMS, desc_params = self.core.modmanager.get_mod_desc_params(mod_id)
-            for code_param, (dflt, mand, pref) in PARAMS.items():
-                desc = desc_params.get(code_param, "No parameter description")
-                perm = "mandatory" if mand else "optional"
-                flag = f"flag {pref}" if pref != "" else "no prefix"
-                header = f"Parameter {code_param} ({perm}, {flag}) : {desc}"
-                marker = f"[default:{dflt if dflt != '' else '<empty>'}] :"
-                user_in = input(f"{header}\n{marker}")
-                if user_in == "":
-                    input_params[code_param] = dflt
-                else:
-                    input_params[code_param] = user_in
-            mod_inst = self.core.instantiate_module(mod_id, curr_params=input_params)
-        if in_rout:
-            setid = self.get_user_in_or_dflt(None, marker="Give a setid if desired (alphanumeric)\n[setid] :")
-            self.core.add_to_routine(mod_inst, given_setid=setid)
-        else:
-            self.core.add_indep_module(mod_inst)
-        self.back_main_menu()
-
     def after_show_select(self, show_input_name):
         res_to_show = self.curr_menu['choices'][show_input_name]
         print(self.core.get_display(res_to_show, level=self.curr_display_lvl))
@@ -308,6 +307,36 @@ class CLIparser:
     def after_remove_mod_slct(self, mod_setid):
         self.core.remove_from_routine(mod_setid)
         self.back_main_menu()
+
+    def after_clear_select(self, target):
+        code = self.get_choice_val(target)
+        advert = f"Clearing {target} will empty it and loose all its components (irreversible).\n" \
+                 f"Are you sure? (y/N) :"
+        valid = self.get_user_confirm(marker=advert, val=('y', 'o', 'yes', 'oui', 'ok'))
+        if valid:
+            self.core.clear_target(code)
+        self.back_main_menu()
+
+    def after_save_select(self, target):
+        # Save components state and/or whole app configuration by writing formatted files (yaml, xml)
+        target = self.get_choice_val(target)
+        ask_path = lambda res, dflt : \
+            self.get_user_in_or_dflt(dflt, f"Give a filename for the {res} save (not full path but with extension),\n"
+            f"default full path : {dflt}\n[filename] :")
+        if self.core_ctrl is not None:
+            if target in ["routine", "app"]:
+                f = ask_path("routine", self.core_ctrl.paths['routine'])
+                self.core_ctrl.save_routine(filepath=f)
+            if target in ["netmap", "app"]:
+                f = ask_path("netmap", self.core_ctrl.paths['netmap'])
+                self.core_ctrl.save_routine(filepath=f)
+            if target in ["config", "app"]:
+                f = ask_path("config", self.core_ctrl.paths['config'])
+                self.core_ctrl.save_routine(filepath=f)
+            self.back_main_menu()
+        else:
+            print("No reference to the core controller where saving procedure is defined")
+            self.no_wipe_next()
 
     def after_resume_slct(self, to_resume):
         target = self.get_choice_val(to_resume)
@@ -367,9 +396,11 @@ class CLIparser:
                           'help': get_res_CLI('main_help'),
                           'choices': {'create': "create",
                                       'remove': "remove",
+                                      'clear': "clear",
                                       'show': "show",
                                       'pause': "pause",
-                                      'resume': "resume"},
+                                      'resume': "resume",
+                                      'save': "save"},
                           'fct_choice': self.transit_menu,
                           'disp_choice': False}
 
@@ -387,6 +418,15 @@ class CLIparser:
                        'dflt_choice': 'module',
                        'fct_choice': self.transit_menu}
 
+        self.clear = {'desc': "Clear application elements containers as netmap, routine, independent modules, etc.",
+                      'help': get_res_CLI('clear_help'),
+                      'choices': {'whole app': "app",
+                                  'netmap': "netmap",
+                                  'routine': "routine",
+                                  'independent modules': "indep",
+                                  'library': "library"},
+                      'fct_choice': self.after_clear_select}
+
         self.show = {'desc': "Display current state of application resources",
                      'help': get_res_CLI('show_help'),
                      'choices': {'routine': "routine",
@@ -396,6 +436,15 @@ class CLIparser:
                                  'independent modules': "indep"},
                      'dflt_choice': 'routine',
                      'fct_choice': self.after_show_select}
+
+        self.save = {'desc': "Save the current application configuration or components separatly",
+                     'help': get_res_CLI('save_help'),
+                     'choices': {'whole app (yaml cfg + xml comp.)': "app",
+                                 'app config (yaml)': "config",
+                                 'routine (xml)': "routine",
+                                 'netmap (xml)': "netmap"},
+                     'dflt_choice': 'whole app (yaml cfg + xml comp.)',
+                     'fct_choice': self.after_save_select}
 
         self.pause = {'desc': "Pause (interrupt running module threads) routine or its components",
                       'help': get_res_CLI('pause_help'),
@@ -436,8 +485,10 @@ class CLIparser:
         # Association between choice code value and real menu objects
         self.index_menus = {"main": self.main_menu,
                             "create": self.create, "remove": self.remove,
+                            "clear": self.clear,
                             "pause": self.pause, "resume": self.resume,
                             "show": self.show,
+                            "save": self.save,
                             "newVI": self.create_VI, "newMod": self.create_mod,
                             "delMod": self.remove_mod, "delIndepMod": self.remove_indep_mod, "delVI": self.remove_VI}
 

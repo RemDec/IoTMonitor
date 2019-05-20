@@ -67,6 +67,9 @@ class Core:
     def remove_from_routine(self, setid_or_mod):
         return self.routine.remove_module(setid_or_mod)
 
+    def clear_routine(self):
+        self.routine.clear()
+
     def pause(self):
         self.routine.pause()
 
@@ -78,9 +81,6 @@ class Core:
 
     def resume_it(self, target):
         self.routine.resume_it(target)
-
-    def clear_routine(self):
-        pass
 
     def get_all_setids(self):
         return self.routine.get_all_setids()
@@ -95,6 +95,9 @@ class Core:
 
     def remove_from_netmap(self, mapid):
         self.netmap.remove_VI(mapid)
+
+    def clear_netmap(self):
+        self.netmap.clear()
 
     def get_netmap(self):
         return self.netmap
@@ -116,6 +119,13 @@ class Core:
         return self.logger_setup.event_center
 
     # ----- Utilities -----
+
+    def clear_target(self, target):
+        self.corresp_target(target).clear()
+
+    def clear(self):
+        self.clear_netmap()
+        self.clear_routine()
 
     def quit(self):
         if self.timer is not None:

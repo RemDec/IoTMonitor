@@ -56,6 +56,12 @@ class FilesManager:
             if dirpath is not None:
                 return str(root / dirpath)
 
+    def complete_path(self, prefix, filename):
+        if Path(filename).is_absolute():
+            return filename
+        dirpath = self.get_res_path(prefix)
+        return str(Path(dirpath) / filename)
+
     def check_file(self, path):
         return True
 

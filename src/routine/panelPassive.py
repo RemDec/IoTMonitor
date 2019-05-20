@@ -25,10 +25,14 @@ class Panel:
             return True
         return False
 
-    def get_mod_entry(self, mod, given_id):
+    def clear(self):
+        self.pause(kill_thmods=True)
+        self.set = []
+
+    def get_mod_entry(self, mod, given_id=None):
         # return a PanelEntry with adapted pid (no duplicate)
         m_id = mod.get_module_id()
-        pid = self.get_unique_pid(m_id)
+        pid = self.get_unique_pid(m_id) if given_id is None else self.get_unique_pid(given_id)
         return PanelEntry(mod, pid)
 
     def get_unique_pid(self, try_id):
