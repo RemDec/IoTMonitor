@@ -34,11 +34,21 @@ class VirtualInstance:
         for portnum, new_port_info in new_vals_dict.items():
             self.ports_table.complete_portinfos(portnum, new_port_info, replacing)
 
-    def used_div_fields(self, keep_val=False):
-        used = []
+    def used_fields(self):
+        used = {}
+        if self.mac is not None:
+            used['mac'] = self.mac
+        if self.ip is not None:
+            used['ip'] = self.ip
+        if self.hostname is not None:
+            used['hostname'] = self.hostname
+        return used
+
+    def used_div_fields(self):
+        used = {}
         for field, value in self.div.items():
             if value != "" and value is not None:
-                used.append((field, value) if keep_val else field)
+                used[field] = value
         return used
 
     def unused_div_fields(self):
@@ -135,7 +145,7 @@ class PortTable:
     # NumPort : {'service': srv_name, 'protocol': netw_protocol, 'state': up|closed|filtered, 'div': {other_fields}}
 
     def __init__(self, table=None):
-        self.dflt_entry = {'serive': 'unknown',
+        self.dflt_entry = {'service': 'unknown',
                            'protocol': 'unknown',
                            'state': 'unknown', 'div': {}}
         self.table = {}
@@ -220,18 +230,24 @@ class PortTable:
         for i, main_field in enumerate(['service', 'protocol', 'state']):
             self.table[num][main_field] = infos_tuple[i]
 
-    def get_infos(self, num):
+    def get_infos(self, num, as_dicts=False):
         if self.table.get(num) is None:
             return None
+        if as_dicts:
+            return self.get_maininfos(num, as_dict=True), self.get_divinfos(num)
         return self.get_maininfos(num) + (self.get_divinfos(num), )
 
     def get_divinfos(self, num):
         return self.table[num]['div'] if num in self.table else None
 
-    def get_maininfos(self, num):
+    def get_maininfos(self, num, as_dict=False):
         entry = self.table.get(num)
         if entry is None:
             return None
+        if as_dict:
+            c = entry.copy()
+            c.pop('div')
+            return c
         return entry['service'], entry['protocol'], entry['state']
 
     def is_empty(self):
@@ -262,125 +278,6 @@ class PortTable:
             lgth_serv, lgth_prot, lgth_sta = [len(h) for h in headers[1:]]
             for port in ports:
                 (service, prot, state) = self.get_maininfos(port)
-                services.append(service)
-                lgth_serv = max(len(service), lgth_serv)
-                prots.append(prot)
-                lgth_prot = max(len(prot), lgth_prot)
-                states.append(state)
-                lgth_sta = max(len(state), lgth_sta)
-            s = "|".join(headers) + '\n'
-            s += len(s) * '=' + '\n'
-            for i, port in enumerate(ports):
-                s_port = str(port) + ' ' * (lgth_port-len(str(port)))
-                s_serv = services[i] + ' ' * (lgth_serv-len(services[i]))
-                s_prot = prots[i] + ' ' * (lgth_prot-len(prots[i]))
-                s_state = states[i] + ' ' * (lgth_sta-len(states[i]))
-                s += '|'.join([s_port, s_serv, s_prot, s_state])
-                if i != len(ports)-1:
-                    s += '\n'
-            return str_lines_frame(s)
-
-    def __str__(self):
-        return self.detail_str(1)
-
-
-class PortTableOld:
-
-    # NumPort : (service, protocol, state, divers_fields={field_name: field_value})
-
-    def __init__(self, table=None):
-        self.table = table if table is not None else {}
-
-    def set_port(self, num, infos=('unknown', 'unknown', 'unknown', {})):
-        if isinstance(infos, dict):
-            self.table[num] = (infos.get('service', 'unknown'),
-                               infos.get('protocol', 'unknown'),
-                               infos.get('state', 'unknown'),
-                               infos.get('div', {}))
-        elif isinstance(infos, tuple):
-            if len(infos) == 4:
-                self.table[num] = infos
-            else:
-                final_infos = ['unknown', 'unknown', 'unknown', {}]
-                for i, val in enumerate(infos):
-                    final_infos[i] = val
-                self.table[num] = tuple(final_infos)
-
-    def complete_portinfos(self, num, infos, replacing=True):
-        values = self.table.get(num)
-        if values is None:
-            return
-        for info_key, info_val in infos.items():
-            curr_val = self.get_info(num, info_key)
-            ind = self.get_ind_info(info_key)
-            if ind != -1 and (curr_val == 'unknown' or replacing):
-                self.replace_val(num, ind, info_val)
-            if ind == -1 and ((values[3].get(info_key) in [None, 'unknown']) or replacing):
-                values[3][info_key] = info_val
-
-    def replace_val(self, num, ind, newval):
-        values = self.table.get(num)
-        new_t = ()
-        for i in range(values):
-            if i == ind:
-                new_t += (newval, )
-            else:
-                new_t += (values[i], )
-        self.table[num] = new_t
-
-    def list_ports(self, only_open=False):
-        if not only_open:
-            return self.table.keys()
-        return [port for port in self.table.keys() if self.table[port][2] not in ['unknown', 'closed']]
-
-    def get_ind_info(self, target):
-        if target == 'service':
-            return 0
-        elif target == 'protocol':
-            return 1
-        elif target == 'state':
-            return 2
-        elif target == 'div':
-            return 3
-        return -1
-
-    def get_info(self, num, target):
-        infos = self.table.get(num)
-        if infos is None:
-            return None
-        ind = self.get_ind_info(target)
-        if ind != -1:
-            return infos[ind]
-        return infos[self.get_ind_info('div')].get(target)
-
-    def is_empty(self):
-        return self.table == {}
-
-    def str_ports_list(self, header=None, empty_str="Empty ports table\n"):
-        if self.is_empty():
-            return empty_str
-        s = "Registered ports with <service, protocol, state>\n" if header is None else header
-        ports = sorted(self.table.keys())
-        for port in ports:
-            (service, prot, state) = self.table[port]
-            s += f" | {port} : < {service}, {prot}, {state} >\n"
-        return s
-
-    def detail_str(self, level=0):
-        if self.is_empty():
-            return "Empty ports table\n"
-        if level == 0:
-            return f"Registered ports in table : {', '.join(map(str,self.list_ports()))}"
-        elif level == 1:
-            return self.str_ports_list()
-        else:
-            ports = sorted(self.table.keys())
-            services, prots, states = [], [], []
-            headers = [" Ports nbr ", " services ", " protocols ", " states "]
-            lgth_port = max(len(str(max(ports))), len(headers[0]))
-            lgth_serv, lgth_prot, lgth_sta = [len(h) for h in headers[1:]]
-            for port in ports:
-                (service, prot, state) = self.table[port]
                 services.append(service)
                 lgth_serv = max(len(service), lgth_serv)
                 prots.append(prot)

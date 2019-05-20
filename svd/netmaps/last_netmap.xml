@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='ASCII'?>
+<xmlsave>
+  <netmap>
+    <instances>
+      <virtinst mapid="VirtInst1" usercreated="True">
+        <mainfields mac="B6-E3-5E-7A-C1-D6" ip="192.168.0.3" hostname="wifiCam"/>
+        <divfields/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="VirtInst2" usercreated="True">
+        <mainfields mac="BB-E5-BA-6F-7E-2A" ip="192.168.0.4"/>
+        <divfields/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="VirtInst3" usercreated="True">
+        <mainfields mac="31-E7-FA-9C-6C-FC" ip="192.168.0.5"/>
+        <divfields uptime="1245s" rate="500kbps"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="homemodem" usercreated="True">
+        <mainfields mac="5A-82-CB-48-47-C6" ip="192.168.0.100"/>
+        <divfields clients="VirtInst1 VirtInst2"/>
+        <portstable>
+          <port portnum="53">
+            <maininfos service="domain" protocol="TCP" state="open"/>
+            <divportinfos/>
+          </port>
+          <port portnum="80">
+            <maininfos service="http" protocol="TCP" state="open"/>
+            <divportinfos/>
+          </port>
+          <port portnum="5060">
+            <maininfos service="sip" protocol="TCP" state="open"/>
+            <divportinfos/>
+          </port>
+          <port portnum="49152">
+            <maininfos service="unknwown" protocol="UDP" state="open"/>
+            <divportinfos/>
+          </port>
+        </portstable>
+      </virtinst>
+      <virtinst mapid="device4" usercreated="False">
+        <mainfields mac="38:35:FB:56:16:BD" ip="192.168.1.1"/>
+        <divfields/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device5" usercreated="False">
+        <mainfields mac="DC:F5:05:1C:DE:01" ip="192.168.1.2"/>
+        <divfields/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device6" usercreated="False">
+        <mainfields mac="48:27:EA:47:FA:92" ip="192.168.1.4"/>
+        <divfields/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device7" usercreated="False">
+        <mainfields mac="08:EE:8B:6D:75:AB" ip="192.168.1.13"/>
+        <divfields manufacturer="Samsung Electronics"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device8" usercreated="False">
+        <mainfields mac="E4:58:E7:3E:C4:C4" ip="192.168.1.37"/>
+        <divfields manufacturer="Samsung Electronics"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device9" usercreated="False">
+        <mainfields ip="192.168.1.33"/>
+        <divfields/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device10" usercreated="False">
+        <mainfields ip="192.168.1.36"/>
+        <divfields/>
+        <portstable/>
+      </virtinst>
+    </instances>
+    <savedevents>
+      <vievents mapid="VirtInst1">
+        <modifevent target="IP field" type="virt_inst">
+          <oldstate>192.168.0.3</oldstate>
+          <newstate>192.168.0.9</newstate>
+          <diveventinfos objid="VirtInst1" modificator="scanmodule2"/>
+        </modifevent>
+        <threatevent originmod="scanmodule1" level="1">
+          <alertmsg>exploit detected for this device :CVE-15559.56.23</alertmsg>
+          <diveventinfos objid="VirtInst1"/>
+        </threatevent>
+      </vievents>
+      <vievents mapid="VirtInst2">
+        <threatevent originmod="scanmodule1" level="4">
+          <alertmsg>Several exploitx detected for this device :CVE-40000.10.10, CVE-40000.21.3</alertmsg>
+          <patchmsg>Look at update from manufacturer : https://www.samsung.com/be_fr/</patchmsg>
+          <diveventinfos objid="VirtInst2"/>
+        </threatevent>
+      </vievents>
+      <vievents mapid="homemodem">
+        <modifevent target="ports table" type="virt_inst">
+          <newstate>+ entry 9000: (cslistener, TCP, open)</newstate>
+          <diveventinfos objid="homemodem" modificator="scanmodule2"/>
+        </modifevent>
+      </vievents>
+    </savedevents>
+  </netmap>
+</xmlsave>

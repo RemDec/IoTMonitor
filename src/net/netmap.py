@@ -49,7 +49,7 @@ class Netmap:
 
     # ----- Events interactions (saved for VI and logged in event center) -----
 
-    # -- with saved events in this netmap instance --
+    # -- from saved events in this netmap instance --
 
     def get_saved_events_for_vi(self, mapid, target='all'):
         events = self.svd_events.get(mapid, [])
@@ -66,15 +66,15 @@ class Netmap:
     def get_saved_modifs_for_vi(self, mapid):
         return self.get_saved_events_for_vi(mapid, 'modifs')
 
-    # -- with events in eventcenter memory --
+    # -- from events in eventcenter memory --
 
     def get_events_for_vi(self, mapid, target='all'):
         vi = self.get_VI(mapid)
         if self.event_center is None or vi is None:
             return None
         find_fct = lambda event: event.rel_to_vi() == mapid
-        corresp_threats = self.event_center.filter_events(target=target, filter_fct=find_fct)
-        return corresp_threats
+        corresp_events = self.event_center.filter_events(target=target, filter_fct=find_fct)
+        return corresp_events
 
     def get_threats_for_vi(self, mapid):
         return self.get_events_for_vi(mapid, target='threats')
@@ -82,7 +82,7 @@ class Netmap:
     def get_modifs_for_vi(self, mapid):
         return self.get_events_for_vi(mapid, target='modifs')
 
-    # -- with both simultaneously --
+    # -- from both simultaneously --
 
     def get_all_events_for_vi(self, mapid, target='all'):
         return self.get_events_for_vi(mapid, target) + self.get_saved_events_for_vi(mapid, target)
@@ -166,7 +166,7 @@ class Netmap:
         s += cut(f" Hostname:{vi.get_hostname()}") + '\n'
         ports = vi.get_ports_table().str_ports_list("Ports table:\n").split('\n')
         s += '\n'.join([cut(portline) for portline in ports])
-        for field, val in vi.used_div_fields(keep_val=True):
+        for field, val in vi.used_div_fields().items():
             s += cut(f" {field}: {val}") + '\n'
         return str_lines_frame(s[:-1] if s[-1] == '\n' else s)
 

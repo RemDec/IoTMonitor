@@ -58,8 +58,10 @@ class AppCLI(TimerInterface):
         filepath = filepath if filepath is not None else self.paths['routine']
         write_routine_XML(self.core.routine, filepath=filepath)
 
-    def save_netmap(self, filepath):
-        pass
+    def save_netmap(self, filepath=None):
+        from src.parsers.netmapParser import write_netmap_XML
+        filepath = filepath if filepath is not None else self.paths['netmap']
+        write_netmap_XML(self.core.netmap, filepath=filepath)
 
     def save_coreconfig(self, filepath=None, routine_path=None, netmap_path=None):
         from src.parsers.coreConfigParser import config_to_YAML

@@ -8,14 +8,14 @@ from src.net.netmap import Netmap
 
 
 def get_coreconfig_from_file(filepath, timer=None, netmap=None, routine=None,
-                             logger_setup=None, modmanager=None,
+                             logger_setup=None, event_center=None, modmanager=None,
                              filemanager=FilesManager(), check_files=True):
     import pathlib
     ext = pathlib.Path(filepath).suffix
     if ext == '.yaml':
         from src.parsers.coreConfigParser import YAML_to_config
-        coreconfig = YAML_to_config(filepath=filepath, timer=timer, netmap=Netmap(), routine=routine,
-                                    logger_setup=logger_setup, modmanager=modmanager,
+        coreconfig = YAML_to_config(filepath=filepath, timer=timer, netmap=netmap, routine=routine,
+                                    logger_setup=logger_setup, event_center=event_center, modmanager=modmanager,
                                     filemanager=filemanager, check_files=check_files)
     else:
         coreconfig = CoreConfig(file_from=filepath)
@@ -25,19 +25,20 @@ def get_coreconfig_from_file(filepath, timer=None, netmap=None, routine=None,
 class CoreConfig:
 
     def __init__(self, timer=None, netmap=None, routine=None,
-                 logger_setup=None, modmanager=None,
+                 logger_setup=None, event_center=None, modmanager=None,
                  filemanager=FilesManager(), check_files=True,
                  file_from=''):
         self.file_from = file_from
         self.paths = {}
         self.timer, self.netmap, self.routine = (None, )*3
-        self.logger_setup, self.modmanager= (None, )*2
+        self.logger_setup, self.event_center, self.modmanager= (None, )*3
         # files and default paths are looked in a filemanager library instance
         self.filemanager = filemanager if filemanager is not None else FilesManager()
         if check_files:
             self.check_file_tree(self.filemanager)
 
         self.init_logger(logger_setup)
+        self.init_event_center(event_center)
         self.init_modmanager(modmanager)
         self.init_timer(timer)
         self.init_netmap(netmap)
@@ -54,6 +55,9 @@ class CoreConfig:
             self.logger_setup = logger_setup
         else:
             pass
+
+    def init_event_center(self, event_center):
+        self.event_center = event_center if event_center is not None else self.logger_setup.get_event_center()
 
     def init_modmanager(self, modmanager):
         if modmanager is None:
@@ -78,6 +82,8 @@ class CoreConfig:
         if netmap is None:
             self.netmap = Netmap()
         elif isinstance(netmap, str):
+            from src.parsers.netmapParser import parse_netmap_XML
+            self.netmap = parse_netmap_XML(filepath=netmap, event_center=self.event_center)
             self.paths['netmap'] = netmap
         elif isinstance(netmap, Netmap):
             self.netmap = netmap
