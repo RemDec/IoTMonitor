@@ -219,7 +219,7 @@ class CLIparser:
 
     def ctrl_output(self, args=[]):
         if self.core_ctrl is None:
-            print("No application view instance currently working")
+            print("No application control instance offering an output view currently working")
             self.no_wipe_next()
             return
         arg_l = len(args)
@@ -234,6 +234,8 @@ class CLIparser:
                 if not self.core_ctrl.set_current_todisplay(args[1]):
                     print("Error, give a viewable resource name :", ','.join(self.core_ctrl.poss_display))
             print("Current viewed resource :", self.core_ctrl.to_disp)
+        elif args[0] == 'infos':
+            print("Current controller maintaining application view :\n", self.core_ctrl)
         self.no_wipe_next()
 
     def set_cfg_param(self, args=[]):

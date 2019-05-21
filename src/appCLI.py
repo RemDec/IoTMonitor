@@ -8,17 +8,20 @@ import subprocess
 import os
 
 
+cli_modes = ('noout', 'outpiped', 'outscreen', 'tkinter')
+
+
 class AppCLI(TimerInterface):
 
-    def __init__(self, mode=1, level=1, spawn_display=True, save_on_exit=True,
+    def __init__(self, mode=cli_modes[2], level=1, start_pull_output=True, save_on_exit=True,
                  use_last_coreconfig=True, target_coreconfig=None):
         self.mode = mode
         self.level = level
-        self.save_on_exit = save_on_exit
+        self.save_on_exit = save_on_exit # Save core components state at regular app exiting
         self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library",
                              "events", "threats", "modifs"]
         self.to_disp = "app"
-        self.output = self.config_output()
+        self.output = self.config_output()  # Init output controller object depending on mode selected
         self.filemanager = FilesManager()
         self.paths = {'config': self.filemanager.get_res_path('last_cfg'),
                       'routine': self.filemanager.get_res_path('last_routine'),
@@ -34,18 +37,19 @@ class AppCLI(TimerInterface):
         self.core = Core(self.coreconfig)
 
         self.cli = CLIparser(self.core, core_controller=self)
-        self.start_app(spawn_display)
+        self.start_app(start_pull_output)
 
     # ----- Control application execution/interactive CLI -----
 
-    def start_app(self, spawn_display=True):
-        if spawn_display:
+    def start_app(self, start_display=True):
+        if self.mode != 'noout' and start_display:
             self.start_display_output()
         # blocking on input waiting
         self.cli.start_parsing()
 
     def stop_app(self):
         self.cli.stop_parsing()
+        self.timer.unsub(self)
         self.output.exit()
         if self.save_on_exit:
             self.save_app_state()
@@ -81,11 +85,16 @@ class AppCLI(TimerInterface):
     # ----- Managing independent display interface (other terminal, graphical text field, ..)
 
     def config_output(self):
-        if self.mode == 0:
-            pass
-        elif self.mode == 1:
+        if isinstance(self.mode, int):
+            ind = min(max(self.mode, 0), len(cli_modes))
+            self.mode = cli_modes[ind]
+        if self.mode == 'noout':
+            return NoOutput()
+        elif self.mode == 'outpiped':
+            return PipeOutput()
+        elif self.mode == 'outscreen':
             return ConsoleOutput()
-        elif self.mode == 2:
+        elif self.mode == 'tkinter':
             return TkinterOutput(self)
 
     def start_display_output(self):
@@ -114,7 +123,7 @@ class AppCLI(TimerInterface):
     # ----- Using timer to regenerate display content and refresh displayed output -----
 
     def is_decrementable(self):
-        return self.output.is_reading
+        return self.output.is_reading()
 
     def decr(self):
         to_disp = self.get_current_todisplay()
@@ -124,35 +133,102 @@ class AppCLI(TimerInterface):
     def __str__(self):
         return f"Controller of application in CLI mode, app view handled by\n" \
                f"{self.output}\n" \
-               f"displaying {self.to_disp} (working:{self.output.is_reading})"
+               f"displaying {self.to_disp} (working:{self.output.is_reading()})"
+
+
+class NoOutput:
+
+    def __init__(self):
+        pass
+
+    def write(self, to_output):
+        pass
+
+    def pull_output(self):
+        pass
+
+    def start_reading(self):
+        pass
+
+    def stop_reading(self):
+        pass
+
+    def is_reading(self):
+        return False
+
+    def exit(self):
+        pass
+
+    def __str__(self):
+        return "NoOutput object - informations taken from app core are not automatically displayed"
+
+
+class PipeOutput:
+
+    def __init__(self):
+        self.PIPE_PATH = "/tmp/output_monitor"
+        self.reading = False
+
+    def write(self, to_output):
+        self.reading = True
+        with open(self.PIPE_PATH, 'w') as pipe_w:
+            pipe_w.write(to_output)
+
+    def pull_output(self):
+        # Let the user make it's own utility of information in pipe
+        pass
+
+    def start_reading(self):
+        if os.path.exists(self.PIPE_PATH):
+            os.remove(self.PIPE_PATH)
+        os.mkfifo(self.PIPE_PATH)
+
+    def is_reading(self):
+        return self.reading
+
+    def stop_reading(self):
+        self.reading = False
+
+    def exit(self):
+        self.stop_reading()
+        if os.path.exists(self.PIPE_PATH):
+            os.remove(self.PIPE_PATH)
+
+    def __str__(self):
+        return "PipeOutput object - informations are sent in a pipe, which you can do whatever with (recommanded" \
+               " use watch command on it).\nPipe descriptor : " + self.PIPE_PATH
 
 
 class ConsoleOutput:
 
     def __init__(self):
         self.PIPE_PATH = "/tmp/output_monitor"
-        self.is_reading = False
+        self.reading = False
         self.popen = None
         self.terminal = 'xterm'
 
     def write(self, to_output):
-        # print("Before write", to_output)
+        # Write where this object want to bufferise the information to display
         with open(self.PIPE_PATH, 'w') as pipe_w:
             pipe_w.write(to_output)
 
     def pull_output(self):
+        # Take the information in buffer where write() placed it and display it
         # already done each 0.5 sec by watch command
         pass
 
     def start_reading(self):
-        self.is_reading = True
+        self.reading = True
         if os.path.exists(self.PIPE_PATH):
             os.remove(self.PIPE_PATH)
         os.mkfifo(self.PIPE_PATH)
         self.popen = subprocess.Popen([self.terminal, '-e', 'watch', '-t', '-n 0,5', 'cat %s' % self.PIPE_PATH])
 
     def stop_reading(self):
-        self.is_reading = False
+        self.reading = False
+
+    def is_reading(self):
+        return self.reading
 
     def exit(self):
         self.stop_reading()
@@ -172,18 +248,20 @@ class TkinterOutput:
         # textual field for output display and graphical interface to control appcli (level, res to disp,..)
         self.appcli = appcli
 
-        def write(self, to_output):
-            pass
+    def write(self, to_output):
+        pass
 
-        def pull_output(self):
-            # already done each 0.5 sec by watch command
-            pass
+    def pull_output(self):
+        pass
 
-        def start_reading(self):
-            pass
+    def start_reading(self):
+        pass
 
-        def stop_reading(self):
-            pass
+    def stop_reading(self):
+        pass
+
+    def __str__(self):
+        return "TkinterOutput : display in a more friendly way app informations, with some GUI interactions on it"
 
 
 if __name__ == "__main__":
