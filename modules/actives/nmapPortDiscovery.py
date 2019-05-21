@@ -54,7 +54,7 @@ class AModNmapPortDisc(ActiveModule):
                     vi.complete_fields(mac=mac, ip=ip)
                     vi.complete_ports_table(table)
 
-    def distrib_output(self, script_output):
+    def distrib_output(self, script_output, rel_to_vi=[]):
         # function called by ending exec thread with script_output as a tuple summarizing how it ended
         if isinstance(script_output[0], int):
             code, popen = script_output
@@ -67,7 +67,7 @@ class AModNmapPortDisc(ActiveModule):
             py_except, popen = script_output
             logging.getLogger("debug").debug(f"Module [{self.m_id}] execution raised exception :{py_except}")
 
-    def launch(self):
+    def launch(self, rel_to_vi=[]):
         super().purge_threadlist()
         cmd = self.CMD + ' '
         for param, val in self.params.items():
@@ -83,8 +83,9 @@ class AModNmapPortDisc(ActiveModule):
     def stop(self):
         super().terminate_threads()
 
-    def get_script_thread(self):
-        return ScriptThread(callback_fct=self.distrib_output, max_exec_time=self.max_exec_time, cmd_as_shell=True)
+    def get_script_thread(self, rel_to_vi=[]):
+        return ScriptThread(callback_fct=self.distrib_output, rel_to_vi=rel_to_vi,
+                            max_exec_time=self.max_exec_time)
 
     def get_default_timer(self):
         return 60

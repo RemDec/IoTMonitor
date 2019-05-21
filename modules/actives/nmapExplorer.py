@@ -52,28 +52,7 @@ class AModNmapExplorer(ActiveModule):
                 else:
                     self.netmap.get_VI(mapid).complete_fields(mac=mac, ip=ip, div={'manufacturer': manuf})
 
-    def parse_outputold(self, output):
-        root = etree.parse(output).getroot()
-        hosts = root.findall('host')
-        for host in hosts:
-            state = host.find('status').get('state')
-            addrs = host.findall('address')
-            ip, mac, manuf = None, None, None
-            for addr in addrs:
-                t, a = addr.get('addrtype'), addr.get('addr')
-                if t == 'ipv4':
-                    ip = a
-                elif t == 'mac':
-                    mac = a
-                    manuf = addr.get('vendor')
-            if self.netmap is not None:
-                mapid = self.netmap.get_similar_VI(mac=mac, ip=ip)
-                if mapid is None:
-                    self.netmap.create_VI(mac=mac, ip=ip, div={'manufacturer': manuf})[1].set_state(state)
-                else:
-                    self.netmap.get_VI(mapid).complete_fields(mac=mac, ip=ip, div={'manufacturer': manuf})
-
-    def distrib_output(self, script_output):
+    def distrib_output(self, script_output, rel_to_vi=[]):
         if isinstance(script_output[0], int):
             code, popen = script_output
             output = popen.stdout
@@ -83,7 +62,7 @@ class AModNmapExplorer(ActiveModule):
             py_except, popen = script_output
             logging.getLogger("debug").debug(f"Module [{self.m_id}] execution raised exception :{py_except}")
 
-    def launch(self):
+    def launch(self, rel_to_vi=[]):
         super().purge_threadlist()
         cmd = self.CMD + ' '
         for param, val in self.params.items():
@@ -96,8 +75,8 @@ class AModNmapExplorer(ActiveModule):
     def stop(self):
         super().terminate_threads()
 
-    def get_script_thread(self):
-        return ScriptThread(callback_fct=self.distrib_output, max_exec_time=60, cmd_as_shell=True)
+    def get_script_thread(self, rel_to_vi=[]):
+        return ScriptThread(callback_fct=self.distrib_output, rel_to_vi=rel_to_vi, max_exec_time=60)
 
     def get_default_timer(self):
         return 60

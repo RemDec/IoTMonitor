@@ -28,7 +28,7 @@ class AModArbitraryCmd(ActiveModule):
     def parse_output(self, output):
         pass
 
-    def distrib_output(self, script_output):
+    def distrib_output(self, script_output, rel_to_vi=[]):
         # function called by ending exec thread with script_output as a tuple summarizing how it ended
         if isinstance(script_output[0], int):
             code, popen = script_output
@@ -41,7 +41,7 @@ class AModArbitraryCmd(ActiveModule):
             py_except, popen = script_output
             logging.getLogger("debug").debug(f"Module [{self.m_id}] execution raised exception : {py_except}")
 
-    def launch(self):
+    def launch(self, rel_to_vi=[]):
         # start a thread for cmd + params execution
         super().purge_threadlist()
         s_thread = self.get_script_thread()
@@ -54,15 +54,15 @@ class AModArbitraryCmd(ActiveModule):
     def stop(self):
         super().terminate_threads()
 
-    def get_script_thread(self):
+    def get_script_thread(self, rel_to_vi=[]):
         # instancing generic thread defined in superclass for active modules
-        return ScriptThread(callback_fct=self.distrib_output, max_exec_time=30)
+        return ScriptThread(callback_fct=self.distrib_output, rel_to_vi=rel_to_vi, max_exec_time=30)
 
     def get_default_timer(self):
         return 60
 
     def get_description(self):
-        return f"[{self.m_id}] Blackbox module executing any command given"
+        return f"[{self.m_id}] Blackbox module executing any command given as prog parameter"
 
     def get_module_id(self):
         return self.m_id

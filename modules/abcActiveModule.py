@@ -15,7 +15,7 @@ class ActiveModule(Module):
         pass
 
     @abc.abstractmethod
-    def get_script_thread(self):
+    def get_script_thread(self, rel_to_vi=[]):
         pass
 
     def is_active(self):
@@ -71,26 +71,27 @@ class ActiveModule(Module):
 
 class ScriptThread(threading.Thread):
 
-    def __init__(self, callback_fct=None, max_exec_time=120, cmd_as_shell=False):
+    def __init__(self, callback_fct=None, rel_to_vi=[], max_exec_time=120):
         threading.Thread.__init__(self)
         self.callback_fct = callback_fct
         self.max_exec_time = max_exec_time
         self.cmd = []
         self.popen = None
-        self.cmd_as_shell = cmd_as_shell
+        self.rel_to_vi = rel_to_vi
 
     def run(self):
+        cmd_as_shell = isinstance(self.cmd, str)
         logging.getLogger("debug").debug(f"Starting thread : {super().getName()}")
         self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE,
                                       stderr=subprocess.STDOUT, universal_newlines=True,
-                                      shell=self.cmd_as_shell)
+                                      shell=cmd_as_shell)
         try:
             return_code = self.popen.wait(timeout=self.max_exec_time)
             if self.callback_fct is not None:
-                self.callback_fct( (return_code, self.popen) )
+                self.callback_fct((return_code, self.popen), rel_to_vi=self.rel_to_vi)
         except subprocess.TimeoutExpired as timeout:
             if self.callback_fct is not None:
-                self.callback_fct( (timeout, self.popen) )
+                self.callback_fct((timeout, self.popen), rel_to_vi=self.rel_to_vi)
 
     def start(self, cmd):
         self.cmd = cmd

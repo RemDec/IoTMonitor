@@ -35,7 +35,7 @@ class Module(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def launch(self):
+    def launch(self, rel_to_vi=[]):
         # A call to this should start cmd execution with current used_params as CLI arguments
         # that should occurs in a thread using distrib_output as an user-defined callback function to
         # parse output of the cmd program process. Pre-defined thread managers available in sub-classes
@@ -47,7 +47,7 @@ class Module(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def distrib_output(self, output):
+    def distrib_output(self, output, rel_to_vi=[]):
         # Callback function that should process output of cmd : parsing, translation to application
         # element like netmap new entry/modif, threat logging and alerting
         pass

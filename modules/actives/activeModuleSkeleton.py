@@ -34,7 +34,7 @@ class AModNameMod(ActiveModule):
         # how script output should act on application (netmap filling, alert raising, logging,..)
         pass
 
-    def distrib_output(self, script_output):
+    def distrib_output(self, script_output, rel_to_vi=[]):
         # function called by ending exec thread with script_output as a tuple summarizing how it ended
         if isinstance(script_output[0], int):
             code, popen = script_output
@@ -47,7 +47,10 @@ class AModNameMod(ActiveModule):
             py_except, popen = script_output
             logging.getLogger("debug").debug(f"Module [{self.m_id}] execution raised exception :{py_except}")
 
-    def launch(self):
+    def launch(self, rel_to_vi=[]):
+        # Start a new thread as given by get_script_thread() and pass it the command, built from get_cmd() that
+        # is the callname of the program (as you would call it on CLI) and current params (reformated as desired in
+        # this function before. Cmd can be a list or a string, see doc of threading.py
         super().purge_threadlist()
         cmd = [self.CMD]
         for param, val in self.params.items():
@@ -63,9 +66,10 @@ class AModNameMod(ActiveModule):
         # kill all threads (running cmd in a subprocess) instantiated from this instance
         super().terminate_threads()
 
-    def get_script_thread(self):
+    def get_script_thread(self, rel_to_vi=[]):
         # instancing generic thread defined in superclass for active modules
-        return ScriptThread(callback_fct=self.distrib_output, max_exec_time=self.max_exec_time)
+        return ScriptThread(callback_fct=self.distrib_output, rel_to_vi=rel_to_vi,
+                            max_exec_time=self.max_exec_time)
 
     def get_default_timer(self):
         # how frequent should be executed in automated queue of routine

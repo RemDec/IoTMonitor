@@ -28,12 +28,18 @@ class AppCLI(TimerInterface):
                       'netmap': self.filemanager.get_res_path('last_netmap')}
         self.timer = TimerThread(name="MainTimer")
         self.timer.subscribe(self)
-        if use_last_coreconfig:
-            self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.get_res_path("last_cfg"), timer=self.timer)
-        elif target_coreconfig is not None:
+        if target_coreconfig is not None:
             self.coreconfig = get_coreconfig_from_file(filepath=target_coreconfig, timer=self.timer)
+        elif use_last_coreconfig:
+            self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.get_res_path("last_cfg"), timer=self.timer)
         else:
             self.coreconfig = CoreConfig(timer=self.timer)
+        # if use_last_coreconfig:
+        #     self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.get_res_path("last_cfg"), timer=self.timer)
+        # elif target_coreconfig is not None:
+        #     self.coreconfig = get_coreconfig_from_file(filepath=target_coreconfig, timer=self.timer)
+        # else:
+        #     self.coreconfig = CoreConfig(timer=self.timer)
         self.core = Core(self.coreconfig)
 
         self.cli = CLIparser(self.core, core_controller=self)

@@ -1,7 +1,15 @@
 <?xml version='1.0' encoding='ASCII'?>
 <xmlsave>
   <routine running="False">
-    <queue running="False" nbr_mods="2">
+    <queue running="False" nbr_mods="3">
+      <modconfig modid="nmapexplo" setid="nmapexplo">
+        <savedparams>
+          <param code="SYNports" value="21,22,23,80,443,3389"/>
+          <param code="UDPports" value="53,135,137,161"/>
+          <param code="XMLfile" value="/tmp/xml_nmapexplo.xml"/>
+          <param code="IP" value="192.168.1.4/24"/>
+        </savedparams>
+      </modconfig>
       <modconfig modid="nmapports" setid="nmapports">
         <savedparams>
           <param code="nbrports" value="50"/>
@@ -10,12 +18,10 @@
           <param code="IP" value="192.168.1.33/24"/>
         </savedparams>
       </modconfig>
-      <modconfig modid="nmapexplo" setid="nmapexplo">
+      <modconfig modid="arbcmd" setid="arbcmd">
         <savedparams>
-          <param code="SYNports" value="21,22,23,80,443,3389"/>
-          <param code="UDPports" value="53,135,137,161"/>
-          <param code="XMLfile" value="/tmp/xml_nmapexplo.xml"/>
-          <param code="IP" value="192.168.1.4/24"/>
+          <param code="prog" value="echo"/>
+          <param code="args" value="No or bad command given to arbitrary module [arbcmd]"/>
         </savedparams>
       </modconfig>
     </queue>
