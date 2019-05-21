@@ -16,11 +16,11 @@ class PassiveModule(Module):
         self.max_shutdown_time = 5
 
     @abc.abstractmethod
-    def new_bg_thread(self, output_stream):
+    def new_bg_thread(self):
         pass
 
     @abc.abstractmethod
-    def new_comm_thread(self, timer, read_interv):
+    def new_comm_thread(self, timer, read_interv, rel_to_vi=[]):
         pass
 
     @abc.abstractmethod
@@ -129,13 +129,15 @@ class BackgroundThread(threading.Thread):
         self.output_stream = output_stream
         self.pipe_w = None
         self.popen = None
+        self.cmd = []
 
     def run(self):
+        cmd_as_shell = isinstance(self.cmd, str)
         logging.getLogger("debug").debug(f"Starting thread : {super().getName()}")
-        if self.output_stream is not None:
-            self.popen = subprocess.Popen(self.cmd, stdout=self.output_stream, stderr=subprocess.STDOUT)
-        else:
-            self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        self.popen = subprocess.Popen(self.cmd,
+                                      stdout=subprocess.PIPE if self.output_stream is None else self.output_stream,
+                                      stderr=subprocess.STDOUT,
+                                      shell=cmd_as_shell)
         self.pipe_w = self.popen.stdout
         logging.getLogger("debug").debug(f"{super().getName()}\n  |> launched subprocess outputing in {self.pipe_w}")
         # waiting for popen cmd exit would be a waste of resources (since it should run continuously)
@@ -181,9 +183,10 @@ class BackgroundThread(threading.Thread):
 
 class CommunicationThread(threading.Thread, TimerInterface):
 
-    def __init__(self, read_fct=None, timer=None, read_timer=0):
+    def __init__(self, read_fct=None, rel_to_vi=[], timer=None, read_timer=0):
         super().__init__()
         self.read_fct = read_fct
+        self.rel_to_vi = rel_to_vi
         self.timer = timer
         self.init_read_t = read_timer if read_timer > 0 else 20
         self.read_t = self.init_read_t
@@ -223,7 +226,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
 
     def call_parsing_fct(self, output):
         if self.read_fct is not None:
-            self.read_fct(output)
+            self.read_fct(output, self.rel_to_vi)
         else:
             print(f"No read fct defined, redirect stdout {output}")
 

@@ -11,7 +11,7 @@ class PModArbitraryCmdBg(PassiveModule):
                        "args": ("-t -n1 echo repeated_text_default_arbcmd_bg", False, "")}
         self.desc_PARAMS = {"prog": "A command to execute available on the system",
                             "args": "CLI arguments to pass as one string (all in it)"}
-        self.read_interval = 60
+        self.read_interval = 50
 
         self.set_params(params)
 
@@ -25,14 +25,16 @@ class PModArbitraryCmdBg(PassiveModule):
         # fix missing execution params with defaults
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
-    def new_bg_thread(self, output_stream=None):
+    def new_bg_thread(self):
         # a bg_thread spawns the cmd in a new child process and controls it (output, killing, ..)
-        return BackgroundThread(output_stream)
+        return BackgroundThread()
 
-    def new_comm_thread(self, timer=None, read_interv=0):
+    def new_comm_thread(self, timer=None, read_interv=0, rel_to_vi=[]):
         # a comm_thread reading in bg_thread cmd output and parsing it regularly (triggered by timer)
+        if read_interv == 0:
+            read_interv = self.get_read_interval()
         timer = timer if timer is not None else self.timer
-        return CommunicationThread(self.distrib_output, timer, read_interv)
+        return CommunicationThread(self.distrib_output, rel_to_vi, timer, read_interv)
 
     def set_read_interval(self, duration):
         self.read_interval = duration
@@ -40,18 +42,18 @@ class PModArbitraryCmdBg(PassiveModule):
     def get_read_interval(self):
         return self.read_interval
 
-    def distrib_output(self, buffer_read):
+    def distrib_output(self, buffer_read, rel_to_vi=[]):
         # do some work with output of bg process (parsing, filling netmap, ..)
         logging.getLogger("debug").debug(f"[{self.m_id}] Data to treat -> {buffer_read.decode()}")
 
-    def launch(self, output_stream=None, read_interv=0):
+    def launch(self, rel_to_vi=[], read_interv=0):
         if self.params.get("args") is None:
             self.params["args"] = self.PARAMS["args"][0] if self.params["prog"] == "watch" else ""
         args_split = shlex.split(self.params["args"])
         cmd = [self.params["prog"]] + args_split
 
-        bg_thread = self.new_bg_thread(output_stream)
-        read_thread = self.new_comm_thread(self.timer, read_interv)
+        bg_thread = self.new_bg_thread()
+        read_thread = self.new_comm_thread(self.timer, read_interv, rel_to_vi)
         # launching bg thread that is running cmd and directing output to given output_stream or pipe
         bg_thread.start(cmd)
         pipe = bg_thread.get_output_pipe()

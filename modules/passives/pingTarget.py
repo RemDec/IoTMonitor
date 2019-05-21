@@ -32,14 +32,14 @@ class PModPing(PassiveModule):
         # fix missing execution params with defaults
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
-    def new_bg_thread(self, output_stream=None):
-        return BackgroundThread(output_stream)
+    def new_bg_thread(self):
+        return BackgroundThread()
 
-    def new_comm_thread(self, timer=None, read_interv=0):
+    def new_comm_thread(self, timer=None, read_interv=0, rel_to_vi=[]):
         if read_interv == 0:
-            read_interv = self.read_interval
+            read_interv = self.get_read_interval()
         timer = timer if timer is not None else self.timer
-        return CommunicationThread(self.distrib_output, timer, read_interv)
+        return CommunicationThread(self.distrib_output, rel_to_vi, timer, read_interv)
 
     def set_read_interval(self, duration):
         self.read_interval = duration
@@ -47,18 +47,18 @@ class PModPing(PassiveModule):
     def get_read_interval(self):
         return self.read_interval
 
-    def distrib_output(self, buffer_read):
+    def distrib_output(self, buffer_read, rel_to_vi=[]):
         logging.getLogger("debug").debug(f"[{self.m_id}] DATA from bg thread output of length {len(buffer_read.decode())}")
 
-    def launch(self, output_stream=None, read_interv=0):
+    def launch(self, rel_to_vi=[], read_interv=0):
         cmd = [self.CMD]
         for param, val in self.params.items():
             if param != "divargs":
                 cmd.append(self.PARAMS[param][2] + val)
         if "divargs" in self.params:
             cmd.append(shlex.split(self.params["divargs"]))
-        bg_thread = self.new_bg_thread(output_stream)
-        read_thread = self.new_comm_thread(self.timer, read_interv)
+        bg_thread = self.new_bg_thread()
+        read_thread = self.new_comm_thread(self.timer, read_interv, rel_to_vi)
         bg_thread.start(cmd)
         pipe = bg_thread.get_output_pipe()
         while pipe is None:

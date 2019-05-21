@@ -99,6 +99,7 @@ class ScriptThread(threading.Thread):
         super().start()
 
     def interrupt(self):
+        self.callback_fct = None
         if self.popen is not None and self.popen.poll() is None:
             self.popen.terminate()
             if self.popen.poll() is None:

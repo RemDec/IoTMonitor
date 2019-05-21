@@ -3,8 +3,8 @@ from lxml import etree
 
 class NmapParser:
 
-    def __init__(self, XML_source):
-        self.tree = etree.parse(XML_source)
+    def __init__(self, xml_source):
+        self.tree = etree.parse(xml_source)
         self.root = self.tree.getroot()
 
     def get_root(self):

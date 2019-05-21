@@ -2,6 +2,7 @@ from modules.abcActiveModule import *
 from src.utils.misc_fcts import get_ip
 from src.parsers.nmapOutputParser import NmapParser
 from src.net.virtualInstance import PortTable
+from lxml import etree
 
 
 class AModNmapPortDisc(ActiveModule):
@@ -12,7 +13,7 @@ class AModNmapPortDisc(ActiveModule):
         self.CMD = "nmap"
         self.PARAMS = {'options': ("", False, ""),
                        'nbrports': ("50", True, "--top-ports "),
-                       'version': ("true", True, "-sV"),
+                       'version': ("false", True, "-sV"),
                        'XMLfile': ("/tmp/xml_nmap_portdisc.xml", True, "-oX "),
                        'IP': (get_ip(mask=24), True, "")
                        }
@@ -33,8 +34,11 @@ class AModNmapPortDisc(ActiveModule):
     def set_params(self, params):
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
-    def parse_output(self, IO_buffer):
-        parser = NmapParser(IO_buffer)
+    def parse_output(self, output):
+        try:
+            parser = NmapParser(output)
+        except etree.XMLSyntaxError:
+            return
         hosts_infos = parser.get_hosts_fields(fields=('port', ))
         for host_elmt, children in hosts_infos:
             ip, mac, _ = parser.addr_from_host(host_elmt)

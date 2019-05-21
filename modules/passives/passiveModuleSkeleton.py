@@ -26,16 +26,16 @@ class PModNameMod(PassiveModule):
         # fix missing execution params with defaults
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
-    def new_bg_thread(self, output_stream=None):
+    def new_bg_thread(self):
         # a bg_thread spawns the cmd in a new child process and controls it (output, killing, ..)
-        return BackgroundThread(output_stream)
+        return BackgroundThread()
 
-    def new_comm_thread(self, timer=None, read_interv=0):
+    def new_comm_thread(self, timer=None, read_interv=0, rel_to_vi=[]):
         # a comm_thread reading in bg_thread cmd output and parsing it regularly (triggered by timer)
         if read_interv == 0:
-            read_interv = self.read_interval
+            read_interv = self.get_read_interval()
         timer = timer if timer is not None else self.timer
-        return CommunicationThread(self.distrib_output, timer, read_interv)
+        return CommunicationThread(self.distrib_output, rel_to_vi, timer, read_interv)
 
     def set_read_interval(self, duration):
         self.read_interval = duration
@@ -43,17 +43,17 @@ class PModNameMod(PassiveModule):
     def get_read_interval(self):
         return self.read_interval
 
-    def distrib_output(self, buffer_read):
+    def distrib_output(self, buffer_read, rel_to_vi=[]):
         # do some work with output of bg process (parsing, filling netmap, ..)
         logging.getLogger("debug").debug("Data to treat ->", buffer_read.decode())
 
-    def launch(self, output_stream=None, read_interv=0):
+    def launch(self, rel_to_vi=[], read_interv=0):
         # spawn 2 threads: bg managing subprocess cmd and comm pulling and treating its output
         cmd = [self.CMD]
         for param, val in self.params.items():
             cmd.append(self.PARAMS[param][2] + val)
-        bg_thread = self.new_bg_thread(output_stream)
-        read_thread = self.new_comm_thread(self.timer, read_interv)
+        bg_thread = self.new_bg_thread()
+        read_thread = self.new_comm_thread(self.timer, read_interv, rel_to_vi)
         # launching bg thread that is running cmd and directing output to given output_stream or pipe
         bg_thread.start(cmd)
         pipe = bg_thread.get_output_pipe()

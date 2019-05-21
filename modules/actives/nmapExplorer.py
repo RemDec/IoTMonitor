@@ -39,7 +39,10 @@ class AModNmapExplorer(ActiveModule):
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
     def parse_output(self, output):
-        parser = NmapParser(output)
+        try:
+            parser = NmapParser(output)
+        except etree.XMLSyntaxError:
+            return
         hosts = parser.get_hosts()
         for host in hosts:
             state = host.find('status').get('state')
