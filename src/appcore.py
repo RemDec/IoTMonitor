@@ -17,6 +17,10 @@ class Core:
         self.modmanager.load_modlib()
         self.timer.launch()
 
+        self.code_components = {'app': self, 'routine': self.routine, 'netmap': self.netmap, 'indep': self.indep_mods,
+                                'timer': self.timer, 'library': self.modmanager,
+                                'events': self.get_event_center()}
+
     # ----- Modules library interactions -----
 
     def instantiate_module(self, mod_id, curr_params=None):
@@ -116,7 +120,7 @@ class Core:
         return self.logger_setup
 
     def get_event_center(self):
-        return self.logger_setup.event_center
+        return self.logger_setup.get_event_center()
 
     # ----- Utilities -----
 
@@ -139,20 +143,9 @@ class Core:
         self.quit()
 
     def corresp_target(self, target_str):
-        if target_str == "app":
-            return self
-        elif target_str == "routine":
-            return self.routine
-        elif target_str == "netmap":
-            return self.netmap
-        elif target_str == "timer":
-            return self.timer
-        elif target_str == "indep":
-            return self.indep_mods
-        elif target_str == "library":
-            return self.modmanager
-        elif target_str == "events":
-            return self.get_event_center()
+        target = self.code_components.get(target_str)
+        if target is not None:
+            return target
         elif target_str == "threats":
             return self.get_event_center().get_threat_events()
         elif target_str == "modifs":
@@ -167,10 +160,14 @@ class Core:
             return all_display
         return obj_str(obj, level)
 
-    def __str__(self):
+    def detail_str(self, level=2):
         actives, passives = self.modmanager.list_all_modid()
         indeps = [mod.m_id for mod in self.indep_mods]
-        s = f"=++====== Core application =========\n"
+        last_feedback = self.get_event_center().pull_feedback()
+        s = ""
+        if last_feedback.strip() != '':
+            s += last_feedback + '_'*130 + '\n\n'
+        s += f"=++====== Core application =========\n"
         s += f" || Using logger {self.logger_setup}\n"
         s += f" || Main timer : {self.timer}\n"
         s += f" || Available AModules : {', '.join(actives)}\n"
@@ -181,3 +178,6 @@ class Core:
         s += f" ||\n ++------- NETMAP -------\n"
         s += f"{self.netmap.detail_str(level=2)}"
         return s
+
+    def __str__(self):
+        self.detail_str()

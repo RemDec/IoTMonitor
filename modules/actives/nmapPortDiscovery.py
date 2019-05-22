@@ -19,7 +19,7 @@ class AModNmapPortDisc(ActiveModule):
                        }
         self.desc_PARAMS = {'options': "Others options to pass to nmap scan",
                             'nbrports': "How many of top most used ports should be probed",
-                            'version': "Should try to guess running version of services",
+                            'version': "Should try to guess running version of services (heavy in time)",
                             'XMLfile': "The temp file where scan output will be written",
                             "IP": "Target IP address(es) acceptable as Nmap syntax"}
         self.set_params(params)

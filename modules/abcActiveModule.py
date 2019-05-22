@@ -81,6 +81,7 @@ class ScriptThread(threading.Thread):
 
     def run(self):
         cmd_as_shell = isinstance(self.cmd, str)
+        logging.getLogger("debug").feedback(f"Starting thread : {super().getName()}")
         logging.getLogger("debug").debug(f"Starting thread : {super().getName()}")
         self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE,
                                       stderr=subprocess.STDOUT, universal_newlines=True,

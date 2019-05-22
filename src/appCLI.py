@@ -34,12 +34,6 @@ class AppCLI(TimerInterface):
             self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.get_res_path("last_cfg"), timer=self.timer)
         else:
             self.coreconfig = CoreConfig(timer=self.timer)
-        # if use_last_coreconfig:
-        #     self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.get_res_path("last_cfg"), timer=self.timer)
-        # elif target_coreconfig is not None:
-        #     self.coreconfig = get_coreconfig_from_file(filepath=target_coreconfig, timer=self.timer)
-        # else:
-        #     self.coreconfig = CoreConfig(timer=self.timer)
         self.core = Core(self.coreconfig)
 
         self.cli = CLIparser(self.core, core_controller=self)
@@ -228,7 +222,7 @@ class ConsoleOutput:
         if os.path.exists(self.PIPE_PATH):
             os.remove(self.PIPE_PATH)
         os.mkfifo(self.PIPE_PATH)
-        self.popen = subprocess.Popen([self.terminal, '-e', 'watch', '-t', '-n 0,5', 'cat %s' % self.PIPE_PATH])
+        self.popen = subprocess.Popen([self.terminal, '-geometry', '150x70+0+0', '+aw', '-e', 'watch', '-t', '-n 0,5', 'cat %s' % self.PIPE_PATH])
 
     def stop_reading(self):
         self.reading = False

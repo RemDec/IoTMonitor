@@ -331,10 +331,10 @@ class CLIparser:
                 self.core_ctrl.save_routine(filepath=f)
             if target in ["netmap", "app"]:
                 f = ask_path("netmap", self.core_ctrl.paths['netmap'])
-                self.core_ctrl.save_routine(filepath=f)
+                self.core_ctrl.save_netmap(filepath=f)
             if target in ["config", "app"]:
                 f = ask_path("config", self.core_ctrl.paths['config'])
-                self.core_ctrl.save_routine(filepath=f)
+                self.core_ctrl.save_coreconfig(filepath=f)
             self.back_main_menu()
         else:
             print("No reference to the core controller where saving procedure is defined")
@@ -404,7 +404,7 @@ class CLIparser:
                                       'resume': "resume",
                                       'save': "save"},
                           'fct_choice': self.transit_menu,
-                          'disp_choice': False}
+                          'disp_choice': True}
 
         self.create = {'desc': "Instantiate an object and integrate it in the application",
                        'help': get_res_CLI('create_help'),

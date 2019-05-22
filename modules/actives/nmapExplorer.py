@@ -46,19 +46,20 @@ class AModNmapExplorer(ActiveModule):
         hosts = parser.get_hosts()
         for host in hosts:
             state = host.find('status').get('state')
-            ip, mac, other = parser.addr_from_host(host, lambda a: [('manuf', a.get('vendor'))])
-            manuf = other['manuf']
+            ip, mac, other = parser.addr_from_host(host, lambda a: [('manufacturer', a.get('vendor'))])
+            div = {'manufacturer': other['manufacturer']} if other.get('manufacturer') is not None else {}
             if self.netmap is not None:
                 mapid = self.netmap.get_similar_VI(mac=mac, ip=ip)
                 if mapid is None:
-                    self.netmap.create_VI(mac=mac, ip=ip, div={'manufacturer': manuf})[1].set_state(state)
+                    self.netmap.create_VI(mac=mac, ip=ip, div=div)[1].set_state(state)
                 else:
-                    self.netmap.get_VI(mapid).complete_fields(mac=mac, ip=ip, div={'manufacturer': manuf})
+                    self.netmap.get_VI(mapid).complete_fields(mac=mac, ip=ip, div=div)
 
     def distrib_output(self, script_output, rel_to_vi=[]):
         if isinstance(script_output[0], int):
             code, popen = script_output
             output = popen.stdout
+            logging.getLogger("debug").feedback(f"Module [{self.m_id}] execution returned (code {code})")
             logging.getLogger("debug").debug(f"Module [{self.m_id}] execution returned (code {code})")
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):

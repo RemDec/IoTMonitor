@@ -12,6 +12,7 @@ class EventsCenter:
         self.MAX_MODIFS = 20
         self.threats = []
         self.modifs = []
+        self.last_feedback = []
         self.temp_ind = 0
         self.setup_loggers()
 
@@ -19,6 +20,12 @@ class EventsCenter:
         for logger in self.loggers:
             logger.register_threat = self.register_threat
             logger.register_modif = self.register_modif
+            logger.feedback = self.feedback
+
+    # --- Registering events in this center and pass it to real loggers ---
+
+    def log_event(self, event, logit_with_lvl, target_logger):
+        logging.getLogger(target_logger).log(level=logit_with_lvl, msg=str(event))
 
     def register_threat(self, from_module, level=1, mapid=None, msg=None, patch=None,
                         logit_with_lvl=-1, target_logger="threat"):
@@ -49,14 +56,17 @@ class EventsCenter:
         self.temp_ind += 1
         self.check_lengths()
 
-    def check_lengths(self):
-        while len(self.threats) > self.MAX_THREATS:
-            self.threats.pop()
-        while len(self.modifs) > self.MAX_MODIFS:
-            self.modifs.pop()
+    def feedback(self, str_fb):
+        self.last_feedback.extend(str_fb.split('\n'))
 
-    def log_event(self, event, logit_with_lvl, target_logger):
-        logging.getLogger(target_logger).log(level=logit_with_lvl, msg=str(event))
+    def pull_feedback(self, nbr_lines=2, nbr_pass=1):
+        to_return = '\n'.join(self.last_feedback[:nbr_lines])
+        if len(self.last_feedback) > nbr_lines:
+            # There are still lines in waiting to be displayed
+            self.last_feedback = self.last_feedback[nbr_pass:]
+        return to_return + '\n' if len(to_return) > 0 and to_return[-1] != '\n' else ''
+
+    # --- Retrieving events object based on filters ---
 
     def get_ordered_events(self, filter_fct=lambda x: True, keep_temp=False):
         threats_list = self.get_threat_events(filter_fct=filter_fct, keep_temp=True)
@@ -95,6 +105,14 @@ class EventsCenter:
 
     def get_modif_events(self, filter_fct=lambda x: True, keep_temp=False):
         return self.filter_events(target="modifs", filter_fct=filter_fct, keep_temp=keep_temp)
+
+    # --- Misc ---
+
+    def check_lengths(self):
+        while len(self.threats) > self.MAX_THREATS:
+            self.threats.pop()
+        while len(self.modifs) > self.MAX_MODIFS:
+            self.modifs.pop()
 
     def detail_str(self, level=0):
         s = f"EventCenter with registered loggers : {', '.join([l.name for l in self.loggers])}\n"

@@ -27,8 +27,13 @@ class VirtualInstance:
         self.hostname = self.hostname if hostname is None or (self.user_created and self.hostname is not None) \
                                       else hostname
         for field, val in div.items():
+            # Set field value if non existing or if it exists, set it if not created by user (consider as prior info)
             curr_field = self.div.get(field)
-            self.div[field] = val if curr_field is None or (self.user_created and curr_field is not None) else val
+            if curr_field is None:
+                self.div[field] = val
+            else:
+                if not self.user_created:
+                    self.div[field] = val
 
     def complete_ports_table(self, new_vals_dict, replacing=True):
         for portnum, new_port_info in new_vals_dict.items():
