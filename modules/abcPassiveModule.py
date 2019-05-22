@@ -82,7 +82,7 @@ class PassiveModule(Module):
             if wait_interv:
                 sleep(wait_interv)
         if i > self.max_shutdown_time:
-            print("Some module remains unterminable :", self)
+            logging.getLogger("debug").debug("Some module remains unterminable :", self)
             return False
         return True
 
@@ -133,13 +133,12 @@ class BackgroundThread(threading.Thread):
 
     def run(self):
         cmd_as_shell = isinstance(self.cmd, str)
-        logging.getLogger("debug").debug(f"Starting thread : {super().getName()}")
+        logging.log_feedback(f"Starting {super().getName()}", logitin='info')
         self.popen = subprocess.Popen(self.cmd,
                                       stdout=subprocess.PIPE if self.output_stream is None else self.output_stream,
                                       stderr=subprocess.STDOUT,
                                       shell=cmd_as_shell)
         self.pipe_w = self.popen.stdout
-        logging.getLogger("debug").debug(f"{super().getName()}\n  |> launched subprocess outputing in {self.pipe_w}")
         # waiting for popen cmd exit would be a waste of resources (since it should run continuously)
 
     def under_proc_state(self):
@@ -156,7 +155,7 @@ class BackgroundThread(threading.Thread):
 
     def start(self, cmd):
         self.cmd = cmd
-        super().setName(f"Background thread ({threading.currentThread().ident}) running {' '.join(cmd)}")
+        super().setName(f"Background thread running {' '.join(cmd)}")
         super().start()
         return self.pipe_w
 
@@ -228,7 +227,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
         if self.read_fct is not None:
             self.read_fct(output, self.rel_to_vi)
         else:
-            print(f"No read fct defined, redirect stdout {output}")
+            logging.log_feedback(f"Read function is None for commthread {super().getName()}", logitin='error')
 
     def read_pipe(self):
         # start program running in exec thread output treatment
@@ -239,13 +238,12 @@ class CommunicationThread(threading.Thread, TimerInterface):
             self.pipe_r.close()
 
     def run(self):
-        logging.getLogger("debug").debug(f"Starting thread :{super().getName()}")
+        logging.log_feedback(f"Starting {super().getName()}", logitin='info')
         self.set_reading()
 
     def start(self, pipe_output):
         self.pipe_r = pipe_output
-        super().setName(f"Communication thread ({threading.currentThread().ident}) with pipe {self.pipe_r}"
-                        f" as given param (read every {self.read_t}s)")
+        super().setName(f"Communication thread reading every {self.read_t}sec in pipe {self.pipe_r}")
         super().start()
 
     def set_reading(self, run=True, t=None):
@@ -269,7 +267,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
                 if thread.is_alive():
                     remaining = True
         if remaining:
-            print("Warning dumb thread alive after interrupt->join", self.decr_threads)
+            logging.getLogger("debug").warning("Warning dumb thread alive after interrupt->join", self.decr_threads)
         self.decr_threads = []
 
     def __str__(self):

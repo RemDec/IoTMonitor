@@ -5,8 +5,11 @@ import signal
 
 class Core:
 
-    def __init__(self, coreconfig=CoreConfig()):
+    def __init__(self, coreconfig=None):
         signal.signal(signal.SIGINT, self.interrupt_handler)
+        if coreconfig is None:
+            coreconfig = CoreConfig()
+        self.coreconfig = coreconfig
         self.logger_setup = coreconfig.logger_setup
         self.modmanager = coreconfig.modmanager
         self.timer = coreconfig.timer
@@ -162,21 +165,52 @@ class Core:
 
     def detail_str(self, level=2):
         actives, passives = self.modmanager.list_all_modid()
-        indeps = [mod.m_id for mod in self.indep_mods]
-        last_feedback = self.get_event_center().pull_feedback()
+        indeps = [mod.m_id for mod in self.indep_mods] if len(self.indep_mods) > 0 else ['< no independent module >']
         s = ""
-        if last_feedback.strip() != '':
-            s += last_feedback + '_'*130 + '\n\n'
-        s += f"=++====== Core application =========\n"
-        s += f" || Using logger {self.logger_setup}\n"
-        s += f" || Main timer : {self.timer}\n"
-        s += f" || Available AModules : {', '.join(actives)}\n"
-        s += f" || Available PModules : {', '.join(passives)}\n"
-        s += f" || Routine independent modules added :\n || {','.join(indeps)}\n"
-        s += f" ++------- ROUTINE -------"
-        s += f"{self.routine.detail_str()}"
-        s += f" ||\n ++------- NETMAP -------\n"
-        s += f"{self.netmap.detail_str(level=2)}"
+        if level == 0:
+            s += f"=++====== Core application =========\n"
+            s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
+            s += f" ++------- ROUTINE -------"
+            s += f"{self.routine.detail_str(level=0)}"
+            s += f" ||\n ++------- NETMAP -------\n"
+            s += f"{self.netmap.detail_str(level=0)}"
+        elif level == 1:
+            last_feedback = self.get_event_center().pull_feedback()
+            if last_feedback.strip() != '':
+                s += last_feedback + '_' * 100 + '\n\n'
+            s += f"=++====== Core application =========\n"
+            s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
+            s += f" || Routine independent modules :\n || {','.join(indeps)}\n"
+            s += f" ++------- ROUTINE -------"
+            s += f"{self.routine.detail_str(level=0)}"
+            s += f" ||\n ++------- NETMAP  -------\n"
+            s += f"{self.netmap.vi_frames()}"
+        elif level == 2:
+            last_feedback = self.get_event_center().pull_feedback(nbr_lines=3)
+            if last_feedback.strip() != '':
+                s += last_feedback + '_' * 130 + '\n\n'
+            s += f"=++====== Core application =========\n"
+            s += f" || Core config file : {self.coreconfig.get_cfg_file()}\n"
+            s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
+            s += f" || Routine independent modules :\n ||  {','.join(indeps)}\n"
+            s += f" ||\n ++------- ROUTINE -------"
+            s += f"{self.routine.detail_str(level=1)}"
+            s += f" ||\n ++------- NETMAP  -------\n"
+            s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=4)}"
+        else:
+            last_feedback = self.get_event_center().pull_feedback(nbr_lines=4)
+            if last_feedback.strip() != '':
+                s += last_feedback + '_'*50 + "^^^ FEEDBACK BAR ^^^" + '_'*50 + '\n\n'
+            s += f"=++====== Core application =========\n"
+            s += f" || Core config file : {self.coreconfig.get_cfg_file()}\n"
+            s += f" || Using loggers {', '.join(self.logger_setup.get_all_loggers())}\n"
+            s += f" || Available AModules : {', '.join(actives)}\n"
+            s += f" || Available PModules : {', '.join(passives)}\n"
+            s += f" || Routine independent modules added :\n || {','.join(indeps)}\n"
+            s += f" ++------- ROUTINE -------"
+            s += f"{self.routine.detail_str(level=1)}"
+            s += f" ||\n ++------- NETMAP -------\n"
+            s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=4, max_char_per_vi=35)}"
         return s
 
     def __str__(self):

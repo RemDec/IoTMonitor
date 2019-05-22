@@ -21,16 +21,11 @@
         </portstable>
       </virtinst>
       <virtinst mapid="device1" usercreated="True">
-        <mainfields mac="E4:58:E7:3E:C4:C4" ip="192.168.0.2"/>
-        <divfields manufacturer="Samsung Electronics"/>
-        <portstable/>
-      </virtinst>
-      <virtinst mapid="device2" usercreated="True">
         <mainfields mac="E0:94:67:56:EF:C3" ip="192.168.0.3"/>
         <divfields manufacturer="Intel Corporate"/>
         <portstable/>
       </virtinst>
-      <virtinst mapid="device3" usercreated="True">
+      <virtinst mapid="device2" usercreated="True">
         <mainfields ip="192.168.0.7"/>
         <divfields/>
         <portstable>

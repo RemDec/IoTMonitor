@@ -125,7 +125,7 @@ class Queue(TimerInterface):
         if level == 0:
             return self.__str__()
         elif level == 1:
-            return self.adaptive_display(lambda entry: f"{entry.qid} {entry.exp_timer}sec [{entry.init_timer}]" +
+            return self.adaptive_display(lambda entry: f"{entry.qid} {entry.exp_timer}s [{entry.init_timer}]" +
                                                        f"{entry.module.str_summary()}")
         else:
             s = f"Queue of {len(self.set)} active modules (running : {self.is_running})\n"

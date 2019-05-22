@@ -104,7 +104,7 @@ class AppCLI(TimerInterface):
         self.output.stop_reading()
 
     def set_level(self, new_lvl):
-        if 0 <= new_lvl <= 2:
+        if 0 <= new_lvl <= 10:
             self.level = new_lvl
 
     def get_level(self):

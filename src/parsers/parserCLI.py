@@ -20,7 +20,8 @@ class CLIparser:
                          'output': self.ctrl_output, 'set': self.set_cfg_param}
         self.display_header = True
         self.clear_cls = True
-        self.curr_display_lvl = 1
+
+        self.curr_display_lvl = 1 if self.core_ctrl is None else self.core_ctrl.get_level()
 
         readline.set_completer_delims(' \t\n;')
         readline.parse_and_bind("tab: complete")

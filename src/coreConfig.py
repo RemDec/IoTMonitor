@@ -112,10 +112,15 @@ class CoreConfig:
             filemanager = FilesManager()
         return filemanager
 
+    def get_cfg_file(self):
+        if self.file_from == '':
+            return "< core configuration from scratch (defaults) >"
+        return self.file_from
+
     def detail_str(self, level=1):
         use_paths = "non defaults values for some resource paths" if len(self.paths) > 0 else "all paths as defaults"
         s = f"Core config maintaining {use_paths}\n"
-        s += f"Instantiated from file {self.file_from}\n"
+        s += f"Instantiated from file {self.get_cfg_file()}\n"
         if level > 0:
             for obj, given_path in self.paths.items():
                 s += f"  | {obj} : {given_path}\n"

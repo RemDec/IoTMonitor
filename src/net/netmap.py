@@ -174,7 +174,11 @@ class Netmap:
             s += cut(f" {field}: {val}") + '\n'
         return str_lines_frame(s[:-1] if s[-1] == '\n' else s)
 
-    def detail_str(self, level=0):
+    def vi_frames(self):
+        vi_frames = [self.vi_frame_str(mapid) for mapid in self.get_VI_mapids()]
+        return str_multiframe(vi_frames)
+
+    def detail_str(self, level=0, vi_by_pack_of=3, max_char_per_vi=25):
         s = f"Netmap maintaining {len(self.map)} virtual instances" \
             f"{'' if self.event_center is None else ' and ref to an EventCenter'}\n"
         if level == 0:
@@ -184,8 +188,8 @@ class Netmap:
                 s += f"      <<<[{mapid}]>>>\n{vi.detail_str(1)}"
             return s
         elif level == 2:
-            vi_frames = [self.vi_frame_str(mapid) for mapid in self.get_VI_mapids()]
-            return s + str_multiframe(vi_frames)
+            vi_frames = [self.vi_frame_str(mapid, max_char=max_char_per_vi) for mapid in self.get_VI_mapids()]
+            return s + str_multiframe(vi_frames, by_pack_of=vi_by_pack_of)
         else:
             for mapid, vi in self.map.items():
                 s += f"\n      <<<[{mapid}]>>>\n{vi.detail_str(2)}"

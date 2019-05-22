@@ -7,7 +7,6 @@ class EventsCenter:
 
     def __init__(self, loggers=[]):
         self.loggers = loggers if isinstance(loggers, list) else [loggers]
-
         self.MAX_THREATS = 20
         self.MAX_MODIFS = 20
         self.threats = []
@@ -17,10 +16,11 @@ class EventsCenter:
         self.setup_loggers()
 
     def setup_loggers(self):
-        for logger in self.loggers:
+        logging.log_feedback = self.log_feedback
+        for i, logger in enumerate(self.loggers):
             logger.register_threat = self.register_threat
             logger.register_modif = self.register_modif
-            logger.feedback = self.feedback
+            logger.log_feedback = self.log_feedback
 
     # --- Registering events in this center and pass it to real loggers ---
 
@@ -55,6 +55,17 @@ class EventsCenter:
         self.modifs.insert(0, (self.temp_ind, modif_event))
         self.temp_ind += 1
         self.check_lengths()
+
+    def log_feedback(self, msg, logitin=None, lvl=10):
+        if logitin is not None and logitin in [l.name for l in self.loggers]:
+            if isinstance(lvl, str):
+                lvl = lvl.upper()
+                map_lvl = {'DEBUG': logging.DEBUG, 'INFO': logging.INFO, 'WARNING': logging.WARNING,
+                           'ERROR': logging.ERROR, 'CRITICAL': logging.CRITICAL}
+                lvl = map_lvl[lvl]
+            if lvl > 0:
+                logging.getLogger(logitin).log(lvl, msg)
+        self.feedback(msg)
 
     def feedback(self, str_fb):
         self.last_feedback.extend(str_fb.split('\n'))
@@ -137,7 +148,7 @@ class EventsCenter:
 if __name__ == '__main__':
     from src.logging.logger_setup import CustomLoggerSetup
     l = CustomLoggerSetup()
-    center = EventsCenter(logging.getLogger("debug"))
+    center = EventsCenter([logging.getLogger("debug")])
     center.register_threat("mymodule", 3, "netmapVI_id", "Alert raised by module!")
     center.register_modif("instance MAC field", "virt_inst", "myinst_id", "scanmodule", "unknown", "1C:39:47:12:AA:B3")
     center.register_threat("second_module", 5, "another_mapid", "Very SERIOUS alert!")

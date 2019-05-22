@@ -40,12 +40,13 @@ class AModNameMod(ActiveModule):
             code, popen = script_output
             output = popen.stdout.read()
             # if code OK, should parse results to integrate in app (netmap, alert threats, ..)
-            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution returned (code {code}):\n{output}")
+            logging.log_feedback(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='debug')
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             # pull info from exception
             py_except, popen = script_output
-            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution raised exception :{py_except}")
+            logging.log_feedback(f"Module [{self.m_id}] execution raised exception :{py_except}",
+                                 logitin='error', lvl='error')
 
     def launch(self, rel_to_vi=[]):
         # Start a new thread as given by get_script_thread() and pass it the command, built from get_cmd() that

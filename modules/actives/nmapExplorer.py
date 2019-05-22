@@ -59,12 +59,12 @@ class AModNmapExplorer(ActiveModule):
         if isinstance(script_output[0], int):
             code, popen = script_output
             output = popen.stdout
-            logging.getLogger("debug").feedback(f"Module [{self.m_id}] execution returned (code {code})")
-            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution returned (code {code})")
+            logging.log_feedback(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='debug')
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             py_except, popen = script_output
-            logging.getLogger("debug").debug(f"Module [{self.m_id}] execution raised exception :{py_except}")
+            logging.log_feedback(f"Module [{self.m_id}] execution raised exception :{py_except}",
+                                 logitin='error', lvl='error')
 
     def launch(self, rel_to_vi=[]):
         super().purge_threadlist()
@@ -94,6 +94,9 @@ class AModNmapExplorer(ActiveModule):
 
 
 if __name__ == '__main__':
+    from src.logging.eventsCenter import *
+    EventsCenter()
+    print(logging.log_feedback)
     nmap = AModNmapExplorer()
     print(nmap)
     nmap.launch()
