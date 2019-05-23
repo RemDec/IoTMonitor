@@ -202,7 +202,8 @@ class Core:
             if last_feedback.strip() != '':
                 s += last_feedback + '_'*50 + "^^^ FEEDBACK BAR ^^^" + '_'*50 + '\n\n'
             s += f"=++====== Core application =========\n"
-            s += f" || Core config file : {self.coreconfig.get_cfg_file()}\n"
+            s += f" || Coreconfig instance maintains file configuration paths :\n"
+            s += self.coreconfig.str_current_paths(prefix=" ||  -")
             s += f" || Using loggers {', '.join(self.logger_setup.get_all_loggers())}\n"
             s += f" || Available AModules : {', '.join(actives)}\n"
             s += f" || Available PModules : {', '.join(passives)}\n"

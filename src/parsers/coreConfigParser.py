@@ -20,7 +20,7 @@ def config_to_YAML(coreconfig, filepath=get_dflt_entry('configs', 'last_coreconf
         yaml.dump(vals, f)
 
 
-def YAML_to_config(filepath=get_dflt_entry('configs', 'last_coreconfig.yaml'),
+def YAML_to_config(filepath=get_dflt_entry('last_cfg'),
                    timer=None, netmap=None, routine=None,
                    logger_setup=None, event_center=None, modmanager=None,
                    filemanager=None, check_files=True):

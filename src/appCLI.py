@@ -23,18 +23,18 @@ class AppCLI(TimerInterface):
         self.to_disp = "app"
         self.output = self.config_output()  # Init output controller object depending on mode selected
         self.filemanager = FilesManager()
-        self.paths = {'config': self.filemanager.get_res_path('last_cfg'),
-                      'routine': self.filemanager.get_res_path('last_routine'),
-                      'netmap': self.filemanager.get_res_path('last_netmap')}
         self.timer = TimerThread(name="MainTimer")
         self.timer.subscribe(self)
         if target_coreconfig is not None:
-            self.coreconfig = get_coreconfig_from_file(filepath=target_coreconfig, timer=self.timer)
+            self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.complete_path('configs', target_coreconfig),
+                                                       timer=self.timer)
         elif use_last_coreconfig:
-            self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.get_res_path("last_cfg"), timer=self.timer)
+            self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.get_res_path("last_cfg"),
+                                                       timer=self.timer)
         else:
             self.coreconfig = CoreConfig(timer=self.timer)
         self.core = Core(self.coreconfig)
+        self.paths = self.coreconfig.paths
 
         self.cli = CLIparser(self.core, core_controller=self)
         self.start_app(start_pull_output)
@@ -59,20 +59,38 @@ class AppCLI(TimerInterface):
 
     def save_routine(self, filepath=None):
         from src.parsers.routineParser import write_routine_XML
-        filepath = filepath if filepath is not None else self.paths['routine']
-        write_routine_XML(self.core.routine, filepath=self.filemanager.complete_path('routines', filepath))
+        filepath = filepath if filepath is not None else self.coreconfig.paths['routine']
+        full_path = self.filemanager.complete_path('routines', filepath)
+        write_routine_XML(self.core.routine, filepath=full_path)
+        return full_path
+
+    def set_current_routine(self, new_filepath):
+        self.coreconfig.paths['routine'] = new_filepath
 
     def save_netmap(self, filepath=None):
         from src.parsers.netmapParser import write_netmap_XML
-        filepath = filepath if filepath is not None else self.paths['netmap']
-        write_netmap_XML(self.core.netmap, filepath=filepath)
+        filepath = filepath if filepath is not None else self.coreconfig.paths['netmap']
+        full_path = self.filemanager.complete_path('netmaps', filepath)
+        write_netmap_XML(self.core.netmap, filepath=full_path)
+        return full_path
+
+    def set_current_netmap(self, new_filepath):
+        self.coreconfig.paths['netmap'] = new_filepath
 
     def save_coreconfig(self, filepath=None, routine_path=None, netmap_path=None):
         from src.parsers.coreConfigParser import config_to_YAML
-        routine_path = routine_path if routine_path is not None else self.paths['routine']
-        netmap_path = netmap_path if netmap_path is not None else self.paths['netmap']
-        filepath = filepath if filepath is not None else self.paths['config']
-        config_to_YAML(self.coreconfig, filepath=filepath, XML_path_routine=routine_path, XML_path_netmap=netmap_path)
+        routine_path = routine_path if routine_path is not None else self.coreconfig.paths['routine']
+        netmap_path = netmap_path if netmap_path is not None else self.coreconfig.paths['netmap']
+        filepath = filepath if filepath is not None else self.coreconfig.paths['config']
+        full_path = self.filemanager.complete_path('configs', filepath)
+        config_to_YAML(self.coreconfig,
+                       filepath=full_path,
+                       XML_path_routine=self.filemanager.complete_path('routines', routine_path),
+                       XML_path_netmap=self.filemanager.complete_path('netmaps', netmap_path))
+        return full_path
+
+    def set_current_coreconfig(self, new_filepath):
+        self.coreconfig.paths['config'] = new_filepath
 
     def save_app_state(self, config_path=None, routine_path=None, netmap_path=None):
         self.save_routine(routine_path)

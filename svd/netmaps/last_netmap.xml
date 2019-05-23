@@ -1,41 +1,7 @@
 <?xml version='1.0' encoding='ASCII'?>
 <xmlsave>
   <netmap>
-    <instances>
-      <virtinst mapid="device0" usercreated="True">
-        <mainfields mac="A0:21:B7:52:B1:69" ip="192.168.0.1"/>
-        <divfields manufacturer="Netgear"/>
-        <portstable>
-          <port portnum="23">
-            <maininfos service="telnet" protocol="TCP" state="closed"/>
-            <divportinfos/>
-          </port>
-          <port portnum="80">
-            <maininfos service="http" protocol="TCP" state="open"/>
-            <divportinfos/>
-          </port>
-          <port portnum="8080">
-            <maininfos service="http-proxy" protocol="TCP" state="closed"/>
-            <divportinfos/>
-          </port>
-        </portstable>
-      </virtinst>
-      <virtinst mapid="device1" usercreated="True">
-        <mainfields mac="E0:94:67:56:EF:C3" ip="192.168.0.3"/>
-        <divfields manufacturer="Intel Corporate"/>
-        <portstable/>
-      </virtinst>
-      <virtinst mapid="device2" usercreated="True">
-        <mainfields ip="192.168.0.7"/>
-        <divfields/>
-        <portstable>
-          <port portnum="80">
-            <maininfos service="http" protocol="TCP" state="open"/>
-            <divportinfos/>
-          </port>
-        </portstable>
-      </virtinst>
-    </instances>
+    <instances/>
     <savedevents/>
   </netmap>
 </xmlsave>

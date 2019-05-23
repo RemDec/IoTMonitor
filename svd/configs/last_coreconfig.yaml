@@ -1,2 +1,5 @@
+config: /home/remy/Documents/MASTER1INFO/IoTMonitor/svd/configs/last_coreconfig.yaml
+library: /home/remy/Documents/MASTER1INFO/IoTMonitor/svd/configs/modlib.xml
+logger_setup: /home/remy/Documents/MASTER1INFO/IoTMonitor/svd/configs/default_logger.yaml
 netmap: /home/remy/Documents/MASTER1INFO/IoTMonitor/svd/netmaps/last_netmap.xml
 routine: /home/remy/Documents/MASTER1INFO/IoTMonitor/svd/routines/last_routine.xml

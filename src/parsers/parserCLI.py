@@ -152,9 +152,11 @@ class CLIparser:
         cmd = list(filter(None, keyword.split(' ')))
         self.reserved[cmd.pop(0)](args=cmd)
 
-    def get_user_confirm(self, marker="Confirm ? (Y/n) ", val=('', 'y', 'o', 'yes', 'oui', 'ok')):
+    def get_user_confirm(self, marker=None, val=('y', 'o', 'yes', 'oui', 'ok'), empty_ok=True):
+        if marker is None:
+            marker = "Confirm ? (Y/n) " if empty_ok else "Confirm ? (y/N) "
         res = input(marker)
-        return res.lower() in val
+        return res.lower() in val + ('',) if empty_ok else val
 
     def get_user_in_or_dflt(self, default, marker=">>>"):
         user_in = input(marker)
@@ -324,18 +326,28 @@ class CLIparser:
         # Save components state and/or whole app configuration by writing formatted files (yaml, xml)
         target = self.get_choice_val(target)
         ask_path = lambda res, dflt : \
-            self.get_user_in_or_dflt(dflt, f"Give a filename for the {res} save (not full path but with extension),\n"
-            f"default full path : {dflt}\n[filename] :")
+            self.get_user_in_or_dflt(dflt,
+                                     f"Give a name for the {res} file to save in (not full path but with extension),\n"
+                                     f"default full path : {dflt}\n[filename] :")
+        set_current = lambda res, path : \
+            self.get_user_confirm(marker=f"Use {path}\n as current file descriptor for {res}\n"
+            f" so that next (auto-)save will be done considering this file? (y/N) :", empty_ok=False)
         if self.core_ctrl is not None:
             if target in ["routine", "app"]:
                 f = ask_path("routine", self.core_ctrl.paths['routine'])
-                self.core_ctrl.save_routine(filepath=f)
+                full_path = self.core_ctrl.save_routine(filepath=f)
+                if set_current("routine", full_path):
+                    self.core_ctrl.set_current_routine(full_path)
             if target in ["netmap", "app"]:
                 f = ask_path("netmap", self.core_ctrl.paths['netmap'])
-                self.core_ctrl.save_netmap(filepath=f)
+                full_path = self.core_ctrl.save_netmap(filepath=f)
+                if set_current("netmap", full_path):
+                    self.core_ctrl.set_current_netmap(full_path)
             if target in ["config", "app"]:
-                f = ask_path("config", self.core_ctrl.paths['config'])
-                self.core_ctrl.save_coreconfig(filepath=f)
+                f = ask_path("app paths configuration", self.core_ctrl.paths['config'])
+                full_path = self.core_ctrl.save_coreconfig(filepath=f)
+                if set_current("app paths configuration", full_path):
+                    self.core_ctrl.set_current_coreconfig(full_path)
             self.back_main_menu()
         else:
             print("No reference to the core controller where saving procedure is defined")

@@ -4,6 +4,9 @@ from src.utils.filesManager import FilesManager
 import argparse
 import os
 
+app_description = "Entry point for IoTMonitor application launching. Report on https://github.com/RemDec/IoTMonitor" \
+                  "for application concepts introduction. You can also check the inapp help relative to its components."
+
 
 def is_valid_file(filesmanager, parser, arg):
     if arg is None:
@@ -24,7 +27,7 @@ filesmanager = FilesManager()
 
 sys.path.extend([os.path.splitext(os.path.abspath(__file__))[0]])
 
-parser = argparse.ArgumentParser(description="Entry point for IoTMonitor application launching.")
+parser = argparse.ArgumentParser(description=app_description)
 
 parser.add_argument("-i", "--interface",
                     help="user interaction mode with the app (graphical or with inline context menu parser)",
@@ -38,7 +41,7 @@ parser.add_argument("-nas", "--noautosave", help="disable current app state bein
                     action="store_true")
 parser.add_argument("-nal", "--noautoload", action="store_true",
                     help="disable auto loading of last config and app elements autosaved when exiting")
-parser.add_argument("-lvl", "--lvldisplay", type=int, choices=range(0, 4), default=1,
+parser.add_argument("-lvl", "--lvldisplay", type=int, choices=range(0, 10), default=1,
                     help="initial informations display level in app (mutable later by interface)"),
 parser.add_argument("--email", help="Email to use for threat alerts, prior to which defined in config file if exists")
 
