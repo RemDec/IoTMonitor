@@ -39,7 +39,6 @@ CLIparser = {
 }
 
 
-
 def get_res_CLI(resource, dflt=None):
     if dflt is None:
         dflt = "No entry in CLIparser for resource " + str(resource)

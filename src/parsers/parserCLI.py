@@ -1,7 +1,7 @@
 from src.appcore import *
 from src.net.virtualInstance import *
 from src.utils.misc_fcts import str_lines_frame
-from src.parsers.parser_res import get_res_CLI
+from src.parsers.parserCLI_helper import get_res_CLI
 import readline
 import os
 
@@ -28,6 +28,7 @@ class CLIparser:
         readline.set_completer(self.complete)
 
     def complete(self, text, state):
+        # autocompletion with tab, implied by readline import
         return (self.match_input_to_choice(text) + [None])[state]
 
     # ----- Parsing execution flow -----
@@ -164,7 +165,7 @@ class CLIparser:
         if marker is None:
             marker = "Confirm ? (Y/n) " if empty_ok else "Confirm ? (y/N) "
         res = input(marker)
-        return res.lower() in val + ('',) if empty_ok else val
+        return res.lower() in (val + ('',) if empty_ok else val)
 
     def get_user_in_or_dflt(self, default, marker=">>>"):
         user_in = input(marker)
@@ -290,6 +291,7 @@ class CLIparser:
         if dflts:
             mod_inst = self.core.instantiate_module(mod_id)
         else:
+            # Taking values for module paramaters from descriptions provided
             input_params = {}
             _, PARAMS, desc_params = self.core.modmanager.get_mod_desc_params(mod_id)
             for code_param, (dflt, mand, pref) in PARAMS.items():
@@ -304,14 +306,34 @@ class CLIparser:
                 else:
                     input_params[code_param] = user_in
             mod_inst = self.core.instantiate_module(mod_id, curr_params=input_params)
+        # Taking VIs mapids the mod exec will be relative to
+        marker = f"Indicate specific VIs the [{mod_id}] execution should be relative to ? (y/N) :"
+        take_vi = self.get_user_confirm(marker=marker, empty_ok=False)
+        vis = []
+        all_vis = self.core.get_all_mapids().copy()
+        while take_vi:
+            ind_mapids = dict([(str(i), mapid) for i, mapid in enumerate(all_vis)])
+            print("Remaining mapids :\n", ' '.join([f"{i}.{mapid}" for i, mapid in ind_mapids.items()]))
+            marker = '\nType mapid(s) index(es) (space separated) or enter to pass\n[index] :'
+            mapid_nbrs = self.get_user_in_or_dflt(default='', marker=marker)
+            added_vi = False
+            for mapid_nbr in list(filter(None, mapid_nbrs.split(' '))):
+                if ind_mapids.get(mapid_nbr, False):
+                    all_vis.remove(ind_mapids[mapid_nbr])
+                    vis.append(ind_mapids[mapid_nbr])
+                    added_vi = True
+            take_vi = added_vi
+
+        # Taking time parameters
         is_mod_act = mod_inst.is_active()
         timer_name = f"{'queue expiration' if is_mod_act else 'reading'} interval timer"
         dflt_val = mod_inst.get_default_timer() if is_mod_act else mod_inst.get_read_interval()
-        input_timer = self.get_user_in_or_dflt(dflt_val,
-                                               marker=f"Set {timer_name} if desired (numeric)\n[default:{dflt_val}] :")
+        marker = f"Set {timer_name} if desired (numeric) or enter to pass\n[default:{dflt_val}] :"
+        input_timer = self.get_user_in_or_dflt(dflt_val, marker=marker)
         if in_rout:
             setid = self.get_user_in_or_dflt(None, marker="Give a setid if desired (alphanumeric)\n[setid] :")
-            self.core.add_to_routine(mod_inst, given_setid=setid, given_timer=abs(int(input_timer)))
+            entry = self.core.add_to_routine(mod_inst, given_setid=setid, given_timer=abs(int(input_timer)))
+            entry.set_vi_relative(vis)
         else:
             self.core.add_indep_module(mod_inst)
         self.back_main_menu()
@@ -474,6 +496,7 @@ class CLIparser:
                        'help': get_res_CLI('create_help'),
                        'choices': {'module': "newMod",
                                    'virtual instance': "newVI"},
+                       'dflt_choice': 'module',
                        'fct_choice': self.transit_menu}
 
         self.remove = {'desc': "Remove an existing object in the app",

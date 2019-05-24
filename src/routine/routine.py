@@ -18,15 +18,16 @@ class Routine:
 
     def add_module(self, mod, given_id=None, given_timer=0):
         if mod.is_active():
-            well_added = self.queue.add_module(mod, given_timer=given_timer, given_id=given_id)
+            entry_added = self.queue.add_module(mod, given_timer=given_timer, given_id=given_id)
         else:
             if given_timer > 0:
                 mod.set_read_interval(given_timer)
-            well_added = self.panel.add_module(mod, given_id=given_id)
-        if not well_added:
+            entry_added = self.panel.add_module(mod, given_id=given_id)
+        if not entry_added:
             # Raise exception
             print("Adding to routine failed for module", mod)
         self.check_unique_ids()
+        return entry_added
 
     def add_modules(self, modlist):
         for any_mod in modlist:

@@ -18,9 +18,9 @@ class Queue(TimerInterface):
         for i in range(len(self.set)):
             if new_entry <= self.set[i]:
                 self.set.insert(i, new_entry)
-                return True
+                return new_entry
         self.set.append(new_entry)
-        return True
+        return new_entry
 
     def remove_module(self, mod):
         ind = self.get_presence(mod)
@@ -172,7 +172,7 @@ class QueueEntry:
             return s
         elif level == 1:
             curr_params, dflt_params, desc_PARAMS = self.module.get_params()
-            rel_vi_str = '< no specific VI >' if len(self.rel_to_vi) == 0 else ', '.join(self.rel_to_vi)
+            rel_vi_str = '| < no specific VI >' if len(self.rel_to_vi) == 0 else ', '.join(self.rel_to_vi)
             s += f"| PASSIVE module whose description is given as :\n"
             s += f"|  {self.module.get_description()}\n"
             s += f"| Execution relative to VIs : {rel_vi_str}\n"
@@ -181,7 +181,7 @@ class QueueEntry:
             s += str_param_comp(curr_params, dflt_params, descriptions=desc_PARAMS, prefix='|  ')
         else:
             curr_params, dflt_params, desc_PARAMS = self.module.get_params()
-            rel_vi_str = '< no specific VI >'
+            rel_vi_str = '| < no specific VI >'
             if len(self.rel_to_vi) > 0 and self.module.netmap is not None:
                 rel_vi_str = self.module.netmap.vi_frames(self.module.netmap.get_VI_mapids(subset_mapids=self.rel_to_vi))
             s += f"| PASSIVE module whose description is given as :\n"
@@ -191,7 +191,8 @@ class QueueEntry:
             s += str_param_comp(curr_params, dflt_params, descriptions=desc_PARAMS, prefix='|  ')
             s += f"| Threads registered :\n"
             s += self.module.str_threads() + "|\n"
-            s += f"| Execution relative to VIs : {rel_vi_str}\n"
+            b = '\n'
+            s += f"| Execution relative to VIs :\n{rel_vi_str}{b if rel_vi_str[-1] != b else ''}"
         return s
 
     def __str__(self):
