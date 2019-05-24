@@ -41,7 +41,7 @@ def get_infoname_py(fun):
     return fun.__name__, modname
 
 
-def str_param_comp(defaults, current):
+def str_param_comp(current, defaults, descriptions={}, prefix=''):
     """Illustrate which value would be given for each param
 
     """
@@ -49,16 +49,18 @@ def str_param_comp(defaults, current):
     for code, (defval, mand, pref) in defaults.items():
         mand = "T" if mand else "F"
         defval = "[empty default value]" if defval == "" else defval
-        if pref != "":
-            s += f"~{code}({mand}): {pref} {defval}"
+        desc = descriptions.get(code)
+        if desc is not None:
+            s += f"{prefix}~{code} (mandatory:{mand}): {desc}\n"
+            s += f"{prefix} -dflt prefixed val : {pref + ' ' if pref is not None else ''}{defval}"
         else:
-            s += f"~{code}({mand}): {defval}"
+            s += f"{prefix}~{code}({mand}): {pref + ' ' if pref is not None else ''}{defval}"
         repl = current.get(code)
         if repl is not None:
             s += f" but current value {repl}"
         s += '\n'
     for other in [code for code in current if defaults.get(code) is None]:
-        s += f"!unref value in default for {other} : {current.get(other)}\n"
+        s += f"{prefix}!unref value in default for {other} : {current.get(other)}\n"
     return s
 
 
@@ -169,6 +171,6 @@ if __name__ == '__main__':
     print("\n\nAfter replacing 0 keys with value 'a'\n", a)
     default = {'par1': ("par1val", True, ""), 'par2': ("par2val", False, ""), 'par3': ("par3val", False, "")}
     given = {'par1':"new_val1", 'par3': "new_val3", 'unknown': "val"}
-    print("\n\nSee used parameters\n", str_param_comp(default, given))
+    print("\n\nSee used parameters\n", str_param_comp(given, default))
 
     write_modlib()

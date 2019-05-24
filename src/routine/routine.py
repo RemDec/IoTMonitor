@@ -88,15 +88,13 @@ class Routine:
 
     # --- Internal methods and misc ---
 
-    def get_mod_by_setid(self, setid):
-        mod_inst = self.panel.get_mod_by_id(setid)
-        if mod_inst is not None:
-            return mod_inst
-        mod_inst = self.queue.get_mod_by_id(setid)
-        return mod_inst
+    def get_mod_by_setid(self, setid, whole_entry=False):
+        if whole_entry:
+            return self.panel.get_corresp_entry(setid), self.queue.get_corresp_entry(setid)
+        return self.panel.get_mod_by_id(setid), self.queue.get_mod_by_id(setid)
 
     def get_all_setids(self):
-        return self.queue.get_idlist(), self.panel.get_idlist()
+        return self.panel.get_idlist(), self.queue.get_idlist()
 
     def get_corresp_set(self, mod):
         # Get which structure is/should be module in, where module either setid or module instance.

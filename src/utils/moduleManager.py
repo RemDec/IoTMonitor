@@ -289,7 +289,7 @@ class ModDescriptor:
 
     def __str__(self):
         modtype = "A" if self.m_active else "P"
-        params_comp = str_param_comp(self.PARAMS, self.curr_params)
+        params_comp = str_param_comp(self.curr_params, self.PARAMS)
         s = f"Module descriptor for [{self.m_id}]({modtype}) def in {self.pymod} by {self.pyclass} class\n"
         s += f"overlayer for cmd {self.cmd} with considered param setup\n{params_comp}"
         return s

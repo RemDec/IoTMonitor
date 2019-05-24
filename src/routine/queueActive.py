@@ -1,5 +1,5 @@
 from src.utils.timer import *
-from src.utils.misc_fcts import str_frame, str_lines_frame
+from src.utils.misc_fcts import str_frame, str_param_comp
 
 
 class Queue(TimerInterface):
@@ -105,9 +105,6 @@ class Queue(TimerInterface):
     def get_idlist(self):
         return [entry.qid for entry in self.set]
 
-    def __str__(self):
-        return self.adaptive_display(lambda entry: f"{entry.qid} ~ {str(entry.exp_timer)}s")
-
     def adaptive_display(self, fct_to_entry, header=True):
         s = ""
         if header:
@@ -139,14 +136,24 @@ class Queue(TimerInterface):
             s += sep
             return s
 
+    def __str__(self):
+        return self.adaptive_display(lambda entry: f"{entry.qid} ~ {str(entry.exp_timer)}s")
+
 
 class QueueEntry:
 
-    def __init__(self, module, exp_timer, qid):
+    def __init__(self, module, exp_timer, qid, rel_to_vi=[]):
         self.module = module
         self.exp_timer = exp_timer
         self.init_timer = exp_timer
         self.qid = qid
+        self.rel_to_vi = rel_to_vi
+
+    def set_vi_relative(self, rel_to_vi):
+        if isinstance(rel_to_vi, str):
+            self.rel_to_vi = [rel_to_vi]
+        else:
+            self.rel_to_vi = rel_to_vi
 
     def decr(self):
         if self.exp_timer >= 1:
@@ -161,11 +168,36 @@ class QueueEntry:
     def __le__(self, other):
         return self.get_timer() <= other.get_timer()
 
+    def detail_str(self, level=0):
+        s = str_frame(f"{self.qid} {self.exp_timer}s [{self.init_timer}]")
+        if level == 0:
+            return s
+        elif level == 1:
+            curr_params, dflt_params, desc_PARAMS = self.module.get_params()
+            rel_vi_str = '< no specific VI >' if len(self.rel_to_vi) == 0 else ', '.join(self.rel_to_vi)
+            s += f"| PASSIVE module whose description is given as :\n"
+            s += f"|  {self.module.get_description()}\n"
+            s += f"| Execution relative to VIs : {rel_vi_str}\n"
+            s += f"| Associated underlying program : {self.module.get_cmd()}\n"
+            s += f"| Module parameters :\n"
+            s += str_param_comp(curr_params, dflt_params, descriptions=desc_PARAMS, prefix='|  ')
+        else:
+            curr_params, dflt_params, desc_PARAMS = self.module.get_params()
+            rel_vi_str = '< no specific VI >'
+            if len(self.rel_to_vi) > 0 and self.module.netmap is not None:
+                rel_vi_str = self.module.netmap.vi_frames(self.module.netmap.get_VI_mapids(subset_mapids=self.rel_to_vi))
+            s += f"| PASSIVE module whose description is given as :\n"
+            s += f"|  {self.module.get_description()}\n"
+            s += f"| Associated underlying program : {self.module.get_cmd()}\n"
+            s += f"| Module parameters :\n"
+            s += str_param_comp(curr_params, dflt_params, descriptions=desc_PARAMS, prefix='|  ')
+            s += f"| Threads registered :\n"
+            s += self.module.str_threads() + "|\n"
+            s += f"| Execution relative to VIs : {rel_vi_str}\n"
+        return s
+
     def __str__(self):
-        title = f"{self.qid} {self.exp_timer}s [{self.init_timer}]"
-        f_title = "| " + title + " |"
-        sep = "+" + (len(f_title)-2)*"-" + "+"
-        return f"{sep}\n{f_title}\n{sep}"
+        return self.detail_str()
 
 
 if __name__=="__main__":

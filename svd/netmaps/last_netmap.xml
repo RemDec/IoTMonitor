@@ -1,7 +1,38 @@
 <?xml version='1.0' encoding='ASCII'?>
 <xmlsave>
   <netmap>
-    <instances/>
+    <instances>
+      <virtinst mapid="device0" usercreated="True">
+        <mainfields mac="A0:21:B7:52:B1:69" ip="192.168.0.1"/>
+        <divfields manufacturer="Netgear"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device1" usercreated="True">
+        <mainfields mac="E4:58:E7:3E:C4:C4" ip="192.168.0.2"/>
+        <divfields manufacturer="Samsung Electronics"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device2" usercreated="True">
+        <mainfields mac="08:EE:8B:6D:75:AB" ip="192.168.0.4"/>
+        <divfields manufacturer="Samsung Electronics"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device3" usercreated="True">
+        <mainfields mac="E0:94:67:56:EF:C3" ip="192.168.0.5"/>
+        <divfields manufacturer="Intel Corporate"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device4" usercreated="True">
+        <mainfields ip="192.168.0.3"/>
+        <divfields/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device5" usercreated="True">
+        <mainfields mac="70:4F:57:EC:95:E3" ip="192.168.0.25"/>
+        <divfields/>
+        <portstable/>
+      </virtinst>
+    </instances>
     <savedevents/>
   </netmap>
 </xmlsave>

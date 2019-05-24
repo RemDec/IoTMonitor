@@ -1,4 +1,4 @@
-from src.utils.misc_fcts import str_frame
+from src.utils.misc_fcts import str_frame, str_param_comp
 
 
 class Panel:
@@ -59,13 +59,13 @@ class Panel:
         if self.is_running:
             if kill_thmods:
                 for entry in self.set:
-                    entry.module.stop()
+                    entry.stop_module()
             self.is_running = False
 
     def resume(self):
         if not self.is_running:
             for entry in self.set:
-                entry.module.launch(read_interv=entry.module.get_read_interval())
+                entry.launch_module()
             self.is_running = True
 
     def is_empty(self):
@@ -88,9 +88,6 @@ class Panel:
     def get_idlist(self):
         return [entry.pid for entry in self.set]
 
-    def __str__(self):
-        return self.adaptive_display(lambda entry: entry.pid)
-
     def adaptive_display(self, fct_to_entry, header=True):
         s = ""
         if header:
@@ -108,7 +105,7 @@ class Panel:
         if level == 0:
             return self.__str__()
         elif level == 1:
-            return self.adaptive_display(lambda entry: entry.pid + " " + entry.module.str_summary())
+            return self.adaptive_display(lambda entry: f"{entry.pid} {entry.module.str_summary()}")
         else:
             s = f"Panel composed of {len(self.set)} passive modules (running : {self.is_running})\n"
             sep = "+"*len(s) + "\n"
@@ -120,15 +117,59 @@ class Panel:
             s += sep
             return s
 
+    def __str__(self):
+        return self.adaptive_display(lambda entry: entry.pid)
+
 
 class PanelEntry:
 
-    def __init__(self, module, pid):
+    def __init__(self, module, pid, rel_to_vi=[]):
         self.module = module
         self.pid = pid
+        self.rel_to_vi = rel_to_vi
+
+    def set_vi_relative(self, rel_to_vi):
+        if isinstance(rel_to_vi, str):
+            self.rel_to_vi = [rel_to_vi]
+        else:
+            self.rel_to_vi = rel_to_vi
+
+    def launch_module(self):
+        self.module.launch(rel_to_vi=self.rel_to_vi, read_interv=self.module.get_read_interval())
+
+    def stop_module(self):
+        self.module.stop()
+
+    def detail_str(self, level=0):
+        s = str_frame(f"{self.pid} {self.module.str_summary()}")
+        if level == 0:
+            return s
+        elif level == 1:
+            curr_params, dflt_params, desc_PARAMS = self.module.get_params()
+            rel_vi_str = '< no specific VI >' if len(self.rel_to_vi) == 0 else ', '.join(self.rel_to_vi)
+            s += f"| PASSIVE module whose description is given as :\n"
+            s += f"|  {self.module.get_description()}\n"
+            s += f"| Execution relative to VIs : {rel_vi_str}\n"
+            s += f"| Associated underlying program : {self.module.get_cmd()}\n"
+            s += f"| Module parameters :\n"
+            s += str_param_comp(curr_params, dflt_params, descriptions=desc_PARAMS, prefix='|  ')
+        else:
+            curr_params, dflt_params, desc_PARAMS = self.module.get_params()
+            rel_vi_str = '< no specific VI >'
+            if len(self.rel_to_vi) > 0 and self.module.netmap is not None:
+                rel_vi_str = self.module.netmap.vi_frames(self.module.netmap.get_VI_mapids(subset_mapids=self.rel_to_vi))
+            s += f"| PASSIVE module whose description is given as :\n"
+            s += f"|  {self.module.get_description()}\n"
+            s += f"| Associated underlying program : {self.module.get_cmd()}\n"
+            s += f"| Module parameters :\n"
+            s += str_param_comp(curr_params, dflt_params, descriptions=desc_PARAMS, prefix='|  ')
+            s += f"| Threads registered :\n"
+            s += self.module.str_pair_threads() + "|\n"
+            s += f"| Execution relative to VIs : {rel_vi_str}\n"
+        return s
 
     def __str__(self):
-        return str_frame(f"{self.pid} -> {self.module.str_summary()}")
+        return self.detail_str()
 
 
 if __name__ == '__main__':

@@ -147,10 +147,19 @@ class CLIparser:
                 return True
         return False
 
-    def handle_reserved_kw(self, keyword):
-        # keyword is all command without the '$' prefix
-        cmd = list(filter(None, keyword.split(' ')))
-        self.reserved[cmd.pop(0)](args=cmd)
+    def handle_reserved_kw(self, keyword_cmd):
+        # keyword is whole command without the '$' prefix. command[0] indicates which function to call on remaining args
+        cmd = list(filter(None, keyword_cmd.split(' ')))
+        tocall = cmd.pop(0)
+        corresp = [cmd_ok for cmd_ok in self.reserved if cmd_ok.startswith(tocall)]
+        if len(corresp) == 0:
+            print(f"No special command starting with {tocall}\n")
+            self.no_wipe_next()
+        elif len(corresp) == 1:
+            self.reserved[corresp[0]](args=cmd)
+        else:
+            print("Ambiguous special command amongs : ", ', '.join(corresp))
+            self.no_wipe_next()
 
     def get_user_confirm(self, marker=None, val=('y', 'o', 'yes', 'oui', 'ok'), empty_ok=True):
         if marker is None:
@@ -305,8 +314,47 @@ class CLIparser:
         self.back_main_menu()
 
     def after_show_select(self, show_input_name):
-        res_to_show = self.curr_menu['choices'][show_input_name]
-        print(self.core.get_display(res_to_show, level=self.curr_display_lvl))
+        map = {'routine': "routine", 'netmap': "netmap", 'mods library': "library", 'independent mods': "indep",
+               'main timer': "timer", 'virtual instance': "vi", 'entry module in routine': "entry",
+               'threat events': "threats", 'modification events': "modifs", 'app': "app"}
+        res_to_show = map.get(show_input_name, "app")
+        if res_to_show == "vi":
+            self.curr_menu = self.show_VI
+        elif res_to_show == "entry":
+            self.curr_menu = self.show_modentry
+        else:
+            lvl_info = f"(increase it with $set lvl {self.curr_display_lvl + 1}" if self.curr_display_lvl < 10 else ''
+            print(f"Displaying app element {show_input_name} with level {self.curr_display_lvl} {lvl_info})\n")
+            to_disp = self.core.get_display(res_to_show, level=self.curr_display_lvl)
+            print(to_disp if to_disp.strip() else f"   < empty app element : {show_input_name} >\n")
+            self.no_wipe_next()
+
+    def after_show_vi_slct(self, mapid):
+        vi = self.core.get_from_netmap(mapid)
+        lvl_info = f"(increase it with $set lvl {self.curr_display_lvl+1}" if self.curr_display_lvl < 2 else ''
+        print(f"Displaying VI informations with level {self.curr_display_lvl} {lvl_info})\n")
+        print(vi.detail_str(self.curr_display_lvl))
+        show_threats = self.get_user_confirm(marker=f"[{mapid}] Display threats linked with ? (y/N) :", empty_ok=False)
+        if show_threats:
+            self.core.get_saved_events(mapid, target='threats')
+        show_modifs = self.get_user_confirm(marker=f"[{mapid}] Display modifications linked with ? (y/N) :",
+                                            empty_ok=False)
+        if show_modifs:
+            self.core.get_saved_events(mapid, target='modifs')
+        self.no_wipe_next()
+
+    def after_show_modentry_slct(self, setid):
+        modentry_panel, modentry_queue = self.core.get_from_routine(setid, whole_entry=True)
+        lvl_info = f"(increase it with $set lvl {self.curr_display_lvl+1}" if self.curr_display_lvl < 2 else ''
+        print(f"Displaying module entry in routine with level {self.curr_display_lvl} {lvl_info})\n")
+        s = ""
+        if modentry_panel is not None:
+            s += f"Module entry in routine PANEL referenced by setid {setid} :\n" \
+                 f"{modentry_panel.detail_str(self.curr_display_lvl)}\n"
+        if modentry_queue is not None:
+            s += f"Module entry in routine QUEUE referenced by setid {setid} :\n" \
+                 f"{modentry_queue.detail_str(self.curr_display_lvl)}\n"
+        print(s if s is not "" else f"   < No module entry in routine referenced by setid {setid} >")
         self.no_wipe_next()
 
     def after_remove_mod_slct(self, mod_setid):
@@ -444,11 +492,9 @@ class CLIparser:
 
         self.show = {'desc': "Display current state of application resources",
                      'help': get_res_CLI('show_help'),
-                     'choices': {'routine': "routine",
-                                 'netmap': "netmap",
-                                 'module library': "library",
-                                 'main timer': "timer",
-                                 'independent modules': "indep"},
+                     'choices': [['app', 'routine', 'netmap', 'mods library', 'independent mods', 'main timer'],
+                                 ['virtual instance', 'entry module in routine'],
+                                 ['threat events', 'modification events']],
                      'dflt_choice': 'routine',
                      'fct_choice': self.after_show_select}
 
@@ -482,10 +528,18 @@ class CLIparser:
                            'marker': "[mod_id] :", 'choices': self.get_available_mods,
                            'fct_choice': self.after_mod_slct}
 
-        self.create_VI = {'desc': "Create a new 'virtual instance' ie a network equipment",
+        self.create_VI = {'desc': "Create a new 'virtual instance' ie a network equipment in-app representation",
                           'choices': [['basic', 'scratch']],
                           'dflt_choice': 'basic',
                           'fct_choice': self.iv_creation}
+
+        self.show_VI = {'desc': "Select an existing virtual instance and show its details (fields, linked events, ..)",
+                        'marker': "[mapid] :", 'choices': self.get_map_mapids,
+                        'fct_choice': self.after_show_vi_slct}
+
+        self.show_modentry = {'desc': "Select a module entry in panel/queue to display info about this instance",
+                              'marker': "[setid] :", 'choices': self.get_routine_setids,
+                              'fct_choice': self.after_show_modentry_slct}
 
         self.remove_mod = {'desc': "Remove a module from routine by its setid",
                            'marker': "[setid] :", 'choices': self.get_routine_setids,
@@ -502,7 +556,7 @@ class CLIparser:
                             "create": self.create, "remove": self.remove,
                             "clear": self.clear,
                             "pause": self.pause, "resume": self.resume,
-                            "show": self.show,
+                            "show": self.show, "showVI": self.show_VI, "showEntry": self.show_modentry,
                             "save": self.save,
                             "newVI": self.create_VI, "newMod": self.create_mod,
                             "delMod": self.remove_mod, "delIndepMod": self.remove_indep_mod, "delVI": self.remove_VI}

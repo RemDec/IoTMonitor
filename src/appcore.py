@@ -68,8 +68,8 @@ class Core:
     def change_mod_params(self, setid, new_params):
         self.routine.change_mod_params(setid, new_params)
 
-    def get_from_routine(self, setid):
-        return self.routine.get_mod_by_setid(setid)
+    def get_from_routine(self, setid, whole_entry=False):
+        return self.routine.get_mod_by_setid(setid, whole_entry)
 
     def remove_from_routine(self, setid_or_mod):
         return self.routine.remove_module(setid_or_mod)
@@ -98,7 +98,7 @@ class Core:
         self.netmap.add_VI(vi, mapid)
 
     def get_from_netmap(self, mapid):
-        self.netmap.get_VI(mapid)
+        return self.netmap.get_VI(mapid)
 
     def remove_from_netmap(self, mapid):
         self.netmap.remove_VI(mapid)
@@ -111,6 +111,9 @@ class Core:
 
     def get_all_mapids(self):
         return self.netmap.get_VI_mapids()
+
+    def get_saved_events(self, mapid, target='all'):
+        return self.netmap.get_saved_events_for_vi(mapid, target)
 
     # ----- Output visualisation -----
 

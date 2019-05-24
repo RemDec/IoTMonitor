@@ -3,12 +3,14 @@ spec_cmds =  "There are some commands callable everywhere (not menu choices rela
              "   -main : brings back to main menu, aborting current action\n" \
              "   -exit : shut down the application and this interactive CLI\n" \
              "   -help [menuid] : print help page for given menu (current one if not specified)\n" \
-             "   -choices [menuid] : print available choices for a menu with detail level depending on print lvl\n" \
+             "   -choices [menuid] : print available choices for the current or any given menu with detail level" \
+             " depending on print lvl\n" \
              "   -output : interact with output view if it exists (launched from an app controller)\n" \
              "      + level [new_level] : print or set detail level of the resources displayed in the view\n" \
-             "                  L 0 for less details, 2 is maximum level\n" \
+             "                  L 0 for less details, 10 is maximum level\n" \
              "      + view [resource] : print or set current app resource displayed in the output view\n" \
-             "                  L type 'any' to display possible code values for available resources\n" \
+             "                  L 'any' to display possible code values for available resources\n" \
+             "   -set" \
              "   -cmds : display above special commands description"
 CLIparser = {
     'main_help': "This interactive CLI works as a menus navigation system where typing one of the proposed choice\n"
@@ -22,7 +24,7 @@ CLIparser = {
     'clear_help': "Clear (meaning empty) target container in the app, or all of them. All objects in target and their\n"
                   " information/job will be dropped and cancelled without possible return.",
     'show_help': "Print in this console the current state of selected resource considering the current detail level\n"
-                 " level (settable with $set level [0<= int <= 2]).",
+                 " level (settable with $set level [0<= int <= 10]).",
     'save_help': "Write a file in a predefined structured format to save an application resource state or config.\n"
                  "Targetable resources are routine and netmap and general app config file (indicating their paths)",
     'pause_help': "Control the routine execution state, pause the panel kill all working background processes and \n"

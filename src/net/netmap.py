@@ -1,6 +1,7 @@
 from src.net.virtualInstance import *
 from src.logging.modifEvent import *
 from src.logging.threatEvent import *
+from src.logging.eventsCenter import EventsCenter
 from src.utils.misc_fcts import str_multiframe
 
 
@@ -8,7 +9,7 @@ class Netmap:
 
     def __init__(self, map=None, event_center=None):
         self.map = {} if map is None else map
-        self.event_center = event_center
+        self.event_center = event_center if event_center is not None else EventsCenter()
         self.svd_events = {}
 
     # ----- Interactions with the network map maintaining Virtual Instances -----
@@ -38,9 +39,9 @@ class Netmap:
         if isinstance(mapid, str):
             return mapid in self.map
 
-    def get_VI_mapids(self, filter_fct=lambda vi_inst: True):
+    def get_VI_mapids(self, subset_mapids=None, filter_fct=lambda vi_inst: True):
         ids = []
-        for mapid in self.map:
+        for mapid in self.map if subset_mapids is None else subset_mapids:
             if filter_fct(self.get_VI(mapid)):
                ids.append(mapid)
         return ids
@@ -174,8 +175,10 @@ class Netmap:
             s += cut(f" {field}: {val}") + '\n'
         return str_lines_frame(s[:-1] if s[-1] == '\n' else s)
 
-    def vi_frames(self):
-        vi_frames = [self.vi_frame_str(mapid) for mapid in self.get_VI_mapids()]
+    def vi_frames(self, slcted_vis=None):
+        if slcted_vis is None:
+            slcted_vis = self.get_VI_mapids()
+        vi_frames = [self.vi_frame_str(mapid) for mapid in slcted_vis]
         return str_multiframe(vi_frames)
 
     def detail_str(self, level=0, vi_by_pack_of=3, max_char_per_vi=25):
