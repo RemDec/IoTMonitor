@@ -14,28 +14,32 @@ cli_modes = ('noout', 'outpiped', 'outscreen', 'tkinter')
 class AppCLI(TimerInterface):
 
     def __init__(self, mode=cli_modes[2], level=1, start_pull_output=True, save_on_exit=True,
-                 use_last_coreconfig=True, target_coreconfig=None):
+                 use_last_coreconfig=True, target_coreconfig=None, check_files=True):
         self.mode = mode
         self.level = level
         self.save_on_exit = save_on_exit # Save core components state at regular app exiting
         self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library",
                              "events", "threats", "modifs"]
-        self.to_disp = "app"
-        self.output = self.config_output()  # Init output controller object depending on mode selected
+        # Check whether essential files are in place
         self.filemanager = FilesManager()
+        if check_files:
+            self.filemanager.check_all_files()
+        # Instantiate app configuration and components
         self.timer = TimerThread(name="MainTimer")
         self.timer.subscribe(self)
         if target_coreconfig is not None:
-            self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.complete_path('configs', target_coreconfig),
-                                                       timer=self.timer)
+            fullpath = self.filemanager.complete_path('configs', target_coreconfig)
+            self.coreconfig = get_coreconfig_from_file(filepath=fullpath, timer=self.timer)
         elif use_last_coreconfig:
-            self.coreconfig = get_coreconfig_from_file(filepath=self.filemanager.get_res_path("last_cfg"),
-                                                       timer=self.timer)
+            dflt_path_last_cfg = self.filemanager.get_res_path("last_cfg")
+            self.coreconfig = get_coreconfig_from_file(filepath=dflt_path_last_cfg, timer=self.timer)
         else:
             self.coreconfig = CoreConfig(timer=self.timer)
         self.core = Core(self.coreconfig)
         self.paths = self.coreconfig.paths
 
+        self.to_disp = "app"
+        self.output = self.config_output()  # Init output controller object depending on mode selected
         self.cli = CLIparser(self.core, core_controller=self)
         self.start_app(start_pull_output)
 

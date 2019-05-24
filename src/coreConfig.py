@@ -9,14 +9,14 @@ from src.net.netmap import Netmap
 
 def get_coreconfig_from_file(filepath, timer=None, netmap=None, routine=None,
                              logger_setup=None, event_center=None, modmanager=None,
-                             filemanager=FilesManager(), check_files=True):
+                             filemanager=FilesManager()):
     import pathlib
     ext = pathlib.Path(filepath).suffix
     if ext == '.yaml':
         from src.parsers.coreConfigParser import YAML_to_config
         coreconfig = YAML_to_config(filepath=filepath, timer=timer, netmap=netmap, routine=routine,
                                     logger_setup=logger_setup, event_center=event_center, modmanager=modmanager,
-                                    filemanager=filemanager, check_files=check_files)
+                                    filemanager=filemanager)
     else:
         coreconfig = CoreConfig(file_from=filepath)
     return coreconfig
@@ -34,8 +34,7 @@ class CoreConfig:
 
         # files and default paths are looked in a filemanager instance, refrenced for saving at exiting time
         self.filemanager = filemanager if filemanager is not None else FilesManager()
-        if check_files:
-            self.check_file_tree(self.filemanager)
+
         self.paths = {'config': self.filemanager.get_res_path('last_cfg') if file_from == '' else file_from,
                       'logger_setup': self.filemanager.get_res_path('dflt_logger'),
                       'library': self.filemanager.get_res_path('dflt_lib'),

@@ -10,7 +10,8 @@ spec_cmds =  "There are some commands callable everywhere (not menu choices rela
              "                  L 0 for less details, 10 is maximum level\n" \
              "      + view [resource] : print or set current app resource displayed in the output view\n" \
              "                  L 'any' to display possible code values for available resources\n" \
-             "   -set" \
+             "   -set : change a general parameter value or print all currents one if no argument given\n" \
+             "      + level [new level] print or set detail level for printing information in this terminal\n" \
              "   -cmds : display above special commands description"
 CLIparser = {
     'main_help': "This interactive CLI works as a menus navigation system where typing one of the proposed choice\n"

@@ -31,8 +31,8 @@ def get_dflt_entry(index, suffix=None):
 class FilesManager:
 
     def __init__(self, assoc_dirs=dflt_dirs, assoc_f=dflt_files):
-        self.assoc_dirs = assoc_dirs
-        self.assoc_f = assoc_f
+        self.assoc_dirs = assoc_dirs.copy()
+        self.assoc_f = assoc_f.copy()
 
     def new_file_entry(self, index, direntry_index, filename):
         self.assoc_f[index] = (direntry_index, filename)
@@ -63,15 +63,46 @@ class FilesManager:
         return str(Path(dirpath) / filename)
 
     def check_file(self, path):
-        return True
+        try:
+            self.get_res_path(path)
+            from os.path import exists
+            return exists(path)
+        except FileNotFoundError:
+            return False
 
     def check_all_files(self):
-        return True
+        missed = []
+        for dir in self.assoc_dirs:
+            full_path = self.get_res_path(dir)
+            if full_path is None or not self.check_file(full_path):
+                missed.append((dir, full_path))
+        for file in self.assoc_f:
+            if not self.assoc_f[file] in map(lambda x : x[0], missed):
+                full_path = self.get_res_path(file)
+                if full_path is None or not self.check_file(full_path):
+                    missed.append((file, full_path))
+        if len(missed) > 0:
+            raise FileEntryError(self, missed)
 
     def __str__(self):
         s = f"FileManager with following entries:\n"
         s += f" | DIR : {','.join(self.assoc_dirs.keys())}\n"
         s += f" | FILES : {','.join(self.assoc_f.keys())}\n"
+        return s
+
+
+class FileEntryError(Exception):
+
+    def __init__(self, filemanager, wrong_entries):
+        self.filemanager = filemanager
+        self.wrong_entries = wrong_entries
+        super().__init__(self.strerror())
+
+    def strerror(self):
+        s = f"Incorrect entries in dicts maintained by filemanager {repr(self.filemanager)}\n"
+        s += f" wrong entries -> paths are following:\n"
+        for entry, path in self.wrong_entries:
+            s += f" > {entry} : {path}\n"
         return s
 
 

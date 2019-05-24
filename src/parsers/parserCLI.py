@@ -47,10 +47,7 @@ class CLIparser:
             header = self.header_from_menu(include_header=self.display_header)
             user_in = input(header)
             self.display_header = True
-            if user_in.startswith('$'):
-                # Handling special command invokable from everywhere (all prefixed by $)
-                self.handle_reserved_kw(user_in[1:])
-            else:
+            if not self.check_reserved_kw(user_in):
                 # Handling regular input, try to match to an available current choice or taking default value if defined
                 if user_in == "" and self.curr_menu.get('dflt_choice', False):
                     user_in = self.curr_menu['dflt_choice']
@@ -142,14 +139,16 @@ class CLIparser:
     def check_reserved_kw(self, user_input, handle_it=True):
         if user_input.startswith('$'):
             if handle_it:
-                self.handle_reserved_kw(user_input[:1])
-            else:
-                return True
+                self.handle_reserved_kw(user_input[1:])
+            return True
         return False
 
     def handle_reserved_kw(self, keyword_cmd):
         # keyword is whole command without the '$' prefix. command[0] indicates which function to call on remaining args
         cmd = list(filter(None, keyword_cmd.split(' ')))
+        if len(cmd) == 0:
+            self.reserved['cmds']()
+            return
         tocall = cmd.pop(0)
         corresp = [cmd_ok for cmd_ok in self.reserved if cmd_ok.startswith(tocall)]
         if len(corresp) == 0:
@@ -253,7 +252,11 @@ class CLIparser:
     def set_cfg_param(self, args=[]):
         arg_l = len(args)
         if arg_l == 0:
-            print("Current config")
+            s = "Current config :\n"
+            s += f"   -display level for this terminal : {self.curr_display_lvl}\n"
+            if self.core_ctrl is not None:
+                s += f"   -display level for core controller and displayed app element :" \
+                     f" {self.core_ctrl.get_level()}, {self.core_ctrl.to_disp}\n"
         elif args[0] in ['l', 'lvl', 'level']:
             if arg_l == 2:
                 self.curr_display_lvl = int(args[1])

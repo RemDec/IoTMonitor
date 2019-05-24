@@ -109,11 +109,9 @@ class Panel:
         else:
             s = f"Panel composed of {len(self.set)} passive modules (running : {self.is_running})\n"
             sep = "+"*len(s) + "\n"
-            s += sep
             for entry in self.set:
-                s += "*"*(len(sep)//2) + " " + entry.pid + "\n"
-                s += entry.module.str_pair_threads()
-                s += "*"*(len(sep)//2 + len(entry.pid) + 1) + "\n"
+                s += sep
+                s += entry.detail_str(level=2)
             s += sep
             return s
 

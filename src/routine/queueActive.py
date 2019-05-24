@@ -128,11 +128,9 @@ class Queue(TimerInterface):
             s = f"Queue of {len(self.set)} active modules (running : {self.is_running})\n"
             sep = "+"*len(s) + "\n"
             s += f"triggered by {self.timer}\n"
-            s += sep
             for entry in self.set:
-                s += "*"*(len(sep)//2) + " " + entry.qid + "\n"
-                s += entry.module.str_threads()
-                s += "*"*(len(sep)//2 + len(entry.qid) + 1) + "\n"
+                s += sep
+                s += entry.detail_str(level=2)
             s += sep
             return s
 
