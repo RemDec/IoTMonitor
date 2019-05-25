@@ -73,15 +73,15 @@ def pretty_str_curr_param(current, defaults, descriptions={}, prefix=''):
     return s
 
 
-def replace_in_dicts(dic, key, newval):
-    """Replace values for a key in multilevel dict
+def replace_in_dicts(dic, key, apply_fct):
+    """Replace values for a key in multilevel dict, applying a function on elements indexed by key
 
     """
     for k in dic:
         if k == key:
-            dic[k] = newval
+            apply_fct(dic[k])
         elif isinstance(dic[k], dict):
-            replace_in_dicts(dic[k], key, newval)
+            replace_in_dicts(dic[k], key, apply_fct)
 
 
 def bound_frame(s):

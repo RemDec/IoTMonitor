@@ -52,11 +52,22 @@ class AModNmapPortDisc(ActiveModule):
             if self.netmap is not None:
                 mapid = self.netmap.get_similar_VI(mac=mac, ip=ip)
                 if mapid is None:
-                    self.netmap.create_VI(mac=mac, ip=ip, ports=PortTable(table))[1].set_state(state)
+                    port_table = PortTable(table)
+                    mapid, vi = self.netmap.create_VI(mac=mac, ip=ip, ports=port_table)
+                    vi.set_state(state)
+                    self.netmap.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
+                                               old_state='Non-existing VI',
+                                               new_state='New VI instance with PortTable:\n'+port_table.detail_str(1),
+                                               logit_with_lvl=20)
                 else:
                     vi = self.netmap.get_VI(mapid)
+                    old = vi.detail_str(2)
                     vi.complete_fields(mac=mac, ip=ip)
                     vi.complete_ports_table(table)
+                    new = vi.detail_str(2)
+                    self.netmap.register_modif('VI ' + mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
+                                               old_state=old, new_state=new, logit_with_lvl=20)
+        logging.log_feedback(f"Module [{self.m_id}] updated {len(hosts_infos)} port tables in VIs")
 
     def distrib_output(self, script_output, rel_to_vi=[]):
         # function called by ending exec thread with script_output as a tuple summarizing how it ended

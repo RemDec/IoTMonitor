@@ -28,7 +28,7 @@ class EventsCenter:
         logging.getLogger(target_logger).log(level=logit_with_lvl, msg=str(event))
 
     def register_threat(self, from_module, level=1, mapid=None, msg=None, patch=None,
-                        logit_with_lvl=-1, target_logger="threat"):
+                        logit_with_lvl=-1, target_logger="threats"):
 
         threat = ThreatEvent(from_module, level, mapid, msg, patch)
         self.register_threat_event(threat)
@@ -38,7 +38,7 @@ class EventsCenter:
 
     def register_modif(self, modified_res, obj_type='app_res', obj_id=None, modificator='app',
                        old_state=None, new_state=None,
-                       logit_with_lvl=-1, target_logger="modif"):
+                       logit_with_lvl=-1, target_logger="modifs"):
 
         modif = ModifEvent(modified_res, obj_type, obj_id, modificator, old_state, new_state)
         self.register_modif_event(modif)

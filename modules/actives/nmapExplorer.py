@@ -51,15 +51,25 @@ class AModNmapExplorer(ActiveModule):
             if self.netmap is not None:
                 mapid = self.netmap.get_similar_VI(mac=mac, ip=ip)
                 if mapid is None:
-                    self.netmap.create_VI(mac=mac, ip=ip, div=div)[1].set_state(state)
+                    mapid, vi = self.netmap.create_VI(mac=mac, ip=ip, div=div)
+                    vi.set_state(state)
+                    self.netmap.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
+                                               old_state='Non-existing VI', new_state='New VI instance',
+                                               logit_with_lvl=20)
                 else:
-                    self.netmap.get_VI(mapid).complete_fields(mac=mac, ip=ip, div=div)
+                    vi = self.netmap.get_VI(mapid)
+                    old = vi.detail_str(2)
+                    vi.complete_fields(mac=mac, ip=ip, div=div)
+                    self.netmap.register_modif('VI ' + mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
+                                               old_state=old, new_state=vi.detail_str(2),
+                                               logit_with_lvl=20)
+        logging.log_feedback(f"Module [{self.m_id}] created/updated {len(hosts)} VIs")
 
     def distrib_output(self, script_output, rel_to_vi=[]):
         if isinstance(script_output[0], int):
             code, popen = script_output
             output = popen.stdout
-            logging.log_feedback(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='debug')
+            logging.log_feedback(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='info')
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             py_except, popen = script_output

@@ -37,13 +37,15 @@ class AModNameMod(ActiveModule):
     def distrib_output(self, script_output, rel_to_vi=[]):
         # function called by ending exec thread with script_output as a tuple summarizing how it ended
         if isinstance(script_output[0], int):
+            # popen is the subprocess overlayer object as manipulated by subprocess.py
             code, popen = script_output
             output = popen.stdout.read()
+            # Logging through feedback system (capturing it to be displayed in app and really logged after)
+            logging.log_feedback(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='info')
             # if code OK, should parse results to integrate in app (netmap, alert threats, ..)
-            logging.log_feedback(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='debug')
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
-            # pull info from exception
+            # pull info from exception and log it
             py_except, popen = script_output
             logging.log_feedback(f"Module [{self.m_id}] execution raised exception :{py_except}",
                                  logitin='error', lvl='error')

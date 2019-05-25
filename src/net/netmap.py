@@ -17,6 +17,7 @@ class Netmap:
     def add_VI(self, vi, given_mapid=None):
         mapid = self.get_unique_id(given_mapid)
         self.map[mapid] = vi
+        return mapid
 
     def remove_VI(self, mapid):
         self.map.pop(mapid)
@@ -25,12 +26,15 @@ class Netmap:
         self.map = {}
         self.svd_events = {}
 
-    def create_VI(self, mapid=None, append_netmap=True,
+    def create_VI(self, mapid=None, append_netmap=True, create_event=False,
                   mac=None, ip=None, hostname=None, div=None, ports=None, user_created=False):
         vi = VirtualInstance(mac=mac, ip=ip, hostname=hostname, div=div, ports=ports, user_created=user_created)
         if append_netmap:
-            self.add_VI(vi, given_mapid=mapid)
-        return mapid, vi
+            mapid = self.add_VI(vi, given_mapid=mapid)
+            if create_event:
+                self.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, old_state="Non-existing VI",
+                                    new_state="Registered VI in netmap", logit_with_lvl=20)
+        return str(mapid), vi
 
     def get_VI(self, mapid):
         return self.map.get(mapid)
@@ -114,7 +118,7 @@ class Netmap:
 
     def register_modif(self, modified_res, obj_type='app_res', obj_id=None, modificator='app',
                        old_state=None, new_state=None,
-                       logit_with_lvl=-1, target_logger="modif",
+                       logit_with_lvl=-1, target_logger="modifs",
                        save_vi_event=True):
 
         if self.event_center is None:

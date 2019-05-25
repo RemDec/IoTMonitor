@@ -482,7 +482,7 @@ class CLIparser:
         code = self.get_choice_val(target)
         advert = f"Clearing {target} will empty it and loose all its components (irreversible).\n" \
                  f"Are you sure? (y/N) :"
-        valid = self.get_user_confirm(marker=advert, val=('y', 'o', 'yes', 'oui', 'ok'))
+        valid = self.get_user_confirm(marker=advert, empty_ok=False)
         if valid:
             self.core.clear_target(code)
         self.back_main_menu()

@@ -11,11 +11,27 @@ handlers:
     level: DEBUG
     formatter: short
     stream: ext://sys.stdout
-  error:
+  errorstream:
     class: logging.StreamHandler
     level: DEBUG
     formatter: simple
     stream: ext://sys.stderr
+  genfile:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: simple
+    filename: logs/general_logs.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 5
+    encoding: utf8
+  eventfile:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: simple
+    filename: logs/events.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 2
+    encoding: utf8
   email:
     class: logging.handlers.SMTPHandler
     mailhost: localhost
@@ -27,21 +43,29 @@ handlers:
 loggers:
   debug:
     level: DEBUG
-    handlers: [console]
+    handlers: [genfile]
     propagate: no
   info:
     level: DEBUG
-    handlers: [console]
-    propagate: no
-  threat:
-    level: DEBUG
-    handlers: [console]
+    handlers: [genfile]
     propagate: no
   error:
-    level: DEBUG
-    handlers: [error]
+    level: ERROR
+    handlers: [errorstream, genfile]
     propagate: no
-  notif:
+  cli:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+  threats:
+    level: DEBUG
+    handlers: [eventfile]
+    propagate: no
+  modifs:
+    level: DEBUG
+    handlers: [eventfile]
+    propagate: no
+  mail:
     level: DEBUG
     handlers: [email]
     propagate: no
