@@ -1,6 +1,6 @@
 from src.appcore import *
 from src.net.virtualInstance import *
-from src.utils.misc_fcts import str_lines_frame
+from src.utils.misc_fcts import str_lines_frame, pretty_str_curr_param, get_sep_modparams
 from src.parsers.parserCLI_helper import get_res_CLI
 import readline
 import os
@@ -165,7 +165,7 @@ class CLIparser:
         if marker is None:
             marker = "Confirm ? (Y/n) " if empty_ok else "Confirm ? (y/N) "
         res = input(marker)
-        return res.lower() in (val + ('',) if empty_ok else val)
+        return res.lower().strip() in (val + ('',) if empty_ok else val)
 
     def get_user_in_or_dflt(self, default, marker=">>>"):
         user_in = input(marker)
@@ -323,16 +323,20 @@ class CLIparser:
                     vis.append(ind_mapids[mapid_nbr])
                     added_vi = True
             take_vi = added_vi
-
         # Taking time parameters
         is_mod_act = mod_inst.is_active()
         timer_name = f"{'queue expiration' if is_mod_act else 'reading'} interval timer"
         dflt_val = mod_inst.get_default_timer() if is_mod_act else mod_inst.get_read_interval()
         marker = f"Set {timer_name} if desired (numeric) or enter to pass\n[default:{dflt_val}] :"
         input_timer = self.get_user_in_or_dflt(dflt_val, marker=marker)
+        try:
+            timer = abs(int(input_timer))
+        except ValueError:
+            print("Incorrect format for given timer (should be integer > 0) -> use default one")
+            timer = 0
         if in_rout:
             setid = self.get_user_in_or_dflt(None, marker="Give a setid if desired (alphanumeric)\n[setid] :")
-            entry = self.core.add_to_routine(mod_inst, given_setid=setid, given_timer=abs(int(input_timer)))
+            entry = self.core.add_to_routine(mod_inst, given_setid=setid, given_timer=timer)
             entry.set_vi_relative(vis)
         else:
             self.core.add_indep_module(mod_inst)
@@ -362,7 +366,65 @@ class CLIparser:
         self.back_main_menu()
 
     def after_edit_modentry_slct(self, setid):
-        pass
+        pmodentry, amodentry = self.core.get_from_routine(setid, whole_entry=True)
+        modentry = pmodentry if pmodentry is not None else amodentry
+        if pmodentry is not None and amodentry is not None:
+            p_ok = self.get_user_confirm(marker="Edit the active or passive entry? (p/a)", val=('p', 'pass', 'passive'))
+            modentry = pmodentry if p_ok else amodentry
+        modinst = modentry.module
+        # Module instance parameters
+        take_param = True
+        while take_param:
+            curr_par, PARAMS, desc_par = modinst.get_params()
+            curr_par = curr_par.copy()
+            print(f"Current parameters for module instance of [{modinst.get_module_id()}] are following:\n|")
+            print(pretty_str_curr_param(curr_par, PARAMS, desc_par, prefix="| "))
+            mand, opt = get_sep_modparams(modinst)
+            print("Select a parameter code whose value should be edited/filled (enter to exit editing)\n|")
+            print(f"|mandatory: {' '.join(mand)}\n|optional: {' '.join(opt)}\n")
+            code = self.get_user_in_or_dflt(default='', marker=f"[code] :").strip()
+            if code != '' and code in mand+opt:
+                new_val = self.get_user_in_or_dflt(default='', marker=f"New value for [{code}] :")
+                curr_par[code] = new_val
+                modinst.set_params(curr_par)
+                self.clear_console()
+            else:
+                take_param = False
+        # Relative VIs
+        marker = f"Indicate specific VIs the [{modinst.get_module_id()}] execution should be relative to ? (y/N) :"
+        take_vi = self.get_user_confirm(marker=marker, empty_ok=False)
+        take_ok = take_vi
+        vis = []
+        all_vis = self.core.get_all_mapids().copy()
+        while take_ok:
+            ind_mapids = dict([(str(i), mapid) for i, mapid in enumerate(all_vis)])
+            print("Remaining mapids :\n", ' '.join([f"{i}.{mapid}" for i, mapid in ind_mapids.items()]))
+            marker = '\nType mapid(s) index(es) (space separated) or enter to pass\n[index] :'
+            mapid_nbrs = self.get_user_in_or_dflt(default='', marker=marker)
+            added_vi = False
+            for mapid_nbr in list(filter(None, mapid_nbrs.split(' '))):
+                if ind_mapids.get(mapid_nbr, False):
+                    all_vis.remove(ind_mapids[mapid_nbr])
+                    vis.append(ind_mapids[mapid_nbr])
+                    added_vi = True
+            take_ok = added_vi
+        if take_vi:
+            modentry.set_vi_relative(vis)
+        # Timer
+        is_mod_act = modinst.is_active()
+        timer_name = f"{'queue expiration' if is_mod_act else 'reading'} interval timer"
+        dflt_val = modinst.get_default_timer() if is_mod_act else modinst.get_read_interval()
+        marker = f"Set {timer_name} if desired (numeric) or enter to pass\n[default:{dflt_val}] :"
+        input_timer = self.get_user_in_or_dflt(dflt_val, marker=marker).strip()
+        try:
+            timer = abs(int(input_timer))
+            if input_timer != '' and is_mod_act:
+                modentry.set_timer(timer)
+            elif input_timer != '' and not is_mod_act:
+                modinst.set_read_interval(timer)
+        except ValueError:
+            print("Incorrect format for given timer (should be integer > 0)")
+        self.back_main_menu()
 
     def after_remove_mod_slct(self, mod_setid):
         self.core.remove_from_routine(mod_setid)

@@ -160,6 +160,9 @@ class QueueEntry:
             self.module.launch()
             self.exp_timer = self.init_timer
 
+    def set_timer(self, new_timer):
+        self.exp_timer = new_timer
+
     def get_timer(self):
         return self.exp_timer
 

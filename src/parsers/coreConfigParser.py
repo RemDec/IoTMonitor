@@ -23,7 +23,7 @@ def config_to_YAML(coreconfig, filepath=get_dflt_entry('configs', 'last_coreconf
 def YAML_to_config(filepath=get_dflt_entry('last_cfg'),
                    timer=None, netmap=None, routine=None,
                    logger_setup=None, event_center=None, modmanager=None,
-                   filemanager=None, check_files=True):
+                   filemanager=None):
     with open(filepath, 'r') as f:
         cfg_dic = yaml.safe_load(f.read())
         cfg_dic = {} if cfg_dic is None else cfg_dic
@@ -34,7 +34,7 @@ def YAML_to_config(filepath=get_dflt_entry('last_cfg'),
                             logger_setup=logger_setup if logger_setup is not None else cfg_dic.get('logger_setup'),
                             event_center=event_center,
                             modmanager=modmanager if modmanager is not None else cfg_dic.get('modmanager'),
-                            filemanager=filemanager, check_files=check_files,
+                            filemanager=filemanager,
                             file_from=filepath)
     return coreconfig
 

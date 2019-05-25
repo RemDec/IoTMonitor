@@ -64,6 +64,15 @@ def str_param_comp(current, defaults, descriptions={}, prefix=''):
     return s
 
 
+def pretty_str_curr_param(current, defaults, descriptions={}, prefix=''):
+    s = ""
+    for code, (defval, mand, _) in defaults.items():
+        m = "mandatory" if mand else "optional"
+        s += f"{prefix}~{code}   {descriptions.get(code, '(no description provided)')}\n"
+        s += f"{prefix} - value ({m}) : {current.get(code, defval)}\n"
+    return s
+
+
 def replace_in_dicts(dic, key, newval):
     """Replace values for a key in multilevel dict
 
@@ -143,6 +152,13 @@ def get_root_path():
     """
     from pathlib import Path
     return Path(__file__).parent.parent.parent
+
+
+def get_sep_modparams(modinstance):
+    _, PARAMS, _ = modinstance.get_params()
+    mandatory = [param_code for param_code in PARAMS if PARAMS[param_code][1]]
+    optional = [param_code for param_code in PARAMS if not PARAMS[param_code][1]]
+    return mandatory, optional
 
 
 def write_modlib(file_dest=None):
