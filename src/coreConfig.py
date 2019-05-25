@@ -26,8 +26,7 @@ class CoreConfig:
 
     def __init__(self, timer=None, netmap=None, routine=None,
                  logger_setup=None, event_center=None, modmanager=None,
-                 filemanager=None, check_files=True,
-                 file_from=''):
+                 filemanager=None, file_from=''):
         self.file_from = file_from
         self.timer, self.netmap, self.routine = (None, )*3
         self.logger_setup, self.event_center, self.modmanager = (None, )*3
@@ -84,7 +83,7 @@ class CoreConfig:
 
     def init_netmap(self, netmap):
         if netmap is None:
-            self.netmap = Netmap()
+            self.netmap = Netmap(event_center=self.event_center)
         elif isinstance(netmap, str):
             from src.parsers.netmapParser import parse_netmap_XML
             self.paths['netmap'] = self.filemanager.complete_path('netmaps', netmap)

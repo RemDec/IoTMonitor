@@ -13,6 +13,8 @@ spec_cmds =  "There are some commands callable everywhere (not menu choices rela
              "   -set : change a general parameter value or print all currents one if no argument given\n" \
              "      + level [new level] print or set detail level for printing information in this terminal\n" \
              "   -cmds : display above special commands description"
+
+
 CLIparser = {
     'main_help': "This interactive CLI works as a menus navigation system where typing one of the proposed choice\n"
                  "redirect in the corresponding menu (if no ambiguity first choice letters suffice)(if defined,\n"
@@ -20,6 +22,7 @@ CLIparser = {
                  + spec_cmds,
     'create_help': "Build diverse elements to append in the application environment : virtual instance, module, etc.\n"
                    "Redirect to an interactive form taking parameters for the new element instance, or defaults.",
+    'edit_help': "Change some parameter/fields value of various in-app elements (this editing will be permanent)\n",
     'remove_help': "Remove an element already present in the application, like a routine or a virtual instance.\n"
                    "The target is specified by id, either a setid for the routine or a mapid for a VI.",
     'clear_help': "Clear (meaning empty) target container in the app, or all of them. All objects in target and their\n"

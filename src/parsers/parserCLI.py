@@ -338,6 +338,40 @@ class CLIparser:
             self.core.add_indep_module(mod_inst)
         self.back_main_menu()
 
+    def after_edit_vi_slct(self, mapid):
+        vi = self.core.get_from_netmap(mapid)
+        take_field = True
+        while take_field:
+            main_fields = dict.fromkeys(['mac', 'ip', 'hostname'])
+            div_fields = vi.get_divfields()
+            print(f"Current virtual instance state with display level {self.curr_display_lvl} :\n"
+                  f"{vi.detail_str(level=self.curr_display_lvl)}")
+            print(f"Select a field of this VI to edit or type a new field name to create it and fill it after (enter to"
+                  f"exit editing)\n"
+                  f" |main fields: {'  '.join(main_fields.keys())}\n |div fields: {' '.join(div_fields.keys())}\n")
+            field = self.get_user_in_or_dflt(default='', marker=f"[VI field] :").strip()
+            if field != '':
+                marker = f"New value for [{field}] :"
+                if field not in (list(main_fields.keys()) + list(div_fields.keys())):
+                    marker = f"Value for new field [{field}] :"
+                new_val = self.get_user_in_or_dflt(default=None, marker=marker)
+                vi.complete_fields_from_dict({field: new_val.strip() if isinstance(new_val, str) else new_val})
+                self.clear_console()
+            else:
+                take_field = False
+        self.back_main_menu()
+
+    def after_edit_modentry_slct(self, setid):
+        pass
+
+    def after_remove_mod_slct(self, mod_setid):
+        self.core.remove_from_routine(mod_setid)
+        self.back_main_menu()
+
+    def after_remove_vi_slct(self, vi_mapid):
+        self.core.remove_from_netmap(vi_mapid)
+        self.back_main_menu()
+
     def after_show_select(self, show_input_name):
         map = {'routine': "routine", 'netmap': "netmap", 'mods library': "library", 'independent mods': "indep",
                'main timer': "timer", 'virtual instance': "vi", 'entry module in routine': "entry",
@@ -381,10 +415,6 @@ class CLIparser:
                  f"{modentry_queue.detail_str(self.curr_display_lvl)}\n"
         print(s if s is not "" else f"   < No module entry in routine referenced by setid {setid} >")
         self.no_wipe_next()
-
-    def after_remove_mod_slct(self, mod_setid):
-        self.core.remove_from_routine(mod_setid)
-        self.back_main_menu()
 
     def after_clear_select(self, target):
         code = self.get_choice_val(target)
@@ -459,10 +489,6 @@ class CLIparser:
             self.core.add_to_netmap(vi, mapid)
         self.back_main_menu()
 
-    def after_remove_vi_slct(self, vi_mapid):
-        self.core.remove_from_netmap(vi_mapid)
-        self.back_main_menu()
-
     # ----- Menus configurations -----
 
     def get_choice_val(self, choice_code):
@@ -484,6 +510,7 @@ class CLIparser:
                           'help': get_res_CLI('main_help'),
                           'choices': {'create': "create",
                                       'remove': "remove",
+                                      'edit': "edit",
                                       'clear': "clear",
                                       'show': "show",
                                       'pause': "pause",
@@ -498,6 +525,11 @@ class CLIparser:
                                    'virtual instance': "newVI"},
                        'dflt_choice': 'module',
                        'fct_choice': self.transit_menu}
+
+        self.edit = {'desc': "Edit an application element on the fly",
+                     'help': get_res_CLI('edit_help'),
+                     'choices': {'VI field': 'editVI', 'module entry (routine)': "editMod"},
+                     'fct_choice': self.transit_menu}
 
         self.remove = {'desc': "Remove an existing object in the app",
                        'help': get_res_CLI('remove_help'),
@@ -554,6 +586,24 @@ class CLIparser:
                            'marker': "[mod_id] :", 'choices': self.get_available_mods,
                            'fct_choice': self.after_mod_slct}
 
+        self.remove_mod = {'desc': "Remove a module from routine by its setid",
+                           'marker': "[setid] :", 'choices': self.get_routine_setids,
+                           'fct_choice': self.after_remove_mod_slct}
+
+        self.remove_indep_mod = {'desc': "Remove a module from routine independent running module"}
+
+        self.remove_VI = {'desc': "Remove a virtual instance from the netmap by mapid",
+                          'marker': "[mapid] :", 'choices': self.get_map_mapids,
+                          'fct_choice': self.after_remove_vi_slct}
+
+        self.edit_VI = {'desc': "Edit current fields of a virtual instance to fill/correct them manually",
+                        'marker': "[mapid] :", 'choices': self.get_map_mapids,
+                        'fct_choice': self.after_edit_vi_slct}
+
+        self.edit_modentry = {'desc': "Edit a module entry present in routine, current parameters, VIs relative to,...",
+                              'marker': "[setid] :", 'choices': self.get_routine_setids,
+                              'fct_choice': self.after_edit_modentry_slct}
+
         self.create_VI = {'desc': "Create a new 'virtual instance' ie a network equipment in-app representation",
                           'choices': [['basic', 'scratch']],
                           'dflt_choice': 'basic',
@@ -567,25 +617,18 @@ class CLIparser:
                               'marker': "[setid] :", 'choices': self.get_routine_setids,
                               'fct_choice': self.after_show_modentry_slct}
 
-        self.remove_mod = {'desc': "Remove a module from routine by its setid",
-                           'marker': "[setid] :", 'choices': self.get_routine_setids,
-                           'fct_choice': self.after_remove_mod_slct}
-
-        self.remove_indep_mod = {'desc': "Remove a module from routine independent running module"}
-
-        self.remove_VI = {'desc': "Remove a virtual instance from the netmap by mapid",
-                          'marker': "[mapid] :", 'choices': self.get_map_mapids,
-                          'fct_choice': self.after_remove_vi_slct}
-
         # Association between choice code value and real menu objects
         self.index_menus = {"main": self.main_menu,
-                            "create": self.create, "remove": self.remove,
+                            "create": self.create, "newVI": self.create_VI, "newMod": self.create_mod,
+                            "edit": self.edit, "editVI": self.edit_VI, "editMod": self.edit_modentry,
+                            "remove": self.remove,
+                            "delMod": self.remove_mod, "delIndepMod": self.remove_indep_mod, "delVI": self.remove_VI,
                             "clear": self.clear,
-                            "pause": self.pause, "resume": self.resume,
+                            "pause": self.pause,
+                            "resume": self.resume,
                             "show": self.show, "showVI": self.show_VI, "showEntry": self.show_modentry,
-                            "save": self.save,
-                            "newVI": self.create_VI, "newMod": self.create_mod,
-                            "delMod": self.remove_mod, "delIndepMod": self.remove_indep_mod, "delVI": self.remove_VI}
+                            "save": self.save
+                            }
 
 
 if __name__ == "__main__":

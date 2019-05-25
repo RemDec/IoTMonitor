@@ -30,10 +30,16 @@ class VirtualInstance:
             # Set field value if non existing or if it exists, set it if not created by user (consider as prior info)
             curr_field = self.div.get(field)
             if curr_field is None:
+                print("selfdiv", type(self.div), "field", type(field)) #, "div[field]", type(self.div[field]), "val", type(val))
                 self.div[field] = val
             else:
                 if not self.user_created:
                     self.div[field] = val
+
+    def complete_fields_from_dict(self, fields_dict):
+        given_div = dict([(key, val) for key, val in fields_dict.items() if key not in ['mac', 'ip', 'hostname']])
+        self.complete_fields(mac=fields_dict.get('mac'), ip=fields_dict.get('ip'), hostname=fields_dict.get('hostname'),
+                             div=given_div)
 
     def complete_ports_table(self, new_vals_dict, replacing=True):
         for portnum, new_port_info in new_vals_dict.items():
@@ -99,6 +105,9 @@ class VirtualInstance:
 
     def get_hostname(self, dflt="< empty >"):
         return dflt if self.hostname is None else self.hostname
+
+    def get_divfields(self):
+        return self.div
 
     def get_ports_table(self):
         return self.ports_table

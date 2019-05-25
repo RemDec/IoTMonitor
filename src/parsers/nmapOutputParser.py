@@ -30,7 +30,7 @@ class NmapParser:
 
     def get_attr_dict_from_elmt(self, elmt, attrs=(), max_val_lgth=-1):
         kept_attrs = {}
-        for attr_key, attr_val in elmt.attrib.items():
+        for attr_key, attr_val in dict(elmt.attrib).items():
             if attr_key in attrs:
                 if max_val_lgth > 0 and len(attr_val) <= max_val_lgth:
                     kept_attrs[attr_key] = attr_val

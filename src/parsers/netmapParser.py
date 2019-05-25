@@ -58,12 +58,12 @@ def XML_to_vi(vi_elmt):
     user_created = bool(vi_elmt.get('usercreated', False))
     mainfields = vi_elmt.find('mainfields')
     mac, ip, hostname = mainfields.get('mac'), mainfields.get('ip'), mainfields.get('hostname')
-    div = vi_elmt.find('divfields').attrib
+    div = dict(vi_elmt.find('divfields').attrib)
     table = PortTable()
     for port_elmt in vi_elmt.find('portstable').findall('port'):
         portnum = int(port_elmt.get('portnum'))
-        port_infos = port_elmt.find('maininfos').attrib
-        port_div_infos = port_elmt.find('divportinfos').attrib
+        port_infos = dict(port_elmt.find('maininfos').attrib)
+        port_div_infos = dict(port_elmt.find('divportinfos').attrib)
         port_infos.update(port_div_infos)
         table.set_port(portnum, port_infos)
     new_vi = VirtualInstance(mac=mac, ip=ip, hostname=hostname, div=div, ports=table, user_created=user_created)
