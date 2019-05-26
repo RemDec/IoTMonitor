@@ -14,7 +14,8 @@ cli_modes = ('noout', 'outpiped', 'outscreen', 'tkinter')
 class AppCLI(TimerInterface):
 
     def __init__(self, mode=cli_modes[2], level=1, start_pull_output=True, save_on_exit=True,
-                 use_last_coreconfig=True, target_coreconfig=None, check_files=True):
+                 use_last_coreconfig=True, target_coreconfig=None, check_files=True,
+                 mail_infos=None):
         self.mode = mode
         self.level = level
         self.save_on_exit = save_on_exit # Save core components state at regular app exiting
@@ -29,18 +30,21 @@ class AppCLI(TimerInterface):
         self.timer.subscribe(self)
         if target_coreconfig is not None:
             fullpath = self.filemanager.complete_path('configs', target_coreconfig)
-            self.coreconfig = get_coreconfig_from_file(filepath=fullpath, timer=self.timer)
+            self.coreconfig = get_coreconfig_from_file(filepath=fullpath, timer=self.timer, mail_infos=mail_infos)
         elif use_last_coreconfig:
             dflt_path_last_cfg = self.filemanager.get_res_path("last_cfg")
-            self.coreconfig = get_coreconfig_from_file(filepath=dflt_path_last_cfg, timer=self.timer)
+            self.coreconfig = get_coreconfig_from_file(filepath=dflt_path_last_cfg, timer=self.timer,
+                                                       mail_infos=mail_infos)
         else:
             self.coreconfig = CoreConfig(timer=self.timer)
+            self.coreconfig.set_mailinfos_tuple(mail_infos)
         self.core = Core(self.coreconfig)
         self.paths = self.coreconfig.paths
 
         self.to_disp = "app"
         self.output = self.config_output()  # Init output controller object depending on mode selected
         self.cli = CLIparser(self.core, core_controller=self)
+
         self.start_app(start_pull_output)
 
     # ----- Control application execution/interactive CLI -----

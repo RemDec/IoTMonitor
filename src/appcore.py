@@ -194,6 +194,7 @@ class Core:
                 s += last_feedback + '_' * 130 + '\n\n'
             s += f"=++====== Core application =========\n"
             s += f" || Core config file : {self.coreconfig.get_cfg_file()}\n"
+            s += f" || {self.logger_setup.email_str()}\n"
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
             s += f" || Routine independent modules :\n ||  {','.join(indeps)}\n"
             s += f" ||\n ++------- ROUTINE -------"
@@ -207,6 +208,7 @@ class Core:
             s += f"=++====== Core application =========\n"
             s += f" || Coreconfig instance maintains file configuration paths :\n"
             s += self.coreconfig.str_current_paths(prefix=" ||  -")
+            s += f" || {self.logger_setup.email_str()}\n"
             s += f" || Using loggers {', '.join(self.logger_setup.get_all_loggers())}\n"
             s += f" || Available AModules : {', '.join(actives)}\n"
             s += f" || Available PModules : {', '.join(passives)}\n"

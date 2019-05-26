@@ -3,17 +3,24 @@ from src.utils.misc_fcts import replace_in_dicts
 from src.utils.filesManager import get_dflt_entry
 import logging
 import logging.config
+import logging.handlers
 
 
 class CustomLoggerSetup:
 
     def __init__(self, event_center=None, loggers_capture_events="all",
+                 email=None, email_pwd=None, mail_server=None,
                  cfg_file=None, fct_modify_loggers=None):
+
+        self.user_email = email
+        self.user_pwd = email_pwd
+        self.mail_server = mail_server
 
         self.cfg_file = cfg_file if cfg_file else get_dflt_entry("dflt_logger")
         self.curr_cfg = {}
         fct_modify_loggers = self.cfg_to_defaults if fct_modify_loggers is None else fct_modify_loggers
         self.setup_from_yaml(self.cfg_file, fct_modify_loggers=fct_modify_loggers)
+        self.setup_mail_service(user_email=email, user_pwd=email_pwd, mail_server=mail_server)
         self.event_center = self.setup_event_center(loggers_capture_events) if event_center is None else event_center
 
     def setup_from_yaml(self, file, fct_modify_loggers=lambda cfg_dic: cfg_dic):
@@ -22,6 +29,28 @@ class CustomLoggerSetup:
             cfg_dic = yaml.safe_load(f.read())
         self.curr_cfg = fct_modify_loggers(cfg_dic)
         logging.config.dictConfig(cfg_dic)
+
+    def email_to_server(self, user_email, mail_server):
+        if user_email is None:
+            return
+        import re
+        if mail_server is None:
+            m = re.search(r'(.+)@(.+)\.(.+)', user_email)
+            if m:
+                _, host, tld = m.groups()
+                self.mail_server = f"smtp.{host}.{tld}"
+            else:
+                raise AttributeError
+
+    def setup_mail_service(self, user_email, user_pwd, mail_server):
+        self.user_email = user_email
+        self.user_pwd = user_pwd
+        self.email_to_server(user_email, mail_server)
+        if self.user_email is not None:
+            mailhandler = TlsSMTPHandler((self.mail_server, 587), fromaddr=self.user_email,
+                                         toaddrs=[self.user_email], subject='IoTMonitor - mail alert service',
+                                         credentials=(self.user_email, self.user_pwd))
+            logging.getLogger('mail').addHandler(mailhandler)
 
     def cfg_to_defaults(self, loaded_cfg):
         general_logs = get_dflt_entry("logs", suffix='general_logs.log')
@@ -46,11 +75,55 @@ class CustomLoggerSetup:
     def get_event_center(self):
         return self.event_center
 
+    def email_str(self):
+        if self.user_email is None:
+            return "No user email configured"
+        return f"Contact email {self.user_email} (SMTP server {self.mail_server})"
+
+    def detail_str(self, level=0):
+        if level == 0:
+            return f"LoggerSetup using cfg {self.cfg_file}"
+        elif level >= 1:
+            return f"LoggerSetup using config file {self.cfg_file}\n{self.email_str()}"
+
     def __str__(self):
-        return f"LoggerSetup using cfg {self.cfg_file}"
+        return self.detail_str()
+
+
+class TlsSMTPHandler(logging.handlers.SMTPHandler):
+    def emit(self, record):
+        try:
+            import smtplib
+            try:
+                from email.utils import formatdate
+            except ImportError:
+                import time
+                formatdate = lambda: str(time.time())
+            port = self.mailport
+            if not port:
+                port = smtplib.SMTP_PORT
+            smtp = smtplib.SMTP(self.mailhost, port)
+            msg = self.format(record)
+            msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nDate: %s\r\n\r\n%s" % (
+                self.fromaddr,
+                ','.join(self.toaddrs),
+                self.getSubject(record),
+                formatdate(), msg)
+            if self.username:
+                smtp.ehlo()  # for tls add this line
+                smtp.starttls()  # for tls add this line
+                smtp.ehlo()  # for tls add this line
+                smtp.login(self.username, self.password)
+            smtp.sendmail(self.fromaddr, self.toaddrs, msg)
+            smtp.quit()
+        except SystemExit:
+            raise
+        except:
+            self.handleError(record)
 
 
 if __name__ == "__main__":
-    l = CustomLoggerSetup()
+    l = CustomLoggerSetup(email='remydecocq@gmail.com', email_pwd='Codelyokotsuno99', mail_server='smtp.gmail.com')
     print(l)
-    logging.getLogger("control").debug("Debugging logger")
+    logging.getLogger("cli").debug("Logger that alert user in cli directly")
+    logging.getLogger("mail").critical("Critical thread sent by email")

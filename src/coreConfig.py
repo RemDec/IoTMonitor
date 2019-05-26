@@ -9,7 +9,7 @@ from src.net.netmap import Netmap
 
 def get_coreconfig_from_file(filepath, timer=None, netmap=None, routine=None,
                              logger_setup=None, event_center=None, modmanager=None,
-                             filemanager=FilesManager()):
+                             filemanager=FilesManager(), mail_infos=None):
     import pathlib
     ext = pathlib.Path(filepath).suffix
     if ext == '.yaml':
@@ -19,6 +19,8 @@ def get_coreconfig_from_file(filepath, timer=None, netmap=None, routine=None,
                                     filemanager=filemanager)
     else:
         coreconfig = CoreConfig(file_from=filepath)
+    if mail_infos is not None:
+        coreconfig.set_mailinfos_tuple(mail_infos)
     return coreconfig
 
 
@@ -58,6 +60,17 @@ class CoreConfig:
             self.logger_setup = logger_setup
         else:
             pass
+
+    def set_mailinfos_tuple(self, mail_infos):
+        if mail_infos[0] is None:
+            return
+        if len(mail_infos) < 3:
+            self.set_mailinfos(user_email=mail_infos[0], user_pwd=mail_infos[1])
+        else:
+            self.set_mailinfos(user_email=mail_infos[0], user_pwd=mail_infos[1], mail_server=mail_infos[2])
+
+    def set_mailinfos(self, user_email, user_pwd, mail_server=None):
+        self.logger_setup.setup_mail_service(user_email, user_pwd, mail_server)
 
     def init_event_center(self, event_center):
         self.event_center = event_center if event_center is not None else self.logger_setup.get_event_center()
@@ -120,6 +133,9 @@ class CoreConfig:
         for res, path in self.paths.items():
             s += f"{prefix}{res} : {path}\n"
         return s
+
+    def str_email(self):
+        return self.logger_setup.email_str()
 
     def get_cfg_file(self):
         if self.file_from == '':
