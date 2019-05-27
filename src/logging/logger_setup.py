@@ -41,6 +41,8 @@ class CustomLoggerSetup:
                 self.mail_server = f"smtp.{host}.{tld}"
             else:
                 raise AttributeError
+        else:
+            self.mail_server = mail_server
 
     def setup_mail_service(self, user_email, user_pwd, mail_server):
         self.user_email = user_email
@@ -51,6 +53,18 @@ class CustomLoggerSetup:
                                          toaddrs=[self.user_email], subject='IoTMonitor - mail alert service',
                                          credentials=(self.user_email, self.user_pwd))
             logging.getLogger('mail').addHandler(mailhandler)
+
+    def test_mail_service(self):
+        if self.user_email is not None:
+            test_mailhandler = TlsSMTPHandlerErrorFree((self.mail_server, 587), fromaddr=self.user_email,
+                                                       toaddrs=[self.user_email], subject='IoTMonitor - testing mail',
+                                                       credentials=(self.user_email, self.user_pwd))
+            mail_logger = logging.getLogger('mail')
+            old_hdlers = mail_logger.handlers
+            mail_logger.handlers = [test_mailhandler]
+            mail_logger.critical("This mail has been sent as a test from an IoTMonitor application, more details here:"
+                                 "https://github.com/RemDec/IoTMonitor")
+            mail_logger.handlers = old_hdlers
 
     def cfg_to_defaults(self, loaded_cfg):
         general_logs = get_dflt_entry("logs", suffix='general_logs.log')
@@ -102,7 +116,7 @@ class TlsSMTPHandler(logging.handlers.SMTPHandler):
             port = self.mailport
             if not port:
                 port = smtplib.SMTP_PORT
-            smtp = smtplib.SMTP(self.mailhost, port)
+            smtp = smtplib.SMTP(self.mailhost, port, timeout=5)
             msg = self.format(record)
             msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nDate: %s\r\n\r\n%s" % (
                 self.fromaddr,
@@ -116,10 +130,36 @@ class TlsSMTPHandler(logging.handlers.SMTPHandler):
                 smtp.login(self.username, self.password)
             smtp.sendmail(self.fromaddr, self.toaddrs, msg)
             smtp.quit()
-        except SystemExit:
-            raise
-        except:
-            self.handleError(record)
+        except Exception as e:
+            msg = f"Exception at mail sending for : {self.fromaddr} (SMTP server {self.mailhost})"
+            logging.getLogger('error').exception(msg)
+
+
+class TlsSMTPHandlerErrorFree(logging.handlers.SMTPHandler):
+    def emit(self, record):
+        import smtplib
+        try:
+            from email.utils import formatdate
+        except ImportError:
+            import time
+            formatdate = lambda: str(time.time())
+        port = self.mailport
+        if not port:
+            port = smtplib.SMTP_PORT
+        smtp = smtplib.SMTP(self.mailhost, port, timeout=5)
+        msg = self.format(record)
+        msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nDate: %s\r\n\r\n%s" % (
+            self.fromaddr,
+            ','.join(self.toaddrs),
+            self.getSubject(record),
+            formatdate(), msg)
+        if self.username:
+            smtp.ehlo()  # for tls add this line
+            smtp.starttls()  # for tls add this line
+            smtp.ehlo()  # for tls add this line
+            smtp.login(self.username, self.password)
+        smtp.sendmail(self.fromaddr, self.toaddrs, msg)
+        smtp.quit()
 
 
 if __name__ == "__main__":

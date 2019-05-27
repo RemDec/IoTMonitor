@@ -13,8 +13,8 @@ cli_modes = ('noout', 'outpiped', 'outscreen', 'tkinter')
 
 class AppCLI(TimerInterface):
 
-    def __init__(self, mode=cli_modes[2], level=1, start_pull_output=True, save_on_exit=True,
-                 use_last_coreconfig=True, target_coreconfig=None, check_files=True,
+    def __init__(self, mode=cli_modes[2], level=1, start_parsing=True, start_pull_output=True,
+                 save_on_exit=True, use_last_coreconfig=True, target_coreconfig=None, check_files=True,
                  mail_infos=None):
         self.mode = mode
         self.level = level
@@ -45,21 +45,22 @@ class AppCLI(TimerInterface):
         self.output = self.config_output()  # Init output controller object depending on mode selected
         self.cli = CLIparser(self.core, core_controller=self)
 
-        self.start_app(start_pull_output)
+        self.start_app(start_parsing, start_pull_output)
 
     # ----- Control application execution/interactive CLI -----
 
-    def start_app(self, start_display=True):
+    def start_app(self, start_parsing=True, start_display=True):
         if self.mode != 'noout' and start_display:
             self.start_display_output()
-        # blocking on input waiting
-        self.cli.start_parsing()
+        if start_parsing:
+            # blocking on input waiting
+            self.cli.start_parsing()
 
-    def stop_app(self):
+    def stop_app(self, oppose_to_saving=False):
         self.cli.stop_parsing()
         self.timer.unsub(self)
         self.output.exit()
-        if self.save_on_exit:
+        if not(oppose_to_saving) and self.save_on_exit:
             self.save_app_state()
         self.core.quit()
 
