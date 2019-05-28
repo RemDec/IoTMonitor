@@ -28,6 +28,10 @@ def get_dflt_entry(index, suffix=None):
     return str(Path(FilesManager().get_res_path(index)) / suffix)
 
 
+def clean_last_files():
+    FilesManager().clean_last_files()
+
+
 class FilesManager:
 
     def __init__(self, assoc_dirs=dflt_dirs, assoc_f=dflt_files):
@@ -83,6 +87,12 @@ class FilesManager:
                     missed.append((file, full_path))
         if len(missed) > 0:
             raise FileEntryError(self, missed)
+
+    def clean_last_files(self):
+        for f in ['last_cfg', 'last_routine', 'last_netmap']:
+            path = self.get_res_path(f)
+            with open(path, 'w'):
+                pass
 
     def __str__(self):
         s = f"FileManager with following entries:\n"
