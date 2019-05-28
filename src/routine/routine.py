@@ -49,6 +49,11 @@ class Routine:
             mod.set_params(new_params)
             mod.launch()
 
+    def rename_module(self, old_setid, new_setid):
+        if new_setid.strip() != '':
+            self.panel.rename(old_setid, new_setid)
+            self.queue.rename(old_setid, new_setid)
+
     def clear(self):
         self.panel.clear()
         self.queue.clear()

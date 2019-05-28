@@ -43,13 +43,13 @@ class Queue(TimerInterface):
         return QueueEntry(active_mod, exp_timer, qid)
 
     def get_unique_qid(self, try_id):
-        curr_id = try_id
+        idlist = self.get_idlist()
+        if not(try_id in idlist):
+            return try_id
         counter = 1
-        for mod_entry in self.set:
-            if mod_entry.qid == curr_id:
-                curr_id = try_id + str(counter)
-                counter += 1
-        return curr_id
+        while try_id + str(counter) in idlist:
+            counter += 1
+        return try_id + str(counter)
 
     def get_presence(self, mod):
         for i, entry in enumerate(self.set):
@@ -84,6 +84,16 @@ class Queue(TimerInterface):
         for entry in self.set:
             entry.decr()
         self.reorganize()
+
+    def rename(self, old_qid, new_qid):
+        qids = self.get_idlist()
+        if old_qid in qids:
+            if new_qid in qids:
+                # Have to rename already so named entry
+                wrong_named = self.get_corresp_entry(new_qid)
+                wrong_named.pid = self.get_unique_qid(new_qid)
+            curr_entry = self.get_corresp_entry(old_qid)
+            curr_entry.pid = new_qid
 
     def is_empty(self):
         return len(self.set) == 0

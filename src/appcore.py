@@ -74,6 +74,9 @@ class Core:
     def remove_from_routine(self, setid_or_mod):
         return self.routine.remove_module(setid_or_mod)
 
+    def rename_routine_modentry(self, oldsetid, newsetid):
+        self.routine.rename_module(oldsetid, newsetid)
+
     def clear_routine(self):
         self.routine.clear()
 
@@ -102,6 +105,9 @@ class Core:
 
     def remove_from_netmap(self, mapid):
         self.netmap.remove_VI(mapid)
+
+    def rename_netmap_vi(self, oldmapid, newmapid):
+        self.netmap.rename_VI(oldmapid, newmapid)
 
     def clear_netmap(self):
         self.netmap.clear()

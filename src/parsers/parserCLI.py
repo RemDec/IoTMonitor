@@ -35,7 +35,7 @@ class CLIparser:
 
     def start_parsing(self):
         self.get_input = True
-        self.curr_menu = self.main_menu
+        self.back_main_menu()
         self.loop_parsing()
 
     def stop_parsing(self):
@@ -426,6 +426,20 @@ class CLIparser:
             print("Incorrect format for given timer (should be integer > 0)")
         self.back_main_menu()
 
+    def after_rename_vi_slct(self, mapid):
+        marker = f"Type the mapid to rename virtual instance {mapid} to (enter to cancel)\n[new mapid] :"
+        new_mapid = self.get_user_in_or_dflt(default='', marker=marker).strip()
+        if new_mapid != '':
+            self.core.rename_netmap_vi(mapid, new_mapid)
+        self.back_main_menu()
+
+    def after_rename_modentry_slct(self, setid):
+        marker = f"Type the new setid for module entry {setid} (enter to cancel)\n[new mapid] :"
+        new_setid = self.get_user_in_or_dflt(default='', marker=marker).strip()
+        if new_setid != '':
+            self.core.rename_routine_modentry(setid, new_setid)
+        self.back_main_menu()
+
     def after_remove_mod_slct(self, mod_setid):
         self.core.remove_from_routine(mod_setid)
         self.back_main_menu()
@@ -573,6 +587,7 @@ class CLIparser:
                           'choices': {'create': "create",
                                       'remove': "remove",
                                       'edit': "edit",
+                                      'rename': "rename",
                                       'clear': "clear",
                                       'show': "show",
                                       'pause': "pause",
@@ -592,6 +607,12 @@ class CLIparser:
                      'help': get_res_CLI('edit_help'),
                      'choices': {'VI field': 'editVI', 'module entry (routine)': "editMod"},
                      'fct_choice': self.transit_menu}
+
+        self.rename = {'desc': "Rename an application element (changing its unique id)",
+                       'help': get_res_CLI('rename_help'),
+                       'choices': {'Virtual Instance (netmap)': "renameVI",
+                                   'Module Entry (routine)': "renameMod"},
+                       'fct_choice': self.transit_menu}
 
         self.remove = {'desc': "Remove an existing object in the app",
                        'help': get_res_CLI('remove_help'),
@@ -648,15 +669,10 @@ class CLIparser:
                            'marker': "[mod_id] :", 'choices': self.get_available_mods,
                            'fct_choice': self.after_mod_slct}
 
-        self.remove_mod = {'desc': "Remove a module from routine by its setid",
-                           'marker': "[setid] :", 'choices': self.get_routine_setids,
-                           'fct_choice': self.after_remove_mod_slct}
-
-        self.remove_indep_mod = {'desc': "Remove a module from routine independent running module"}
-
-        self.remove_VI = {'desc': "Remove a virtual instance from the netmap by mapid",
-                          'marker': "[mapid] :", 'choices': self.get_map_mapids,
-                          'fct_choice': self.after_remove_vi_slct}
+        self.create_VI = {'desc': "Create a new 'virtual instance' ie a network equipment in-app representation",
+                          'choices': [['basic', 'scratch']],
+                          'dflt_choice': 'basic',
+                          'fct_choice': self.iv_creation}
 
         self.edit_VI = {'desc': "Edit current fields of a virtual instance to fill/correct them manually",
                         'marker': "[mapid] :", 'choices': self.get_map_mapids,
@@ -666,10 +682,23 @@ class CLIparser:
                               'marker': "[setid] :", 'choices': self.get_routine_setids,
                               'fct_choice': self.after_edit_modentry_slct}
 
-        self.create_VI = {'desc': "Create a new 'virtual instance' ie a network equipment in-app representation",
-                          'choices': [['basic', 'scratch']],
-                          'dflt_choice': 'basic',
-                          'fct_choice': self.iv_creation}
+        self.rename_vi = {'desc': "Rename a VI in netmap (its mapid)",
+                          'marker': "[target mapid] :", 'choices': self.get_map_mapids,
+                          'fct_choice': self.after_rename_vi_slct}
+
+        self.rename_modentry = {'desc': "Rename a modentry in routine (its setid)",
+                                'marker': "[target setid] :", 'choices': self.get_routine_setids,
+                                'fct_choice': self.after_rename_modentry_slct}
+
+        self.remove_mod = {'desc': "Remove a module from routine by its setid",
+                           'marker': "[setid] :", 'choices': self.get_routine_setids,
+                           'fct_choice': self.after_remove_mod_slct}
+
+        self.remove_indep_mod = {'desc': "Remove a module from routine independent running module"}
+
+        self.remove_VI = {'desc': "Remove a virtual instance from the netmap by mapid",
+                          'marker': "[mapid] :", 'choices': self.get_map_mapids,
+                          'fct_choice': self.after_remove_vi_slct}
 
         self.show_VI = {'desc': "Select an existing virtual instance and show its details (fields, linked events, ..)",
                         'marker': "[mapid] :", 'choices': self.get_map_mapids,
@@ -683,6 +712,7 @@ class CLIparser:
         self.index_menus = {"main": self.main_menu,
                             "create": self.create, "newVI": self.create_VI, "newMod": self.create_mod,
                             "edit": self.edit, "editVI": self.edit_VI, "editMod": self.edit_modentry,
+                            "rename": self.rename, "renameVI": self.rename_vi, "renameMod": self.rename_modentry,
                             "remove": self.remove,
                             "delMod": self.remove_mod, "delIndepMod": self.remove_indep_mod, "delVI": self.remove_VI,
                             "clear": self.clear,

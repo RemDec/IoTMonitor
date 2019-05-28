@@ -23,6 +23,9 @@ CLIparser = {
     'create_help': "Build diverse elements to append in the application environment : virtual instance, module, etc.\n"
                    "Redirect to an interactive form taking parameters for the new element instance, or defaults.",
     'edit_help': "Change some parameter/fields value of various in-app elements (this editing will be permanent)\n",
+    'rename_help': "Some elements in app are uniquely identified by an id, namely setid for module entries and mapid \n"
+                   "for virtual instances. Edit this name, if new given name already exists the current so named will\n"
+                   "be automatically renamed with an increment counter at its end",
     'remove_help': "Remove an element already present in the application, like a routine or a virtual instance.\n"
                    "The target is specified by id, either a setid for the routine or a mapid for a VI.",
     'clear_help': "Clear (meaning empty) target container in the app, or all of them. All objects in target and their\n"

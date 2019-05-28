@@ -158,9 +158,9 @@ class AppCLI(TimerInterface):
         self.output.pull_output()
 
     def __str__(self):
-        return f"Controller of application in CLI mode, app view handled by\n" \
+        return f"Controller of application in CLI mode  (working:{self.output.is_reading()}), app view handled by\n" \
                f"{self.output}\n" \
-               f"displaying {self.to_disp} (working:{self.output.is_reading()})"
+               f"displaying {self.to_disp}"
 
 
 class NoOutput:
@@ -197,7 +197,6 @@ class PipeOutput:
         self.reading = False
 
     def write(self, to_output):
-        self.reading = True
         with open(self.PIPE_PATH, 'w') as pipe_w:
             pipe_w.write(to_output)
 
@@ -206,6 +205,7 @@ class PipeOutput:
         pass
 
     def start_reading(self):
+        self.reading = True
         if os.path.exists(self.PIPE_PATH):
             os.remove(self.PIPE_PATH)
         os.mkfifo(self.PIPE_PATH)
@@ -249,7 +249,8 @@ class ConsoleOutput:
         if os.path.exists(self.PIPE_PATH):
             os.remove(self.PIPE_PATH)
         os.mkfifo(self.PIPE_PATH)
-        self.popen = subprocess.Popen([self.terminal, '-geometry', '150x70+0+0', '+aw', '-e', 'watch', '-t', '-n 0,5', 'cat %s' % self.PIPE_PATH])
+        self.popen = subprocess.Popen([self.terminal, '-geometry', '150x70+0+0', '+aw', '-e', 'watch', '-t', '-n 0,5', 'cat %s' % self.PIPE_PATH],
+                                      stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL)
 
     def stop_reading(self):
         self.reading = False

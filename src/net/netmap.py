@@ -36,6 +36,13 @@ class Netmap:
                                     new_state="Registered VI in netmap", logit_with_lvl=20)
         return str(mapid), vi
 
+    def rename_VI(self, oldmapid, newmapid):
+        if newmapid != '' and oldmapid in self.map:
+            vi_to_rename = self.map.pop(oldmapid)
+            if newmapid in self.map:
+                self.map[self.get_unique_id(newmapid)] = self.get_VI(newmapid)
+            self.map[newmapid] = vi_to_rename
+
     def get_VI(self, mapid):
         return self.map.get(mapid)
 
