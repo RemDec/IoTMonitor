@@ -186,7 +186,7 @@ class QueueEntry:
         elif level == 1:
             curr_params, dflt_params, desc_PARAMS = self.module.get_params()
             rel_vi_str = '| < no specific VI >' if len(self.rel_to_vi) == 0 else ', '.join(self.rel_to_vi)
-            s += f"| PASSIVE module whose description is given as :\n"
+            s += f"| ACTIVE module whose description is given as :\n"
             s += f"|  {self.module.get_description()}\n"
             s += f"| Execution relative to VIs : {rel_vi_str}\n"
             s += f"| Associated underlying program : {self.module.get_cmd()}\n"

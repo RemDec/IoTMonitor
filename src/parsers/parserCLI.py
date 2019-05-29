@@ -449,7 +449,7 @@ class CLIparser:
         self.back_main_menu()
 
     def after_show_select(self, show_input_name):
-        map = {'routine': "routine", 'netmap': "netmap", 'mods library': "library", 'independent mods': "indep",
+        map = {'routine': "routine", 'netmap': "netmap", 'library': "library", 'independent mods': "indep",
                'main timer': "timer", 'virtual instance': "vi", 'entry module in routine': "entry",
                'threat events': "threats", 'modification events': "modifs", 'app': "app"}
         res_to_show = map.get(show_input_name, "app")
@@ -565,6 +565,29 @@ class CLIparser:
             self.core.add_to_netmap(vi, mapid)
         self.back_main_menu()
 
+    def after_integrate_slct(self, archetype):
+        if archetype == 'active':
+            py_pkg = 'modules.actives'
+        else:
+            py_pkg = 'modules.passives'
+        marker = f"Type de python module name in package {py_pkg} containing the class definition\n" \
+                 f"of the new Module to integrate (enter to cancel)\n[pymod name] :"
+        pymod_name = self.get_user_in_or_dflt(default='', marker=marker)
+        if pymod_name != '':
+            from src.utils.filesManager import ModuleIntegrator as MI
+            try:
+                integrator = MI(f"{py_pkg}.{pymod_name}", library=self.core.modmanager, auto_integrate=False)
+                print(integrator)
+                integrate_ok = self.get_user_confirm(marker="Validate Module integration (Y/n) ? ")
+                if integrate_ok:
+                    integrator.integrate_module()
+            except (ModuleNotFoundError, NotImplementedError) as e:
+                print(e)
+                self.no_wipe_next()
+            self.curr_menu = self.main_menu
+        else:
+            self.back_main_menu()
+
     # ----- Menus configurations -----
 
     def get_choice_val(self, choice_code):
@@ -592,7 +615,8 @@ class CLIparser:
                                       'show': "show",
                                       'pause': "pause",
                                       'resume': "resume",
-                                      'save': "save"},
+                                      'save': "save",
+                                      'integrate': "integrate"},
                           'fct_choice': self.transit_menu,
                           'disp_choice': True}
 
@@ -633,7 +657,7 @@ class CLIparser:
 
         self.show = {'desc': "Display current state of application resources",
                      'help': get_res_CLI('show_help'),
-                     'choices': [['app', 'routine', 'netmap', 'mods library', 'independent mods', 'main timer'],
+                     'choices': [['app', 'routine', 'netmap', 'library', 'independent mods', 'main timer'],
                                  ['virtual instance', 'entry module in routine'],
                                  ['threat events', 'modification events']],
                      'dflt_choice': 'routine',
@@ -663,6 +687,10 @@ class CLIparser:
                                    'queue only': "queue"},
                        'dflt_choice': 'entire routine',
                        'fct_choice': self.after_resume_slct}
+
+        self.integrate = {'desc': "Integrate a new written module in the application (library)",
+                          'help': get_res_CLI('integrate_help'), 'choices': [['active', 'passive']],
+                          'fct_choice': self.after_integrate_slct}
 
         # -- Secondary menu --
         self.create_mod = {'desc': "Choose a module in the current library and instantiate it",
@@ -719,7 +747,8 @@ class CLIparser:
                             "pause": self.pause,
                             "resume": self.resume,
                             "show": self.show, "showVI": self.show_VI, "showEntry": self.show_modentry,
-                            "save": self.save
+                            "save": self.save,
+                            "integrate": self.integrate
                             }
 
 

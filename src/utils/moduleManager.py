@@ -31,6 +31,8 @@ class ModManager:
     def load_modlib(self):
         # parse de module library file to build available modules descriptors
         self.clear()
+        if self.modfile_empty():
+            return
         with open(self.modlib_file, 'r') as f:
             tree = etree.parse(f)
         root = tree.getroot()
@@ -40,9 +42,17 @@ class ModManager:
 
     def add_to_modlib_file(self, mod):
         # append a module signature on current used module library in modlib_file
-        xml_tree = ModDescriptor(mod_inst=mod).modinfos_to_xml()
-        with open(self.modlib_file, 'a') as f:
-            f.write(etree.tostring(xml_tree).decode())
+        if self.modfile_empty():
+            self.create_modlib(modlist=[mod])
+            return
+        if self.is_available(mod.get_module_id()):
+            return
+        parser = etree.XMLParser(remove_blank_text=True)
+        modlib_elmt = etree.parse(self.modlib_file, parser).getroot()
+        target_container = modlib_elmt.find("actives") if mod.is_active() else modlib_elmt.find("passives")
+        xml_element_mod = ModDescriptor(mod_inst=mod).modinfos_to_xml()
+        target_container.append(xml_element_mod)
+        etree.ElementTree(modlib_elmt).write(self.modlib_file, pretty_print=True)
 
     def change_modlib(self, new_file):
         self.modlib_file = new_file
@@ -117,6 +127,10 @@ class ModManager:
         pas_instances = [mod_desc.get_mod_instance(timer=timer, netmap=netmap) for mod_desc in passives_desc]
         return act_instances, pas_instances
 
+    def modfile_empty(self):
+        from os import stat
+        return stat(self.modlib_file).st_size == 0
+
     def detail_str(self, level=0):
         s = f"Module manager (library) loaded from {self.modlib_file}\n"
         if level == 0:
@@ -126,7 +140,7 @@ class ModManager:
             s += f"listing current available modules from this file:\n" \
                  f"Actives: {', '.join(act)}\n" \
                  f"Passives: {', '.join(pas)}\n"
-        elif level == 2:
+        else:
             act, pas = self.list_all_mod_desc()
             s += f"created following module descriptors :\n"
             s += f"\n      <[[ {len(act)} ACTIVE MODULES ]]>\n"

@@ -168,7 +168,7 @@ def write_modlib(file_dest=None):
     from src.utils.filesManager import get_dflt_entry
 
     if file_dest is None:
-        file_dest = get_dflt_entry('lib')
+        file_dest = get_dflt_entry('dflt_lib')
     actives = [arbitraryCmd.AModArbitraryCmd(), nmapExplorer.AModNmapExplorer(), nmapPortDiscovery.AModNmapPortDisc()]
     passives = [arbitraryCmdBg.PModArbitraryCmdBg(), pingTarget.PModPing()]
     mod_instances = actives + passives
@@ -181,12 +181,5 @@ if __name__ == '__main__':
     print("\n-----------------\n")
     print(str_lines_frame("with one | only | line"))
     print(str_lines_frame("str\nstr a bit longer\nmark|here"))
-
-    a = {0: 1, 1: {}, 2: {0: "b", 1: "c"}, 3: {0: {}}}
-    replace_in_dicts(a, 0, "a")
-    print("\n\nAfter replacing 0 keys with value 'a'\n", a)
-    default = {'par1': ("par1val", True, ""), 'par2': ("par2val", False, ""), 'par3': ("par3val", False, "")}
-    given = {'par1':"new_val1", 'par3': "new_val3", 'unknown': "val"}
-    print("\n\nSee used parameters\n", str_param_comp(given, default))
 
     write_modlib()

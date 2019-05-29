@@ -32,6 +32,10 @@ def clean_last_files():
     FilesManager().clean_last_files()
 
 
+def complete_path(prefix, filename):
+    return FilesManager().complete_path(prefix=prefix, filename=filename)
+
+
 class FilesManager:
 
     def __init__(self, assoc_dirs=dflt_dirs, assoc_f=dflt_files):
@@ -113,6 +117,63 @@ class FileEntryError(Exception):
         s += f" wrong entries -> paths are following:\n"
         for entry, path in self.wrong_entries:
             s += f" > {entry} : {path}\n"
+        return s
+
+
+class ModuleIntegrator:
+
+    def __init__(self, module, module_class=None, library=None, auto_integrate=True):
+        self.modinst = self.compute_modinst(module, module_class)
+        self.library = self.compute_library(library)
+        self.library.load_modlib()
+        if auto_integrate:
+            self.integrate_module()
+
+    def compute_modinst(self, module, module_class=None):
+        from modules.abcModule import Module
+        if isinstance(module, Module):
+            return module
+        elif isinstance(module, str):
+            from importlib import import_module
+            try:
+                pymodule = import_module(module)
+                if module_class is None:
+                    # Searching in module dir for the module class name
+                    for direntry in dir(pymodule):
+                        if direntry.startswith('AMod') or direntry.startswith('PMod'):
+                            module_class = direntry
+                            break
+                    if module_class is None:
+                        raise NotImplementedError(f"Class guessing for Module in python module {module} failed.\n"
+                                                  f"Check that the class name begins with 'AMod' or 'PMod'")
+                return getattr(pymodule, module_class)()
+            except ModuleNotFoundError as e:
+                raise ModuleNotFoundError(f"Unable to import python {module} supposed to contain Module class def.")
+
+    def compute_library(self, library):
+        from src.utils.moduleManager import ModManager
+        if isinstance(library, ModManager):
+            return library
+        elif isinstance(library, str):
+            return ModManager(modlib_file=complete_path('configs', library))
+        elif library is None:
+            return ModManager()
+
+    def integrate_module(self):
+        self.library.add_to_modlib_file(self.modinst)
+        self.library.load_modlib()
+
+    def __str__(self):
+        from src.utils.misc_fcts import str_param_comp
+        s = f">  Module integration to :\n{self.library.detail_str(level=1)}\n" \
+            f">  From the instantiated module :\n"
+        curr_params, dflt_params, desc_PARAMS = self.modinst.get_params()
+        arch = 'ACTIVE' if self.modinst.is_active() else 'PASSIVE'
+        s += f"| {arch} module whose description is given as :\n"
+        s += f"|  {self.modinst.get_description()}\n"
+        s += f"| Associated underlying program : {self.modinst.get_cmd()}\n"
+        s += f"| Module parameters :\n"
+        s += str_param_comp(curr_params, dflt_params, descriptions=desc_PARAMS, prefix='|  ')
         return s
 
 

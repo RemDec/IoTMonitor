@@ -41,6 +41,10 @@ CLIparser = {
                    "on every module sitting in (spawning two threads managing underlying cmd subprocess), start queue\n"
                    "rerun its timer that will decrement every expiration time of modules (spawning a thread at this\n"
                    "moment running underlying scanning program).",
+    'integrate_help': "New Module integration to the app. environment. Supply the corresponding python module name \n"
+                      "ie. the name of the file where the new Module class is defined (should be located in either\n"
+                      "modules/passives either modules/actives). If the Module is correctly written, it will be added\n"
+                      "to the Library and instantiable in the app from here.",
     'cmds_help': spec_cmds
 }
 
