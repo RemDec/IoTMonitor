@@ -125,7 +125,6 @@ class ModuleIntegrator:
     def __init__(self, module, module_class=None, library=None, auto_integrate=True):
         self.modinst = self.compute_modinst(module, module_class)
         self.library = self.compute_library(library)
-        self.library.load_modlib()
         if auto_integrate:
             self.integrate_module()
 

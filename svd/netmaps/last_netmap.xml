@@ -1,7 +1,1658 @@
 <?xml version='1.0' encoding='ASCII'?>
 <xmlsave>
   <netmap>
-    <instances/>
-    <savedevents/>
+    <instances>
+      <virtinst mapid="device0" usercreated="True">
+        <mainfields mac="A0:21:B7:52:B1:69" ip="192.168.0.1"/>
+        <divfields manufacturer="Netgear"/>
+        <portstable>
+          <port portnum="23">
+            <maininfos service="telnet" protocol="TCP" state="closed"/>
+            <divportinfos/>
+          </port>
+          <port portnum="80">
+            <maininfos service="http" protocol="TCP" state="open"/>
+            <divportinfos/>
+          </port>
+          <port portnum="8080">
+            <maininfos service="http-proxy" protocol="TCP" state="closed"/>
+            <divportinfos/>
+          </port>
+        </portstable>
+      </virtinst>
+      <virtinst mapid="device1" usercreated="True">
+        <mainfields mac="E4:58:E7:3E:C4:C4" ip="192.168.0.2"/>
+        <divfields manufacturer="Samsung Electronics"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device2" usercreated="True">
+        <mainfields mac="08:EE:8B:6D:75:AB" ip="192.168.0.4"/>
+        <divfields manufacturer="Samsung Electronics"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device3" usercreated="True">
+        <mainfields mac="C4:9D:ED:92:DE:DE" ip="192.168.0.5"/>
+        <divfields/>
+        <portstable>
+          <port portnum="135">
+            <maininfos service="msrpc" protocol="TCP" state="open"/>
+            <divportinfos/>
+          </port>
+          <port portnum="139">
+            <maininfos service="netbios-ssn" protocol="TCP" state="open"/>
+            <divportinfos/>
+          </port>
+          <port portnum="445">
+            <maininfos service="microsoft-ds" protocol="TCP" state="open"/>
+            <divportinfos/>
+          </port>
+        </portstable>
+      </virtinst>
+      <virtinst mapid="device4" usercreated="True">
+        <mainfields ip="192.168.0.3"/>
+        <divfields/>
+        <portstable>
+          <port portnum="80">
+            <maininfos service="http" protocol="TCP" state="open"/>
+            <divportinfos/>
+          </port>
+        </portstable>
+      </virtinst>
+      <virtinst mapid="device5" usercreated="True">
+        <mainfields mac="14:32:D1:77:CA:F9" ip="192.168.0.6"/>
+        <divfields manufacturer="Samsung Electronics"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device6" usercreated="True">
+        <mainfields mac="70:4F:57:EC:95:E3" ip="192.168.0.25"/>
+        <divfields/>
+        <portstable>
+          <port portnum="22">
+            <maininfos service="ssh" protocol="TCP" state="open"/>
+            <divportinfos/>
+          </port>
+          <port portnum="80">
+            <maininfos service="http" protocol="TCP" state="open"/>
+            <divportinfos/>
+          </port>
+        </portstable>
+      </virtinst>
+    </instances>
+    <savedevents>
+      <vievents mapid="device0">
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 23         |telnet    |TCP        |closed    |
+| 80         |http      |TCP        |open      |
+| 8080       |http-proxy|TCP        |closed    |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Netgear
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: A0:21:B7:52:B1:69
+ |--Main fields :
+ | MAC : A0:21:B7:52:B1:69
+ | IP : 192.168.0.1
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Netgear
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance</newstate>
+          <diveventinfos objid="device0" modificator="nmapexplo"/>
+        </modifevent>
+      </vievents>
+      <vievents mapid="device1">
+        <modifevent target="VI device1" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device1" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device1" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device1" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device1" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device1" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device1" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device1" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device1" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device1" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device1" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: E4:58:E7:3E:C4:C4
+ |--Main fields :
+ | MAC : E4:58:E7:3E:C4:C4
+ | IP : 192.168.0.2
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device1" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device1" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance</newstate>
+          <diveventinfos objid="device1" modificator="nmapexplo"/>
+        </modifevent>
+      </vievents>
+      <vievents mapid="device2">
+        <modifevent target="VI device2" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance</newstate>
+          <diveventinfos objid="device2" modificator="nmapexplo"/>
+        </modifevent>
+      </vievents>
+      <vievents mapid="device3">
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+-----------+
+|  Ports nbr | services | protocols | states    |
+| ============================================  |
+| 135        |msrpc       |TCP        |open     |
+| 139        |netbios-ssn |TCP        |open     |
+| 445        |microsoft-ds|TCP        |open     |
++------------+------------+-----------+---------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: C4:9D:ED:92:DE:DE
+ |--Main fields :
+ | MAC : C4:9D:ED:92:DE:DE
+ | IP : 192.168.0.5
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance</newstate>
+          <diveventinfos objid="device3" modificator="nmapexplo"/>
+        </modifevent>
+      </vievents>
+      <vievents mapid="device4">
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 192.168.0.3
+ |--Main fields :
+ | MAC : None
+ | IP : 192.168.0.3
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device4" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device4" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance</newstate>
+          <diveventinfos objid="device4" modificator="nmapexplo"/>
+        </modifevent>
+      </vievents>
+      <vievents mapid="device5">
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device5" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Virtual Instance (state:unknown) created manually: 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:unknown) created manually: 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device5" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device5" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device5" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device5" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device5" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device5" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device5" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device5" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 14:32:D1:77:CA:F9
+ |--Main fields :
+ | MAC : 14:32:D1:77:CA:F9
+ | IP : 192.168.0.6
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+ | manufacturer = Samsung Electronics
+</newstate>
+          <diveventinfos objid="device5" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device5" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance</newstate>
+          <diveventinfos objid="device5" modificator="nmapexplo"/>
+        </modifevent>
+      </vievents>
+      <vievents mapid="device6">
+        <modifevent target="VI device6" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device6" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device6" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device6" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device6" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device6" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device6" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device6" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device6" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device6" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device6" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
++------------+----------+-----------+----------+
+|  Ports nbr | services | protocols | states   |
+| ============================================ |
+| 22         |ssh       |TCP        |open      |
+| 80         |http      |TCP        |open      |
++------------+----------+-----------+----------+
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device6" modificator="nmapports"/>
+        </modifevent>
+        <modifevent target="VI device6" type="virt_inst">
+          <oldstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</oldstate>
+          <newstate>Virtual Instance (state:up) : 70:4F:57:EC:95:E3
+ |--Main fields :
+ | MAC : 70:4F:57:EC:95:E3
+ | IP : 192.168.0.25
+ | Hostname : None
+ |--Registered ports table :
+Empty ports table
+ |--Other divers fields :
+</newstate>
+          <diveventinfos objid="device6" modificator="nmapexplo"/>
+        </modifevent>
+        <modifevent target="VI device6" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance</newstate>
+          <diveventinfos objid="device6" modificator="nmapexplo"/>
+        </modifevent>
+      </vievents>
+    </savedevents>
   </netmap>
 </xmlsave>

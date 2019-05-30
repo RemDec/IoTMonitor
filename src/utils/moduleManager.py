@@ -142,7 +142,7 @@ class ModManager:
                  f"Passives: {', '.join(pas)}\n"
         else:
             act, pas = self.list_all_mod_desc()
-            s += f"created following module descriptors :\n"
+            s += f"maintaining following module descriptors :\n"
             s += f"\n      <[[ {len(act)} ACTIVE MODULES ]]>\n"
             for desc in act:
                 s += f" < {desc.m_id} >\n{desc}\n"
@@ -208,7 +208,7 @@ class ModDescriptor:
     def modinfos_to_xml(self, include_nondefault_param=False):
         # outputs a XML tree describing the module itself
         modtype = "actmod" if self.m_active else "passmod"
-        modattr = {"modid": self.m_id, "pymod": self.pymod, "pyclass": self.pyclass}
+        modattr = {"modid": self.m_id, "cmd": self.cmd, "pymod": self.pymod, "pyclass": self.pyclass}
         saved_params = self.curr_param_to_xml() if include_nondefault_param else E.savedparams()
         xml = E(modtype,
                     E.desc(self.txt_desc),
@@ -250,6 +250,7 @@ class ModDescriptor:
         if xml_tree.tag == "actmod":
             self.m_active = True
         self.m_id = xml_tree.get("modid")
+        self.cmd = xml_tree.get("cmd")
         self.pymod = xml_tree.get("pymod")
         self.pyclass = xml_tree.get("pyclass")
         self.txt_desc = xml_tree.find("desc").text
@@ -303,9 +304,10 @@ class ModDescriptor:
 
     def __str__(self):
         modtype = "A" if self.m_active else "P"
-        params_comp = str_param_comp(self.curr_params, self.PARAMS)
-        s = f"Module descriptor for [{self.m_id}]({modtype}) def in {self.pymod} by {self.pyclass} class\n"
-        s += f"overlayer for cmd {self.cmd} with considered param setup\n{params_comp}"
+        params_comp = str_param_comp(self.curr_params, self.PARAMS, descriptions=self.desc_params, prefix='| ')
+        s = f"Module descriptor for [{self.m_id}]({modtype}) def in {self.pymod} by {self.pyclass} class.\n" \
+            f"Description : {self.txt_desc}\n"
+        s += f"Overlayer for program '{self.cmd}' with considered param setup :\n{params_comp}"
         return s
 
 

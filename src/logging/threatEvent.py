@@ -37,15 +37,15 @@ class ThreatEvent:
                 s += f"    no description provided\n"
             else:
                 s += f"    description : {self.msg}\n"
-        elif level == 2:
+        elif level >= 2:
             if self.msg is None:
-                s += f"    | no threat description provided\n"
+                s += f"----| no threat description provided\n"
             else:
-                s += f"    | threat description :\n{self.msg}\n"
+                s += f"----| threat description :\n{self.msg}\n"
             if self.patch is None:
-                s += f"    | no patch/help for threat provided\n"
+                s += f"----| no patch/help for threat provided\n"
             else:
-                s += f"    | patch/help provided for threat :\n{self.patch}\n"
+                s += f"----| patch/help provided for threat :\n{self.patch}\n"
         return s
 
     def __str__(self):

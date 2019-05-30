@@ -307,7 +307,7 @@ class CLIparser:
                     input_params[code_param] = user_in
             mod_inst = self.core.instantiate_module(mod_id, curr_params=input_params)
         # Taking VIs mapids the mod exec will be relative to
-        marker = f"Indicate specific VIs the [{mod_id}] execution should be relative to ? (y/N) :"
+        marker = f"\nIndicate specific VIs the [{mod_id}] execution should be relative to ? (y/N) :"
         take_vi = self.get_user_confirm(marker=marker, empty_ok=False)
         vis = []
         all_vis = self.core.get_all_mapids().copy()
@@ -327,7 +327,7 @@ class CLIparser:
         is_mod_act = mod_inst.is_active()
         timer_name = f"{'queue expiration' if is_mod_act else 'reading'} interval timer"
         dflt_val = mod_inst.get_default_timer() if is_mod_act else mod_inst.get_read_interval()
-        marker = f"Set {timer_name} if desired (numeric) or enter to pass\n[default:{dflt_val}] :"
+        marker = f"\nSet {timer_name} if desired (numeric) or enter to pass\n[default:{dflt_val}] :"
         input_timer = self.get_user_in_or_dflt(dflt_val, marker=marker)
         try:
             timer = abs(int(input_timer))
@@ -335,7 +335,7 @@ class CLIparser:
             print("Incorrect format for given timer (should be integer > 0) -> use default one")
             timer = 0
         if in_rout:
-            setid = self.get_user_in_or_dflt(None, marker="Give a setid if desired (alphanumeric)\n[setid] :")
+            setid = self.get_user_in_or_dflt(None, marker="\nGive a setid if desired (alphanumeric)\n[setid] :")
             entry = self.core.add_to_routine(mod_inst, given_setid=setid, given_timer=timer)
             entry.set_vi_relative(vis)
         else:
@@ -461,7 +461,7 @@ class CLIparser:
             lvl_info = f"(increase it with $set lvl {self.curr_display_lvl + 1}" if self.curr_display_lvl < 10 else ''
             print(f"Displaying app element {show_input_name} with level {self.curr_display_lvl} {lvl_info})\n")
             to_disp = self.core.get_display(res_to_show, level=self.curr_display_lvl)
-            print(to_disp if to_disp.strip() else f"   < empty app element : {show_input_name} >\n")
+            print(to_disp if to_disp.strip() != '' else f"   < empty app element : {show_input_name} >\n")
             self.no_wipe_next()
 
     def after_show_vi_slct(self, mapid):
@@ -471,11 +471,16 @@ class CLIparser:
         print(vi.detail_str(self.curr_display_lvl))
         show_threats = self.get_user_confirm(marker=f"[{mapid}] Display threats linked with ? (y/N) :", empty_ok=False)
         if show_threats:
-            self.core.get_saved_events(mapid, target='threats')
+            th_str = self.core.get_saved_events(mapid, target='threats', to_str_lvl=self.curr_display_lvl, reverse=True)
+            print(f"vv Displaying Threats in chronological order vv\n{th_str}\n\n" if th_str != ''
+                  else f"No threat registered in Netmap for VI {mapid}\n")
         show_modifs = self.get_user_confirm(marker=f"[{mapid}] Display modifications linked with ? (y/N) :",
                                             empty_ok=False)
         if show_modifs:
-            self.core.get_saved_events(mapid, target='modifs')
+            mo_str = self.core.get_saved_events(mapid, target='modifs', to_str_lvl=self.curr_display_lvl, reverse=True)
+            print(f"vv Displaying Modifications in chronological order vv\n\n{mo_str}\n" if mo_str != ''
+                  else f"No modifications registered in Netmap for VI {mapid}\n")
+
         self.no_wipe_next()
 
     def after_show_modentry_slct(self, setid):
@@ -578,6 +583,7 @@ class CLIparser:
             try:
                 integrator = MI(f"{py_pkg}.{pymod_name}", library=self.core.modmanager, auto_integrate=False)
                 print(integrator)
+                print(self.core.modmanager)
                 integrate_ok = self.get_user_confirm(marker="Validate Module integration (Y/n) ? ")
                 if integrate_ok:
                     integrator.integrate_module()

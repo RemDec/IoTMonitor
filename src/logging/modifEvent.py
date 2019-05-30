@@ -42,15 +42,15 @@ class ModifEvent:
                 s += f"    no new state provided\n"
             else:
                 s += f"    new state is {self.new_state}\n"
-        elif level == 2:
+        elif level >= 2:
             if self.old_state is None:
-                s += f"    | no old state description provided\n"
+                s += f"----| no old state description provided\n"
             else:
-                s += f"    | old state description :\n{self.old_state}\n"
+                s += f"----| old state description :\n{self.old_state}\n"
             if self.new_state is None:
-                s += f"    | no new state description provided\n"
+                s += f"----| no new state description provided\n"
             else:
-                s += f"    | new state description is \n{self.new_state}\n"
+                s += f"----| new state description is \n{self.new_state}\n"
         return s
 
     def __str__(self):

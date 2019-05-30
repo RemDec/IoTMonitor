@@ -118,8 +118,13 @@ class Core:
     def get_all_mapids(self):
         return self.netmap.get_VI_mapids()
 
-    def get_saved_events(self, mapid, target='all'):
-        return self.netmap.get_saved_events_for_vi(mapid, target)
+    def get_saved_events(self, mapid, target='all', to_str_lvl=-1, reverse=False):
+        event_list = self.netmap.get_saved_events_for_vi(mapid, target)
+        if reverse:
+            event_list = reversed(event_list)
+        if to_str_lvl < 0:
+            return event_list
+        return '\n'.join(map(lambda e: e.detail_str(level=to_str_lvl), event_list))
 
     # ----- Output visualisation -----
 
