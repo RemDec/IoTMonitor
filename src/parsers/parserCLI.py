@@ -348,10 +348,10 @@ class CLIparser:
         while take_field:
             main_fields = dict.fromkeys(['mac', 'ip', 'hostname'])
             div_fields = vi.get_divfields()
-            print(f"Current virtual instance state with display level {self.curr_display_lvl} :\n"
+            print(f"Current virtual instance state with display level {self.curr_display_lvl} :\n\n"
                   f"{vi.detail_str(level=self.curr_display_lvl)}")
-            print(f"Select a field of this VI to edit or type a new field name to create it and fill it after (enter to"
-                  f"exit editing)\n"
+            print(f"Select VI field to edit or type a new field name to create it and fill it after (enter to"
+                  f" exit editing)\n"
                   f" |main fields: {'  '.join(main_fields.keys())}\n |div fields: {' '.join(div_fields.keys())}\n")
             field = self.get_user_in_or_dflt(default='', marker=f"[VI field] :").strip()
             if field != '':
@@ -514,8 +514,8 @@ class CLIparser:
                                      f"Give a name for the {res} file to save in (not full path but with extension),\n"
                                      f"default full path : {dflt}\n[filename] :")
         set_current = lambda res, path : \
-            self.get_user_confirm(marker=f"Use {path}\n as current file descriptor for {res}\n"
-            f" so that next (auto-)save will be done considering this file? (y/N) :", empty_ok=False)
+            self.get_user_confirm(marker=f"Use {path}\n  as current file descriptor for {res}\n"
+            f"  so that next (auto-)save will be done considering this file ? (y/N) :", empty_ok=False)
         if self.core_ctrl is not None:
             if target in ["routine", "app"]:
                 f = ask_path("routine", self.core_ctrl.paths['routine'])

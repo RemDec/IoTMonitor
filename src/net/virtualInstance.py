@@ -22,19 +22,42 @@ class VirtualInstance:
         self.div[key] = value
 
     def complete_fields(self, mac=None, ip=None, hostname=None, div={}):
-        self.mac = self.mac if mac is None or (self.user_created and self.mac is not None) else mac
-        self.ip = self.ip if ip is None or (self.user_created and self.ip is not None) else ip
-        self.hostname = self.hostname if hostname is None or (self.user_created and self.hostname is not None) \
-                                      else hostname
+        changed = False
+        if mac is not None:
+            if self.mac is None or not self.user_created:
+                self.mac = mac
+                changed = True
+        if ip is not None:
+            if self.ip is None or not self.user_created:
+                self.ip = ip
+                changed = True
+        if hostname is not None:
+            if self.hostname is None or not self.user_created:
+                self.hostname = hostname
+                changed = True
         for field, val in div.items():
             # Set field value if non existing or if it exists, set it if not created by user (consider as prior info)
             curr_field = self.div.get(field)
-            if curr_field is None:
-                print("selfdiv", type(self.div), "field", type(field)) #, "div[field]", type(self.div[field]), "val", type(val))
+            if val is not None  and (curr_field is None or not self.user_created):
                 self.div[field] = val
-            else:
-                if not self.user_created:
-                    self.div[field] = val
+                changed = True
+        return changed
+
+    # def complete_fields(self, mac=None, ip=None, hostname=None, div={}):
+    #     changed = False
+    #     self.mac = self.mac if mac is None or (self.user_created and self.mac is not None) else mac
+    #     self.ip = self.ip if ip is None or (self.user_created and self.ip is not None) else ip
+    #     self.hostname = self.hostname if hostname is None or (self.user_created and self.hostname is not None) \
+    #                                   else hostname
+    #     for field, val in div.items():
+    #         # Set field value if non existing or if it exists, set it if not created by user (consider as prior info)
+    #         curr_field = self.div.get(field)
+    #         if curr_field is None:
+    #             print("selfdiv", type(self.div), "field", type(field)) #, "div[field]", type(self.div[field]), "val", type(val))
+    #             self.div[field] = val
+    #         else:
+    #             if not self.user_created:
+    #                 self.div[field] = val
 
     def complete_fields_from_dict(self, fields_dict):
         given_div = dict([(key, val) for key, val in fields_dict.items() if key not in ['mac', 'ip', 'hostname']])
