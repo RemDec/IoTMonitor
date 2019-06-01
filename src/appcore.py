@@ -213,7 +213,7 @@ class Core:
             s += f" ||\n ++------- NETMAP  -------\n"
             s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=4)}"
         else:
-            last_feedback = self.get_event_center().pull_feedback(nbr_lines=4)
+            last_feedback = self.get_event_center().pull_feedback(nbr_lines=level)
             if last_feedback.strip() != '':
                 s += last_feedback + '_'*50 + "^^^ FEEDBACK BAR ^^^" + '_'*50 + '\n\n'
             s += f"=++====== Core application =========\n"

@@ -23,50 +23,38 @@ class VirtualInstance:
 
     def complete_fields(self, mac=None, ip=None, hostname=None, div={}):
         changed = False
-        if mac is not None:
+        if mac is not None and mac != self.mac:
             if self.mac is None or not self.user_created:
                 self.mac = mac
                 changed = True
-        if ip is not None:
+        if ip is not None and ip != self.ip:
             if self.ip is None or not self.user_created:
                 self.ip = ip
                 changed = True
-        if hostname is not None:
+        if hostname is not None and hostname != self.hostname:
             if self.hostname is None or not self.user_created:
                 self.hostname = hostname
                 changed = True
         for field, val in div.items():
             # Set field value if non existing or if it exists, set it if not created by user (consider as prior info)
             curr_field = self.div.get(field)
-            if val is not None  and (curr_field is None or not self.user_created):
+            if val != curr_field and (curr_field is None or not self.user_created):
                 self.div[field] = val
                 changed = True
         return changed
 
-    # def complete_fields(self, mac=None, ip=None, hostname=None, div={}):
-    #     changed = False
-    #     self.mac = self.mac if mac is None or (self.user_created and self.mac is not None) else mac
-    #     self.ip = self.ip if ip is None or (self.user_created and self.ip is not None) else ip
-    #     self.hostname = self.hostname if hostname is None or (self.user_created and self.hostname is not None) \
-    #                                   else hostname
-    #     for field, val in div.items():
-    #         # Set field value if non existing or if it exists, set it if not created by user (consider as prior info)
-    #         curr_field = self.div.get(field)
-    #         if curr_field is None:
-    #             print("selfdiv", type(self.div), "field", type(field)) #, "div[field]", type(self.div[field]), "val", type(val))
-    #             self.div[field] = val
-    #         else:
-    #             if not self.user_created:
-    #                 self.div[field] = val
-
     def complete_fields_from_dict(self, fields_dict):
         given_div = dict([(key, val) for key, val in fields_dict.items() if key not in ['mac', 'ip', 'hostname']])
-        self.complete_fields(mac=fields_dict.get('mac'), ip=fields_dict.get('ip'), hostname=fields_dict.get('hostname'),
-                             div=given_div)
+        return self.complete_fields(mac=fields_dict.get('mac'), ip=fields_dict.get('ip'),
+                                    hostname=fields_dict.get('hostname'), div=given_div)
 
     def complete_ports_table(self, new_vals_dict, replacing=True):
+        changed = False
         for portnum, new_port_info in new_vals_dict.items():
-            self.ports_table.complete_portinfos(portnum, new_port_info, replacing)
+            if self.ports_table.complete_portinfos(portnum, new_port_info, replacing):
+                print("Modif for", portnum, " with new infos in", new_port_info)
+                changed = True
+        return changed
 
     def used_fields(self):
         used = {}
@@ -167,7 +155,7 @@ class VirtualInstance:
                  f" | IP : {self.ip}\n" \
                  f" | Hostname : {self.hostname}\n" \
                  f" |--Registered ports table :\n"
-            s += self.ports_table.detail_str(level=2)
+            s += self.ports_table.detail_str(level=level)
             s += f" |--Other divers fields :\n"
             for field, value in self.div.items():
                 s += f" | {field} = {value if value != '' else '<empty>'}\n"
@@ -228,23 +216,28 @@ class PortTable:
         if entry is None:
             if creating:
                 self.set_port(num, infos)
-            return
+            return True
+        changed = False
         if isinstance(infos, tuple):
             infos = self.tupleinfo_to_dict(infos)
         for field, val in infos.items():
             if field in entry:
                 # Main field
-                if replacing:
+                if val != entry.get(field) and (replacing or entry[field] in ['', 'unknown', {}, None]):
                     entry[field] = val
-                elif entry[field] in ['unknown', {}]:
-                    entry[field] = val
+                    changed = True
             else:
                 # Diverse info in div dict
                 if field in self.get_divinfos(num):
-                    if replacing:
+                    if replacing and val != self.get_divinfos(num).get(field):
+                        print(num, "replacing existent field ", field, " val from", self.get_divinfos(num).get(field),"to", val)
                         self.set_divinfo(num, field, val)
+                        changed = True
                 else:
+                    print(num, "setting nonexistent field", field, "to", val)
                     self.set_divinfo(num, field, val)
+                    changed = True
+        return changed
 
     def list_ports(self, only_open=False):
         if not only_open:
@@ -290,14 +283,18 @@ class PortTable:
     def is_empty(self):
         return self.table == {}
 
-    def str_ports_list(self, header=None, empty_str="Empty ports table\n"):
+    def str_ports_list(self, header=None, empty_str="Empty ports table\n", fct_per_port=None):
         if self.is_empty():
             return empty_str
         s = "Registered ports with <service, protocol, state>\n" if header is None else header
         ports = sorted(self.table.keys())
         for port in ports:
-            (service, prot, state) = self.get_maininfos(port)
-            s += f" | {port} : < {service}, {prot}, {state} >\n"
+            if fct_per_port is None:
+                (service, prot, state) = self.get_maininfos(port)
+                has_div = ' [+]' if self.get_divinfos(port) else ''
+                s += f" | {port} : < {service}, {prot}, {state} >{has_div}\n"
+            else:
+                s += fct_per_port(port)
         return s
 
     def detail_str(self, level=0):
@@ -307,7 +304,7 @@ class PortTable:
             return f"Registered ports in table : {', '.join(map(str,self.list_ports()))}"
         elif level == 1:
             return self.str_ports_list()
-        else:
+        elif level == 2:
             ports = sorted(self.table.keys())
             services, prots, states = [], [], []
             headers = [" Ports nbr ", " services ", " protocols ", " states "]
@@ -332,6 +329,28 @@ class PortTable:
                 if i != len(ports)-1:
                     s += '\n'
             return str_lines_frame(s)
+        else:
+            def fct_per_port(port):
+                service, prot, state, div = self.get_infos(num=port)
+                s = f" | < {service}, {prot}, {state} >\n"
+                if len(div) == 0:
+                    s = s[:-1] + " (no other div field)\n"
+                else:
+                    div = div.copy()
+                    for cpe_part in ['App', 'Hw', 'Os']:
+                        cpe_val = div.pop(cpe_part, False)
+                        if cpe_val:
+                            s += f" |   +- CPE {cpe_part}: {cpe_val}\n"
+                    while len(div) > 0:
+                        others = ''
+                        for divkey in sorted(div.keys()):
+                            others += f"{divkey}:{div.pop(divkey, 'unknown')}, "
+                            if len(others) > 300:
+                                break
+                        s += f" |    +- divs: {others[:-2]}\n"
+                return s
+            return self.str_ports_list(header="Registered ports with <service, protocol, state> and diverse fields\n",
+                                       fct_per_port=fct_per_port)
 
     def __str__(self):
         return self.detail_str(1)

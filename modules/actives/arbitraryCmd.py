@@ -54,6 +54,7 @@ class AModArbitraryCmd(ActiveModule):
 
     def stop(self):
         super().terminate_threads()
+        super().purge_threadlist()
 
     def get_script_thread(self, rel_to_vi=[]):
         # instancing generic thread defined in superclass for active modules

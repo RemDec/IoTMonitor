@@ -467,7 +467,7 @@ class CLIparser:
     def after_show_vi_slct(self, mapid):
         vi = self.core.get_from_netmap(mapid)
         lvl_info = f"(increase it with $set lvl {self.curr_display_lvl+1}" if self.curr_display_lvl < 2 else ''
-        print(f"Displaying VI informations with level {self.curr_display_lvl} {lvl_info})\n")
+        print(f"Displaying VI informations with level {self.curr_display_lvl} {lvl_info}\n")
         print(vi.detail_str(self.curr_display_lvl))
         show_threats = self.get_user_confirm(marker=f"[{mapid}] Display threats linked with ? (y/N) :", empty_ok=False)
         if show_threats:

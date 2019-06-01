@@ -48,11 +48,12 @@ class AModNmapExplorer(ActiveModule):
         for host in hosts:
             state = host.find('status').get('state', 'unknown')
             ip, mac, other = parser.addr_from_host(host, lambda a: [('manufacturer', a.get('vendor'))])
+            hostname = parser.hostname_from_host(host)
             div = {'manufacturer': other['manufacturer']} if other.get('manufacturer') is not None else {}
             if self.netmap is not None:
-                mapid = self.netmap.get_similar_VI(mac=mac, ip=ip)
+                mapid = self.netmap.get_similar_VI(mac=mac, ip=ip, hostname=hostname)
                 if mapid is None:
-                    mapid, vi = self.netmap.create_VI(mac=mac, ip=ip, div=div)
+                    mapid, vi = self.netmap.create_VI(mac=mac, ip=ip, hostname=hostname, div=div)
                     changed += 1
                     vi.set_state(state)
                     self.netmap.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
@@ -61,16 +62,17 @@ class AModNmapExplorer(ActiveModule):
                 else:
                     vi = self.netmap.get_VI(mapid)
                     old = vi.detail_str(2)
-                    changed_this_vi = vi.complete_fields(mac=mac, ip=ip, div=div)
+                    changed_this_vi = vi.complete_fields(mac=mac, ip=ip, hostname=hostname, div=div)
                     if changed_this_vi:
                         self.netmap.register_modif('VI ' + mapid, obj_type='virt_inst', obj_id=mapid,
                                                    modificator=self.m_id, old_state=old, new_state=vi.detail_str(2),
                                                    logit_with_lvl=20)
                         changed += 1
+        name = f"Module [{self.m_id}]"
         if changed:
-            logging.log_feedback(f"Module [{self.m_id}] created/updated {changed} VIs")
+            logging.log_feedback(f"{name} created/updated {changed} VIs")
         else:
-            logging.log_feedback(f"Module [{self.m_id}] did not find any new information in {len(hosts)} VIs analyzed")
+            logging.log_feedback(f"{name} didn't find any new information amongst {len(hosts)} hosts analyzed")
 
     def distrib_output(self, script_output, rel_to_vi=[]):
         if isinstance(script_output[0], int):
