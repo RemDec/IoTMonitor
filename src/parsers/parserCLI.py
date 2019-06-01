@@ -583,7 +583,6 @@ class CLIparser:
             try:
                 integrator = MI(f"{py_pkg}.{pymod_name}", library=self.core.modmanager, auto_integrate=False)
                 print(integrator)
-                print(self.core.modmanager)
                 integrate_ok = self.get_user_confirm(marker="Validate Module integration (Y/n) ? ")
                 if integrate_ok:
                     integrator.integrate_module()

@@ -57,11 +57,23 @@ class Netmap:
                ids.append(mapid)
         return ids
 
+    def get_VIs_from_mapids(self, mapids_list):
+        return [self.get_VI(mapid) for mapid in mapids_list if self.get_VI(mapid) is not None]
+
     def get_similar_VI(self, mac=None, ip=None, hostname=None, div={}):
         for mapid in self.map:
             vi = self.map[mapid]
             if vi.repr_same_device(mac, ip, hostname, div):
                 return mapid
+
+    def map_fct_on_VIs(self, mapids, fct, purge=False):
+        applied = list(map(fct, self.get_VIs_from_mapids(mapids)))
+        if not purge:
+            return applied
+        return [info for info in applied if info is not None]
+
+    def get_IPs_from_mapids(self, mapids):
+        return self.map_fct_on_VIs(mapids, lambda vi: vi.get_ip(), purge=True)
 
     # ----- Events interactions (saved for VI and logged in event center) -----
 

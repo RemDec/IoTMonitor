@@ -232,7 +232,7 @@ class ModDescriptor:
     def defparam_to_xml(self):
         params = E.defparams()
         for parname, (defval, mand, prefix) in self.PARAMS.items():
-            desc = self.desc_params.get(parname)
+            desc = self.desc_params.get(parname, 'no description')
             attributes = {'code': parname, 'mandatory': str(mand), 'default': defval, 'prefix': prefix}
             params.append(E.param(desc, attributes))
         return params

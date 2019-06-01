@@ -11,7 +11,7 @@ class ThreatEvent:
         self.patch = patch
 
     def set_threat_lvl(self, lvl):
-        self.level = max(1, min(5, lvl))
+        self.level = max(1, min(10, int(lvl)))
 
     def rel_to_vi(self):
         if self.mapid is None or self.mapid == "":

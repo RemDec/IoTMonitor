@@ -14,7 +14,7 @@ class AModNmapPortDisc(ActiveModule):
         self.PARAMS = {'options': ("", False, ""),
                        'nbrports': ("50", True, "--top-ports "),
                        'version': ("false", True, "-sV"),
-                       'XMLfile': ("/tmp/xml_nmap_portdisc.xml", True, "-oX "),
+                       'XMLfile': ("/tmp/nmap_portdisc.xml", True, "-oX "),
                        'IP': (get_ip(mask=24), True, "")
                        }
         self.desc_PARAMS = {'options': "Others options to pass to nmap scan",
@@ -35,16 +35,20 @@ class AModNmapPortDisc(ActiveModule):
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
     def parse_output(self, output):
+        if self.netmap is None:
+            return
         try:
             parser = NmapParser(output)
         except etree.XMLSyntaxError:
+            import logging
+            logging.getLogger('error').exception("Nmapparser were unable to parse XML tree result of PortDiscovery")
             return
         hosts = parser.get_hosts()
         div_port_attrs = ('product', 'version', 'extrainfo', 'conf')
         changed_vi = 0
         changed_table = 0
         for host_elmt in hosts:
-            ip, mac, _ = parser.addr_from_host(host_elmt)
+            mac, ip, _ = parser.addr_from_host(host_elmt)
             hostname = parser.hostname_from_host(host_elmt)
             state = parser.state_from_host(host_elmt)
             table = {}

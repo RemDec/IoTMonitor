@@ -163,7 +163,7 @@ class TlsSMTPHandlerErrorFree(logging.handlers.SMTPHandler):
 
 
 if __name__ == "__main__":
-    l = CustomLoggerSetup(email='remydecocq@gmail.com', email_pwd='Codelyokotsuno99', mail_server='smtp.gmail.com')
+    l = CustomLoggerSetup()
     print(l)
     logging.getLogger("cli").debug("Logger that alert user in cli directly")
     logging.getLogger("mail").critical("Critical thread sent by email")

@@ -1,5 +1,5 @@
 from modules.abcModule import *
-from src.utils.misc_fcts import get_infoname_py
+from src.utils.misc_fcts import get_infoname_py, log_feedback_available
 import threading
 import subprocess
 
@@ -81,7 +81,7 @@ class ScriptThread(threading.Thread):
 
     def run(self):
         cmd_as_shell = isinstance(self.cmd, str)
-        logging.log_feedback(f"Starting {super().getName()}", 'debug')
+        log_feedback_available(f"Starting {super().getName()}", 'debug')
         # logging.getLogger("debug").debug(f"Starting {super().getName()}")
         self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE,
                                       stderr=subprocess.STDOUT, universal_newlines=True,

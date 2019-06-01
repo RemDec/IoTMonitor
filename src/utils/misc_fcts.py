@@ -24,6 +24,14 @@ def has_method(obj, name):
     return callable(getattr(obj, name, None))
 
 
+def log_feedback_available(msg, logitin='info', lvl=20):
+    import logging
+    if has_method(logging, 'log_feedback'):
+        logging.log_feedback(msg, logitin=logitin, lvl=lvl)
+    else:
+        logging.getLogger(logitin).log(level=lvl, msg=msg)
+
+
 def obj_str(obj, level=0):
     if has_method(obj, 'detail_str'):
         return obj.detail_str(level=level)
@@ -71,6 +79,25 @@ def pretty_str_curr_param(current, defaults, descriptions={}, prefix=''):
         s += f"{prefix}~{code}   {descriptions.get(code, '(no description provided)')}\n"
         s += f"{prefix} - value ({m}) : {current.get(code, defval)}\n"
     return s
+
+
+def treat_params(scheme_params, given_params):
+    final_par = {}
+    for par, val in scheme_params.items():
+        if given_params.get(par):
+            # Parameter is given as is
+            final_par[par] = given_params[par]
+        elif val[1]:
+            # Not given parameter but mandatory -> take default
+            final_par[par] = val[0]
+    return final_par
+
+
+def get_sep_modparams(modinstance):
+    _, PARAMS, _ = modinstance.get_params()
+    mandatory = [param_code for param_code in PARAMS if PARAMS[param_code][1]]
+    optional = [param_code for param_code in PARAMS if not PARAMS[param_code][1]]
+    return mandatory, optional
 
 
 def replace_in_dicts(dic, key, apply_fct):
@@ -154,22 +181,16 @@ def get_root_path():
     return Path(__file__).parent.parent.parent
 
 
-def get_sep_modparams(modinstance):
-    _, PARAMS, _ = modinstance.get_params()
-    mandatory = [param_code for param_code in PARAMS if PARAMS[param_code][1]]
-    optional = [param_code for param_code in PARAMS if not PARAMS[param_code][1]]
-    return mandatory, optional
-
-
 def write_modlib(file_dest=None):
-    from modules.actives import arbitraryCmd, nmapExplorer, nmapPortDiscovery
+    from modules.actives import arbitraryCmd, nmapExplorer, nmapPortDiscovery, nmapVulners
     from modules.passives import arbitraryCmdBg, pingTarget
     from src.utils.moduleManager import ModManager
     from src.utils.filesManager import get_dflt_entry
 
     if file_dest is None:
         file_dest = get_dflt_entry('dflt_lib')
-    actives = [arbitraryCmd.AModArbitraryCmd(), nmapExplorer.AModNmapExplorer(), nmapPortDiscovery.AModNmapPortDisc()]
+    actives = [arbitraryCmd.AModArbitraryCmd(), nmapExplorer.AModNmapExplorer(), nmapPortDiscovery.AModNmapPortDisc(),
+               nmapVulners.AModNmapVulners()]
     passives = [arbitraryCmdBg.PModArbitraryCmdBg(), pingTarget.PModPing()]
     mod_instances = actives + passives
     ModManager(str(file_dest)).create_modlib(mod_instances)

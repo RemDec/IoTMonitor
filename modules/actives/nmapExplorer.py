@@ -15,7 +15,6 @@ class AModNmapExplorer(ActiveModule):
 
     def __init__(self, params=None, netmap=None):
         super().__init__(netmap)
-        subnetwork = get_ip(mask='24')
         self.m_id = "nmapexplo"
         self.CMD = "nmap -sn"
         subnetwork = get_ip(mask='24')
@@ -39,15 +38,19 @@ class AModNmapExplorer(ActiveModule):
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
     def parse_output(self, output):
+        if self.netmap is None:
+            return
         try:
             parser = NmapParser(output)
         except etree.XMLSyntaxError:
+            import logging
+            logging.getLogger('error').exception("Nmapparser were unable to parse XML tree result of nmapExplorer")
             return
         hosts = parser.get_hosts()
         changed = 0
         for host in hosts:
             state = host.find('status').get('state', 'unknown')
-            ip, mac, other = parser.addr_from_host(host, lambda a: [('manufacturer', a.get('vendor'))])
+            mac, ip, other = parser.addr_from_host(host, lambda a: [('manufacturer', a.get('vendor'))])
             hostname = parser.hostname_from_host(host)
             div = {'manufacturer': other['manufacturer']} if other.get('manufacturer') is not None else {}
             if self.netmap is not None:

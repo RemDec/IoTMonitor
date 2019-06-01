@@ -106,7 +106,7 @@ class NmapParser:
             list_pairs = add_info_fct(addr)
             for key, got_val in list_pairs:
                 others[key] = got_val
-        return ip, mac, others
+        return mac, ip, others
 
     def hostname_from_host(self, host_elmt, list_all=False):
         """From an host element, retrieve its found hostname(s)
@@ -125,11 +125,18 @@ class NmapParser:
         if len(names) > 0:
             return names[0]
 
+    def state_from_host(self, host_elmt):
+        return host_elmt.find('status').get('state')
+
     def portlist_from_host(self, host_elmt):
         return self.get_host_fields(host_elmt, fields=('port',))['port']
 
-    def state_from_host(self, host_elmt):
-        return host_elmt.find('status').get('state')
+    def maininfos_from_port(self, port_elmt):
+        service_elmt = port_elmt.find('service')
+        service = service_elmt.get('name') if service_elmt is not None else 'unknown'
+        state_elmt = port_elmt.find('state')
+        state = state_elmt.get('state') if state_elmt is not None else 'unknown'
+        return port_elmt.get('portid', 0), service, port_elmt.get('protocol', 'unknown'), state
 
 
 def cpes_to_dict(cpes):

@@ -52,7 +52,6 @@ class VirtualInstance:
         changed = False
         for portnum, new_port_info in new_vals_dict.items():
             if self.ports_table.complete_portinfos(portnum, new_port_info, replacing):
-                print("Modif for", portnum, " with new infos in", new_port_info)
                 changed = True
         return changed
 
@@ -230,11 +229,9 @@ class PortTable:
                 # Diverse info in div dict
                 if field in self.get_divinfos(num):
                     if replacing and val != self.get_divinfos(num).get(field):
-                        print(num, "replacing existent field ", field, " val from", self.get_divinfos(num).get(field),"to", val)
                         self.set_divinfo(num, field, val)
                         changed = True
                 else:
-                    print(num, "setting nonexistent field", field, "to", val)
                     self.set_divinfo(num, field, val)
                     changed = True
         return changed
