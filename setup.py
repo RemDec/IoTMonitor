@@ -1,3 +1,4 @@
+from src.utils.filesManager import clean_last_files
 from setuptools import setup
 
 setup(name='IoTMonitor',
@@ -9,3 +10,5 @@ setup(name='IoTMonitor',
       license='GNU',
       packages=['src', 'modules'],
       install_requires=['lxml'])
+
+clean_last_files()
