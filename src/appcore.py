@@ -1,14 +1,15 @@
 from src.coreConfig import CoreConfig
-from src.utils.misc_fcts import obj_str
+from src.utils.misc_fcts import obj_str, log_feedback_available
 import signal
 
 
 class Core:
 
     def __init__(self, coreconfig=None):
-        signal.signal(signal.SIGINT, self.interrupt_handler)
         if coreconfig is None:
             coreconfig = CoreConfig()
+        log_feedback_available('Instantiation of AppCore considering CoreConfig'+coreconfig.detail_str(level=0))
+        signal.signal(signal.SIGINT, self.interrupt_handler)
         self.coreconfig = coreconfig
         self.logger_setup = coreconfig.logger_setup
         self.modmanager = coreconfig.modmanager
@@ -23,6 +24,7 @@ class Core:
         self.code_components = {'app': self, 'routine': self.routine, 'netmap': self.netmap, 'indep': self.indep_mods,
                                 'timer': self.timer, 'library': self.modmanager,
                                 'events': self.get_event_center()}
+        log_feedback_available('Finished instantiation of AppCore and its components')
 
     # ----- Modules library interactions -----
 
@@ -157,6 +159,7 @@ class Core:
             self.routine.stop()
 
     def interrupt_handler(self, sig, frame):
+        log_feedback_available('AppCore execution flow interrupted due to signal '+str(sig))
         self.quit()
 
     def corresp_target(self, target_str):

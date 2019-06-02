@@ -1,4 +1,5 @@
 from modules.abcActiveModule import *
+from src.utils.misc_fcts import log_feedback_available
 # permits CLI arguments smart parsing
 import shlex
 
@@ -34,13 +35,13 @@ class AModArbitraryCmd(ActiveModule):
             code, popen = script_output
             output = popen.stdout.read()
             # if code OK, should parse results to integrate in app (netmap, alert threats, ..)
-            logging.log_feedback(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='info')
+            log_feedback_available(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='info')
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             # pull info from exception
             py_except, popen = script_output
-            logging.log_feedback(f"Module [{self.m_id}] execution raised exception :{py_except}",
-                                 logitin='error', lvl='error')
+            log_feedback_available(f"Module [{self.m_id}] execution raised exception :{py_except}",
+                                   logitin='error', lvl='error')
 
     def launch(self, rel_to_vi=[]):
         # start a thread for cmd + params execution

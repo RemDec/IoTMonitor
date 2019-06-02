@@ -167,6 +167,10 @@ def cpes_to_dict(cpes):
     return cpes_typed
 
 
+def iplist_to_nmap(iplist):
+    return ' '.join(iplist)
+
+
 if __name__ == '__main__':
     cpe1 = 'cpe:/a:lighttpd:lighttpd'
     cpe2 = 'cpe:/a:samba:samba:3'

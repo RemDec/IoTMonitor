@@ -1,5 +1,5 @@
 from modules.abcFacilityActiveModule import FacilityActiveModule
-from src.parsers.nmapOutputParser import NmapParser, cpes_to_dict
+from src.parsers.nmapOutputParser import NmapParser, cpes_to_dict, iplist_to_nmap
 from src.net.virtualInstance import PortTable
 from src.utils.misc_fcts import get_ip, log_feedback_available
 from lxml import etree
@@ -41,8 +41,15 @@ class AModNmapVulners(FacilityActiveModule):
     def build_final_cmd(self, rel_to_vi=[]):
         cmd = self.get_cmd() + ' '
         for param, val in self.get_curr_params().items():
-            prefix = self.scheme[param][2]
-            cmd += prefix + val + ' '
+            if param == 'IP':
+                iplist = val
+                if len(rel_to_vi) > 0 and self.netmap is not None:
+                    # Replace IPs to consider by specified ones
+                    iplist = iplist_to_nmap(self.netmap.get_IPs_from_mapids(rel_to_vi))
+                cmd += iplist + ' '
+            else:
+                prefix = self.scheme[param][2]
+                cmd += prefix + val + ' '
         cmd += '> /dev/null && cat ' + self.get_curr_params()['XMLfile']
         return cmd
 
@@ -74,6 +81,7 @@ class AModNmapVulners(FacilityActiveModule):
                                            logit_with_lvl=20)
             else:
                 vi = self.netmap.get_VI(mapid)
+                vi.set_state(state)
                 old = vi.detail_str(2)
                 old_portstable = vi.get_ports_table().detail_str(level=3)
                 if vi.complete_fields(mac=mac, ip=ip, hostname=hostname):

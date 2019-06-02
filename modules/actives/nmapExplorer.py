@@ -1,6 +1,6 @@
 from modules.abcActiveModule import *
-from src.utils.misc_fcts import get_ip
-from src.parsers.nmapOutputParser import NmapParser
+from src.utils.misc_fcts import get_ip, log_feedback_available
+from src.parsers.nmapOutputParser import NmapParser, iplist_to_nmap
 from lxml import etree
 
 
@@ -21,7 +21,7 @@ class AModNmapExplorer(ActiveModule):
         self.PARAMS = {"options": ("", False, ""),
                        "SYNports": ("21,22,23,80,443,3389", True, "-PS"),
                        "UDPports": ("53,135,137,161", True, "-PU"),
-                       "XMLfile": ("/tmp/xml_nmapexplo.xml", True, "-oX "),
+                       "XMLfile": ("/tmp/nmapexplo.xml", True, "-oX "),
                        "IP": (subnetwork, True, "")
                        }
         self.desc_PARAMS = desc_PARAMS
@@ -64,6 +64,7 @@ class AModNmapExplorer(ActiveModule):
                                                logit_with_lvl=20)
                 else:
                     vi = self.netmap.get_VI(mapid)
+                    vi.set_state(state)
                     old = vi.detail_str(2)
                     changed_this_vi = vi.complete_fields(mac=mac, ip=ip, hostname=hostname, div=div)
                     if changed_this_vi:
@@ -73,26 +74,33 @@ class AModNmapExplorer(ActiveModule):
                         changed += 1
         name = f"Module [{self.m_id}]"
         if changed:
-            logging.log_feedback(f"{name} created/updated {changed} VIs")
+            log_feedback_available(f"{name} created/updated {changed} VIs")
         else:
-            logging.log_feedback(f"{name} didn't find any new information amongst {len(hosts)} hosts analyzed")
+            log_feedback_available(f"{name} didn't find any new information amongst {len(hosts)} hosts analyzed")
 
     def distrib_output(self, script_output, rel_to_vi=[]):
         if isinstance(script_output[0], int):
             code, popen = script_output
             output = popen.stdout
-            logging.log_feedback(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='info')
+            log_feedback_available(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='info')
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             py_except, popen = script_output
-            logging.log_feedback(f"Module [{self.m_id}] execution raised exception :{py_except}",
-                                 logitin='error', lvl='error')
+            log_feedback_available(f"Module [{self.m_id}] execution raised exception :{py_except}",
+                                   logitin='error', lvl='error')
 
     def launch(self, rel_to_vi=[]):
         super().purge_threadlist()
         cmd = self.CMD + ' '
         for param, val in self.params.items():
-            cmd += self.PARAMS[param][2] + val + ' '
+            if param == 'IP':
+                iplist = val
+                if len(rel_to_vi) > 0 and self.netmap is not None:
+                    # Replace IPs to consider by specified ones
+                    iplist = iplist_to_nmap(self.netmap.get_IPs_from_mapids(rel_to_vi))
+                cmd += iplist + ' '
+            else:
+                cmd += self.PARAMS[param][2] + val + ' '
         cmd += '> /dev/null && cat ' + self.params['XMLfile']
         s_thread = self.get_script_thread()
         s_thread.start(cmd)
@@ -109,7 +117,7 @@ class AModNmapExplorer(ActiveModule):
 
     def get_description(self):
         return f"[{self.m_id}] Nmap scan to discover hosts (-sn mode, no port scanning)" \
-               f" by SYN/UDP probing on common ports (need sudo)"
+               f" by SYN/UDP probing on common ports (really fast)"
 
     def get_module_id(self):
         return self.m_id
@@ -118,7 +126,6 @@ class AModNmapExplorer(ActiveModule):
 if __name__ == '__main__':
     from src.logging.eventsCenter import *
     EventsCenter()
-    print(logging.log_feedback)
     nmap = AModNmapExplorer()
     print(nmap)
     nmap.launch()

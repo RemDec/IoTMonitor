@@ -1,6 +1,6 @@
 from modules.abcActiveModule import *
 # import logging is done in superclass abcModule
-
+from src.utils.misc_fcts import log_feedback_available
 
 class AModNameMod(ActiveModule):
 
@@ -41,14 +41,14 @@ class AModNameMod(ActiveModule):
             code, popen = script_output
             output = popen.stdout.read()
             # Logging through feedback system (capturing it to be displayed in app and really logged after)
-            logging.log_feedback(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='info')
+            log_feedback_available(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='info')
             # if code OK, should parse results to integrate in app (netmap, alert threats, ..)
             self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             # pull info from exception and log it
             py_except, popen = script_output
-            logging.log_feedback(f"Module [{self.m_id}] execution raised exception :{py_except}",
-                                 logitin='error', lvl='error')
+            log_feedback_available(f"Module [{self.m_id}] execution raised exception :{py_except}",
+                                   logitin='error', lvl='error')
 
     def launch(self, rel_to_vi=[]):
         # Start a new thread as given by get_script_thread() and pass it the command, built from get_cmd() that

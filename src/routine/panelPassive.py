@@ -142,7 +142,7 @@ class PanelEntry:
             self.rel_to_vi = rel_to_vi
 
     def launch_module(self):
-        self.module.launch(rel_to_vi=self.rel_to_vi, read_interv=self.module.get_read_interval())
+        self.module.launch(rel_to_vi=self.rel_to_vi)
 
     def stop_module(self):
         self.module.stop()

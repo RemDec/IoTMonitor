@@ -1,6 +1,6 @@
 from modules.abcModule import *
 from src.utils.timer import *
-from src.utils.misc_fcts import get_infoname_py
+from src.utils.misc_fcts import get_infoname_py, log_feedback_available
 from time import sleep
 import threading
 import subprocess
@@ -20,7 +20,7 @@ class PassiveModule(Module):
         pass
 
     @abc.abstractmethod
-    def new_comm_thread(self, timer, read_interv, rel_to_vi=[]):
+    def new_comm_thread(self, rel_to_vi=[]):
         pass
 
     @abc.abstractmethod
@@ -82,7 +82,7 @@ class PassiveModule(Module):
             if wait_interv:
                 sleep(wait_interv)
         if i > self.max_shutdown_time:
-            logging.getLogger("debug").debug("Some module remains unterminable :", self)
+            log_feedback_available(f"Some module underlying process remains unterminable : {self}", logitin='error', lvl=40)
             return False
         return True
 
@@ -133,7 +133,7 @@ class BackgroundThread(threading.Thread):
 
     def run(self):
         cmd_as_shell = isinstance(self.cmd, str)
-        logging.log_feedback(f"Starting {super().getName()}", logitin='info')
+        log_feedback_available(f"Starting {super().getName()}", logitin='info')
         self.popen = subprocess.Popen(self.cmd,
                                       stdout=subprocess.PIPE if self.output_stream is None else self.output_stream,
                                       stderr=subprocess.STDOUT,
@@ -227,7 +227,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
         if self.read_fct is not None:
             self.read_fct(output, self.rel_to_vi)
         else:
-            logging.log_feedback(f"Read function is None for commthread {super().getName()}", logitin='error')
+            log_feedback_available(f"Read function is None for commthread {super().getName()}", logitin='error')
 
     def read_pipe(self):
         # start program running in exec thread output treatment
@@ -238,7 +238,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
             self.pipe_r.close()
 
     def run(self):
-        logging.log_feedback(f"Starting {super().getName()}", logitin='info')
+        log_feedback_available(f"Starting {super().getName()}", logitin='info')
         self.set_reading()
 
     def start(self, pipe_output):

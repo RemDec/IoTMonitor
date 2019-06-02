@@ -167,7 +167,7 @@ class QueueEntry:
         if self.exp_timer >= 1:
             self.exp_timer -= 1
         else:
-            self.module.launch()
+            self.module.launch(rel_to_vi=self.rel_to_vi)
             self.exp_timer = self.init_timer
 
     def set_timer(self, new_timer):

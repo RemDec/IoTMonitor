@@ -126,9 +126,9 @@ class VirtualInstance:
         if self.state == 'unknown':
             return '?'
         elif self.state == 'up':
-            return 'v'
+            return 'up'
         elif self.state == 'down':
-            return 'n'
+            return 'down'
 
     def get_defined_fields(self):
         s = f"{'' if self.mac is None else 'MAC, '}" \

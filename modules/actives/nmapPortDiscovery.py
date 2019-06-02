@@ -1,6 +1,6 @@
 from modules.abcActiveModule import *
-from src.utils.misc_fcts import get_ip
-from src.parsers.nmapOutputParser import NmapParser, cpes_to_dict
+from src.utils.misc_fcts import get_ip, log_feedback_available
+from src.parsers.nmapOutputParser import NmapParser, cpes_to_dict, iplist_to_nmap
 from src.net.virtualInstance import PortTable
 from lxml import etree
 
@@ -82,6 +82,7 @@ class AModNmapPortDisc(ActiveModule):
                 changed_table += 1
             else:
                 vi = self.netmap.get_VI(mapid)
+                vi.set_state(state)
                 old = vi.detail_str(2)
                 old_portstable = vi.get_ports_table().detail_str(level=3)
                 changed_this_vi = vi.complete_fields(mac=mac, ip=ip, hostname=hostname)
@@ -99,9 +100,9 @@ class AModNmapPortDisc(ActiveModule):
                                                new_state=new_portstable, logit_with_lvl=20)
         name = f"Module [{self.m_id}]"
         if changed_vi+changed_table:
-            logging.log_feedback(f"{name} created/updated {changed_vi} VIs and {changed_table} of their ports tables")
+            log_feedback_available(f"{name} created/updated {changed_vi} VIs and {changed_table} of their ports tables")
         else:
-            logging.log_feedback(f"{name} didn't find any new information amongst {len(hosts)} hosts analyzed")
+            log_feedback_available(f"{name} didn't find any new information amongst {len(hosts)} hosts analyzed")
 
     def distrib_output(self, script_output, rel_to_vi=[]):
         # function called by ending exec thread with script_output as a tuple summarizing how it ended
@@ -109,14 +110,14 @@ class AModNmapPortDisc(ActiveModule):
             code, popen = script_output
             output = popen.stdout
             # if code OK, should parse results to integrate in app (netmap, alert threats, ..)
-            logging.log_feedback(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='debug')
+            log_feedback_available(f"Module [{self.m_id}] execution returned (code {code})", logitin='info', lvl='debug')
             if self.netmap is not None:
                 self.parse_output(output)
         elif isinstance(script_output[0], Exception):
             # pull info from exception
             py_except, popen = script_output
-            logging.log_feedback(f"Module [{self.m_id}] execution raised exception :{py_except}",
-                                 logitin='error', lvl='error')
+            log_feedback_available(f"Module [{self.m_id}] execution raised exception :{py_except}",
+                                   logitin='error', lvl='error')
 
     def launch(self, rel_to_vi=[]):
         super().purge_threadlist()
@@ -124,6 +125,11 @@ class AModNmapPortDisc(ActiveModule):
         for param, val in self.params.items():
             if param == 'version':
                 cmd += '-sV ' if val == 'true' else ''
+            elif param == 'IP':
+                iplist = val
+                if len(rel_to_vi) > 0 and self.netmap is not None:
+                    iplist = iplist_to_nmap(self.netmap.get_IPs_from_mapids(rel_to_vi))
+                cmd += iplist + ' '
             else:
                 cmd += self.PARAMS[param][2] + val + ' '
         cmd += '> /dev/null && cat ' + self.params['XMLfile']

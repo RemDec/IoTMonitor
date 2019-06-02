@@ -145,8 +145,9 @@ class CoreConfig:
     def detail_str(self, level=1):
         use_paths = "non defaults values for some resource paths" if len(self.paths) > 0 else "all paths as defaults"
         s = f"Core config maintaining {use_paths}\n"
-        s += f"Instantiated from file {self.get_cfg_file()}\n"
+        s += f"Instantiated from file {self.get_cfg_file()}"
         if level > 0:
+            s += '\n'
             for obj, given_path in self.paths.items():
                 s += f"  | {obj} : {given_path}\n"
             s += "Instantiated objects maintained :\n"
