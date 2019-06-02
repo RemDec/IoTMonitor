@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='ASCII'?>
+<xmlsave>
+  <netmap>
+    <instances>
+      <virtinst mapid="device0" usercreated="False">
+        <mainfields mac="38:35:FB:56:16:BD" ip="192.168.1.1" hostname="mymodem"/>
+        <divfields/>
+        <portstable>
+          <port portnum="21">
+            <maininfos service="ftp" protocol="TCP" state="filtered"/>
+            <divportinfos conf="3"/>
+          </port>
+          <port portnum="22">
+            <maininfos service="ssh" protocol="TCP" state="filtered"/>
+            <divportinfos conf="3"/>
+          </port>
+          <port portnum="23">
+            <maininfos service="telnet" protocol="TCP" state="filtered"/>
+            <divportinfos conf="3"/>
+          </port>
+          <port portnum="80">
+            <maininfos service="http" protocol="TCP" state="open"/>
+            <divportinfos product="lighttpd" conf="10" App="cpe:/a:lighttpd:lighttpd"/>
+          </port>
+          <port portnum="443">
+            <maininfos service="http" protocol="TCP" state="open"/>
+            <divportinfos product="lighttpd" conf="10" App="cpe:/a:lighttpd:lighttpd"/>
+          </port>
+        </portstable>
+      </virtinst>
+      <virtinst mapid="device1" usercreated="False">
+        <mainfields mac="08:EE:8B:6D:75:AB" ip="192.168.1.13"/>
+        <divfields/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device2" usercreated="False">
+        <mainfields mac="B8:27:EB:62:34:38" ip="192.168.1.50"/>
+        <divfields/>
+        <portstable>
+          <port portnum="22">
+            <maininfos service="ssh" protocol="TCP" state="open"/>
+            <divportinfos extrainfo="protocol 2.0" conf="10"/>
+          </port>
+        </portstable>
+      </virtinst>
+      <virtinst mapid="device3" usercreated="False">
+        <mainfields ip="192.168.1.36"/>
+        <divfields/>
+        <portstable>
+          <port portnum="80">
+            <maininfos service="http" protocol="TCP" state="open"/>
+            <divportinfos product="Apache httpd" version="2.4.18" extrainfo="(Ubuntu)" conf="10" App="cpe:/a:apache:http_server:2.4.18"/>
+          </port>
+        </portstable>
+      </virtinst>
+    </instances>
+    <savedevents>
+      <vievents mapid="device0">
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance with PortTable:
+Registered ports with &lt;service, protocol, state&gt;
+ | 21 : &lt; ftp, TCP, filtered &gt; [+]
+ | 22 : &lt; ssh, TCP, filtered &gt; [+]
+ | 23 : &lt; telnet, TCP, filtered &gt; [+]
+ | 80 : &lt; http, TCP, open &gt; [+]
+ | 443 : &lt; http, TCP, open &gt; [+]
+</newstate>
+          <diveventinfos objid="device0" modificator="nmapvulners"/>
+        </modifevent>
+      </vievents>
+      <vievents mapid="device1">
+        <modifevent target="VI device1" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance with PortTable:
+Empty ports table
+</newstate>
+          <diveventinfos objid="device1" modificator="nmapvulners"/>
+        </modifevent>
+      </vievents>
+      <vievents mapid="device2">
+        <modifevent target="VI device2" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance with PortTable:
+Registered ports with &lt;service, protocol, state&gt;
+ | 22 : &lt; ssh, TCP, open &gt; [+]
+</newstate>
+          <diveventinfos objid="device2" modificator="nmapvulners"/>
+        </modifevent>
+      </vievents>
+      <vievents mapid="device3">
+        <modifevent target="VI device3" type="virt_inst">
+          <oldstate>Non-existing VI</oldstate>
+          <newstate>New VI instance with PortTable:
+Registered ports with &lt;service, protocol, state&gt;
+ | 80 : &lt; http, TCP, open &gt; [+]
+</newstate>
+          <diveventinfos objid="device3" modificator="nmapvulners"/>
+        </modifevent>
+      </vievents>
+    </savedevents>
+  </netmap>
+</xmlsave>

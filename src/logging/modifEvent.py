@@ -29,6 +29,13 @@ class ModifEvent:
             return False
         return self.obj_id
 
+    def __eq__(self, other):
+        if not isinstance(other, ModifEvent):
+            return False
+        same_target = (self.modified_res, self.obj_type, self.obj_id) == (other.modified_res, other.obj_type, other.obj_id)
+        same_modif = (self.old_state, self.new_state) == (other.old_state, other.new_state)
+        return same_target and same_modif
+
     def detail_str(self, level=1):
         id = f"id in app:{self.obj_id}, " if self.obj_id is not None else ""
         typ = f"object type:{self.obj_type}"

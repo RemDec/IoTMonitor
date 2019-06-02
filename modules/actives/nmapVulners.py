@@ -100,9 +100,10 @@ class AModNmapVulners(FacilityActiveModule):
                     msg = f"Threat found registered as {dict_infos.get('code', 'CVE')}"
                     patch = f"Online CVE details : {dict_infos.get('url', 'no url')}"
                     lvl = float(dict_infos.get('severity', 1))
-                    self.netmap.register_threat(self.get_module_id(), level=lvl, mapid=mapid, msg=msg, patch=patch,
-                                                logit_with_lvl=40)
+                    threat = self.netmap.register_threat(self.get_module_id(), level=lvl, mapid=mapid,
+                                                         msg=msg, patch=patch, logit_with_lvl=40)
                     nbr_threats += 1
+
         if nbr_threats:
             log_feedback_available(f"Module [{self.get_module_id()}] found {nbr_threats} vulnerabilities/threats")
         else:

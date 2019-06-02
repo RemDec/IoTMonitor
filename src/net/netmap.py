@@ -94,6 +94,15 @@ class Netmap:
     def get_saved_modifs_for_vi(self, mapid):
         return self.get_saved_events_for_vi(mapid, 'modifs')
 
+    def event_already_saved(self, tomatch):
+        mapid = tomatch.rel_to_vi()
+        if mapid:
+            events = self.get_saved_events_for_vi(mapid)
+            for event in events:
+                if event == tomatch:
+                    return True
+        return False
+
     # -- from events in eventcenter memory --
 
     def get_events_for_vi(self, mapid, target='all'):
@@ -115,6 +124,9 @@ class Netmap:
     def get_all_events_for_vi(self, mapid, target='all'):
         return self.get_events_for_vi(mapid, target) + self.get_saved_events_for_vi(mapid, target)
 
+    def event_already_reported(self, tomatch):
+        return self.event_already_saved(tomatch) or self.event_center.event_already_exists(tomatch)
+
     # ----- Registering events through this map -----
 
     def add_vi_event(self, mapid, event):
@@ -133,7 +145,10 @@ class Netmap:
         event = self.event_center.register_threat(from_module, level, mapid, msg, patch,
                                                   logit_with_lvl, target_logger)
         if save_vi_event:
-            self.register_threat_event(event)
+            if not self.event_already_reported(event):
+                self.register_threat_event(event)
+            else:
+                print("Event already reported", event)
         return event
 
     def register_modif(self, modified_res, obj_type='app_res', obj_id=None, modificator='app',
@@ -142,7 +157,7 @@ class Netmap:
                        save_vi_event=True):
 
         if self.event_center is None:
-            return False
+            return None
         event = self.event_center.register_modif(modified_res, obj_type, obj_id, modificator,
                                                  old_state, new_state,
                                                  logit_with_lvl, target_logger)

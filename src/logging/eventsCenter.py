@@ -31,9 +31,10 @@ class EventsCenter:
                         logit_with_lvl=-1, target_logger="threats"):
 
         threat = ThreatEvent(from_module, level, mapid, msg, patch)
-        self.register_threat_event(threat)
-        if logit_with_lvl > 0:
-            self.log_event(threat, logit_with_lvl, target_logger)
+        if not self.event_already_exists(threat):
+            self.register_threat_event(threat)
+            if logit_with_lvl > 0:
+                self.log_event(threat, logit_with_lvl, target_logger)
         return threat
 
     def register_modif(self, modified_res, obj_type='app_res', obj_id=None, modificator='app',
@@ -118,6 +119,9 @@ class EventsCenter:
         return self.filter_events(target="modifs", filter_fct=filter_fct, keep_temp=keep_temp)
 
     # --- Misc ---
+
+    def event_already_exists(self, tomatch):
+        return len(self.filter_events(filter_fct=lambda event: event == tomatch)) > 0
 
     def check_lengths(self):
         while len(self.threats) > self.MAX_THREATS:

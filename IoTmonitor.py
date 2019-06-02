@@ -80,7 +80,7 @@ args = parser.parse_args()
 
 auto_save = not args.noautosave
 use_last_cfg = not args.noautoload
-clean_last = args.clean
+clean_last = args.cleanlast
 user_email = args.mail
 pwd = None
 mail_server = args.mserver

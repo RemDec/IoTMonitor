@@ -182,7 +182,7 @@ class Core:
 
     def detail_str(self, level=2):
         actives, passives = self.modmanager.list_all_modid()
-        indeps = [mod.m_id for mod in self.indep_mods] if len(self.indep_mods) > 0 else ['< no independent module >']
+        indeps = [mod.get_module_id() for mod in self.indep_mods] if len(self.indep_mods) > 0 else ['< no independent module >']
         s = ""
         if level == 0:
             s += f"=++====== Core application =========\n"

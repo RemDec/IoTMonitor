@@ -29,6 +29,11 @@ class ThreatEvent:
             return "No patch available to eliminate the threat"
         return self.patch
 
+    def __eq__(self, other):
+        if not isinstance(other, ThreatEvent):
+            return False
+        return (self.from_module, self.mapid, self.msg) == (other.from_module, other.mapid, other.msg)
+
     def detail_str(self, level=1):
         for_vi = self.rel_to_vi()
         s = f"/!\\ [{self.level}] threat declared by {self.from_module}{' for '+str(for_vi) if for_vi else ''}\n"
@@ -50,3 +55,11 @@ class ThreatEvent:
 
     def __str__(self):
         return self.detail_str()
+
+
+if __name__ == '__main__':
+    th1 = ThreatEvent('scanmodule1', mapid='VirtInst1', msg='exploit detected for this device :CVE-15559.56.23')
+    th2 = ThreatEvent('scanmodule1', level=4, mapid='VirtInst2',
+                       msg='Several exploitx detected for this device :CVE-40000.10.10, CVE-40000.21.3',
+                       patch='Look at update from manufacturer : https://www.samsung.com/be_fr/')
+    print(th1.__eq__(th2))
