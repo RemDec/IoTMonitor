@@ -1,19 +1,34 @@
-import sys
 from src.appCLI import *
 from src.utils.filesManager import FilesManager
+from argparse import RawDescriptionHelpFormatter
 import argparse
+import sys
 import os
 
-app_desc = "Entry point for IoTMonitor launching, a Python > 3.6 application/framework for home network security " \
-           "supervision.\n For more detail, report on https://github.com/RemDec/IoTMonitor (you should need an intro" \
-           "duction to concepts manipulated in). You can also check the in-app help to be guided.\n One feature of" \
-           " the app is the alert mailing. The only mail account involved is yours : used to send email to an auth. " \
-           "SMTP server with as default destination the same email address so that you are notified of found threats." \
-           "It's why you have to provide your email credentials if you want to use this feature of course. Notes :\n" \
-           "*Some mail services providers as Gmail may ask for a manual configuration in order to receive such mails." \
-           " Check it : https://support.google.com/accounts/answer/6010255\n" \
-           "*If not given, SMTP server is guessed, but it is not 100% reliable. Try to pass it with --mserver " \
-           "and the corresponding entry in https://serversmtp.com/smtp-server-address/"
+app_desc = "    Entry point for IoTMonitor launching, a Python > 3.6 application/framework for home\n" \
+           "network security supervision. For more details about its features, refer to Github guide :\n" \
+           "https://github.com/RemDec/IoTMonitor (you should need an intro to concepts manipulated in).\n" \
+           "You can also check the in-app help to be guided, depending chosen interface type.\n" \
+           "    One feature of the app is the alert mailing. The only mail account involved is yours!\n" \
+           "It is used to send email to an authentication SMTP server with as default destination the\n" \
+           "same email address so that you are notified of found threats on your own mailbox. It is why\n" \
+           "you have to provide your email credentials (if you want to use this feature with --mail).\n" \
+           "    Notes :\n\n" \
+           "[*] For now, only CLI interface is available. However, this is coupled with a watching system\n" \
+           "    to have a continuous look at app state, considering 3 modes (-m):\n" \
+           "        ~ noout is simply no watching excepted by implicit call in CLI interactive interface\n" \
+           "        ~ outpiped sends the display stream in a pipe you use as desired (useful for remotely\n" \
+           "          use/control app with ssh or in non-graphical environment)\n" \
+           "        ~ outscreen spawns a new terminal window whose only job is giving continuously a \n" \
+           "          current state overview of selected app elements\n\n" \
+           "[*] If you are using console output (and you should) that is default, a terminal is spawned\n" \
+           "    displaying continuously app state. To avoid display to be truncated due to inheritance,\n" \
+           "    invoke the app in a max-sized terminal (fullscreen preferentially)\n\n" \
+           "[*] Some mail services providers as Gmail may ask for a manual config. in order to receive\n" \
+           "    such mails. Check this help page : https://support.google.com/accounts/answer/6010255\n\n" \
+           "[*] If not given, SMTP server is guessed but it is not 100% reliable. Try to pass it with\n" \
+           "    --mserver. If you don't know it, try to look the corresponding entry in\n" \
+           "    https://serversmtp.com/smtp-server-address/\n"
 
 
 def is_valid_file(filesmanager, parser, arg):
@@ -35,7 +50,7 @@ filesmanager = FilesManager()
 
 sys.path.extend([os.path.splitext(os.path.abspath(__file__))[0]])
 
-parser = argparse.ArgumentParser(description=app_desc)
+parser = argparse.ArgumentParser(description=app_desc, formatter_class=RawDescriptionHelpFormatter)
 
 parser.add_argument("-i", "--interface",
                     help="user interaction mode with the app (graphical or with inline context menu parser)",
@@ -49,6 +64,9 @@ parser.add_argument("-nas", "--noautosave", help="disable current app state bein
                     action="store_true")
 parser.add_argument("-nal", "--noautoload", action="store_true",
                     help="disable auto loading of last config and app elements autosaved when exiting")
+parser.add_argument("-clean", "--cleanlast", action="store_true",
+                    help="clean files resulted from autosave of last app elements state at exiting (/svd/*/last_*)")
+
 parser.add_argument("-lvl", "--lvldisplay", type=int, choices=range(0, 10), default=1,
                     help="initial informations display level in app (mutable later by interface)"),
 parser.add_argument("--mail", help="Email to use for threat alerts, prior to which defined in config file if exists")
@@ -62,10 +80,14 @@ args = parser.parse_args()
 
 auto_save = not args.noautosave
 use_last_cfg = not args.noautoload
+clean_last = args.clean
 user_email = args.mail
 pwd = None
 mail_server = args.mserver
 must_test_email = args.testmail
+
+if clean_last:
+    filesmanager.clean_last_files()
 
 if user_email is not None:
     import getpass

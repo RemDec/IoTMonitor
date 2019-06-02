@@ -8,7 +8,7 @@ import subprocess
 import os
 
 
-cli_modes = ('noout', 'outpiped', 'outscreen', 'tkinter')
+cli_modes = ('noout', 'outpiped', 'outscreen')
 
 
 class AppCLI(TimerInterface):
