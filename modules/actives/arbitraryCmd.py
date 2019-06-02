@@ -5,6 +5,10 @@ import shlex
 
 
 class AModArbitraryCmd(ActiveModule):
+    """Active Module used to call any program accessible in the system, without any special output treatment
+
+    It can be used to automatise diverse tasks by including it in the routine as any other module
+    """
 
     def __init__(self, params=None, netmap=None):
         super().__init__(netmap)

@@ -8,6 +8,9 @@ from lxml import etree
 class AModNmapPortDisc(ActiveModule):
 
     def __init__(self, params=None, netmap=None):
+        """Active Module whose purpose is used host ports discovery and service running on it.
+
+        """
         super().__init__(netmap)
         self.m_id = "nmapports"
         self.CMD = "nmap"

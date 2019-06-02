@@ -3,7 +3,11 @@ import shlex
 
 
 class PModArbitraryCmdBg(PassiveModule):
+    """Passive Module used to call any program accessible in the system, without any special output treatment
 
+    It can be used to automatise diverse tasks by including it in the routine as any other module, but especially
+    tasks corresponding to passive archetype (producing output continuously until manual interruption)
+    """
     def __init__(self, params=None, timer=None, netmap=None):
         super().__init__(timer, netmap)
         self.m_id = "arbcmd_bg"

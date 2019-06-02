@@ -138,17 +138,18 @@ class Netmap:
 
     def register_threat(self, from_module, level=1, mapid=None, msg=None, patch=None,
                         logit_with_lvl=-1, target_logger="threat",
-                        save_vi_event=True):
+                        save_vi_event=True, avoid_duplicate=True):
 
         if self.event_center is None:
             return None
         event = self.event_center.register_threat(from_module, level, mapid, msg, patch,
                                                   logit_with_lvl, target_logger)
         if save_vi_event:
-            if not self.event_already_reported(event):
+            if not self.event_already_saved(event):
                 self.register_threat_event(event)
             else:
-                print("Event already reported", event)
+                if not avoid_duplicate:
+                    self.register_threat_event(event)
         return event
 
     def register_modif(self, modified_res, obj_type='app_res', obj_id=None, modificator='app',

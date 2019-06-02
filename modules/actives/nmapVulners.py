@@ -6,6 +6,10 @@ from lxml import etree
 
 
 class AModNmapVulners(FacilityActiveModule):
+    """Active Module pulling service version infos from host accessible ports and searching known vulnerabilities.
+
+    It performs an online search in Vulners database that contains some CVEs entries to match to version of services
+    """
 
     def __init__(self, params=None, netmap=None):
         self.scheme = {'ports': ('usetop', False, '-p'),
@@ -53,6 +57,13 @@ class AModNmapVulners(FacilityActiveModule):
         cmd += '> /dev/null && cat ' + self.get_curr_params()['XMLfile']
         return cmd
 
+    def work_before_launching(self, cmd_to_exec, exec_script_thread, rel_to_vi=[]):
+        from os import remove
+        try:
+            remove(self.get_curr_params().get('XMLfile'))
+        except FileNotFoundError:
+            pass
+
     def parse_output(self, output_stream, rel_to_vi=[]):
         if self.netmap is None:
             return
@@ -86,7 +97,8 @@ class AModNmapVulners(FacilityActiveModule):
                 old_portstable = vi.get_ports_table().detail_str(level=3)
                 if vi.complete_fields(mac=mac, ip=ip, hostname=hostname):
                     new = vi.detail_str(2)
-                    self.netmap.register_modif('VI ' + mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
+                    self.netmap.register_modif('VI ' + mapid, obj_type='virt_inst', obj_id=mapid,
+                                               modificator=self.get_module_id(),
                                                old_state=old, new_state=new, logit_with_lvl=20)
                 if vi.complete_ports_table(table):
                     new_portstable = vi.get_ports_table().detail_str(level=3)

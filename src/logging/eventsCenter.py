@@ -28,10 +28,10 @@ class EventsCenter:
         logging.getLogger(target_logger).log(level=logit_with_lvl, msg=str(event))
 
     def register_threat(self, from_module, level=1, mapid=None, msg=None, patch=None,
-                        logit_with_lvl=-1, target_logger="threats"):
+                        logit_with_lvl=-1, target_logger="threats", avoid_duplicate=True):
 
         threat = ThreatEvent(from_module, level, mapid, msg, patch)
-        if not self.event_already_exists(threat):
+        if not(self.event_already_exists(threat)) or not avoid_duplicate:
             self.register_threat_event(threat)
             if logit_with_lvl > 0:
                 self.log_event(threat, logit_with_lvl, target_logger)

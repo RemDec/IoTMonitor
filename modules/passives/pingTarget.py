@@ -1,4 +1,5 @@
 from modules.abcPassiveModule import *
+from src.utils.misc_fcts import log_feedback_available, treat_params, get_ip
 import shlex
 
 desc_PARAMS = {"IP": "Target IP adress(es) in ping command syntax",
@@ -8,18 +9,20 @@ desc_PARAMS = {"IP": "Target IP adress(es) in ping command syntax",
 
 
 class PModPing(PassiveModule):
+    """Passive Module used to confirm that an equipment behind an IP address is still responding (ICMP echo requests)
 
+    """
     def __init__(self, read_interval=10, params=None, timer=None, netmap=None):
         super().__init__(timer, netmap)
         self.m_id = "pingit"
         self.CMD = "ping"
         self.PARAMS = {"nbr": ("", False, "-c"),
-                       "interv": ("", False, "-i"),
+                       "interv": ("5", False, "-i"),
                        "divargs": ("", False, ""),
-                       "IP": ("8.8.8.8", True, "")}
+                       "IP": (get_ip(), True, "")}
         self.desc_PARAMS = desc_PARAMS
         self.read_interval = read_interval
-
+        self.params = params
         self.set_params(params)
 
     def get_cmd(self):
@@ -30,16 +33,14 @@ class PModPing(PassiveModule):
 
     def set_params(self, params):
         # fix missing execution params with defaults
-        self.params = super().treat_params(self.PARAMS, {} if params is None else params)
+        self.params = treat_params(self.PARAMS, {} if params is None else params)
 
     def new_bg_thread(self):
         return BackgroundThread()
 
-    def new_comm_thread(self, timer=None, read_interv=0, rel_to_vi=[]):
-        if read_interv == 0:
-            read_interv = self.get_read_interval()
+    def new_comm_thread(self, timer=None, rel_to_vi=[]):
         timer = timer if timer is not None else self.timer
-        return CommunicationThread(self.distrib_output, rel_to_vi, timer, read_interv)
+        return CommunicationThread(self.distrib_output, rel_to_vi, timer, self.get_read_interval())
 
     def set_read_interval(self, duration):
         self.read_interval = duration
@@ -48,9 +49,9 @@ class PModPing(PassiveModule):
         return self.read_interval
 
     def distrib_output(self, buffer_read, rel_to_vi=[]):
-        logging.getLogger("debug").debug(f"[{self.m_id}] DATA from bg thread output of length {len(buffer_read.decode())}")
+        log_feedback_available(f"[{self.m_id}] DATA from bg thread output of length {len(buffer_read.decode())}")
 
-    def launch(self, rel_to_vi=[], read_interv=0):
+    def launch(self, rel_to_vi=[]):
         cmd = [self.CMD]
         for param, val in self.params.items():
             if param != "divargs":
@@ -58,7 +59,7 @@ class PModPing(PassiveModule):
         if "divargs" in self.params:
             cmd.append(shlex.split(self.params["divargs"]))
         bg_thread = self.new_bg_thread()
-        read_thread = self.new_comm_thread(self.timer, read_interv, rel_to_vi)
+        read_thread = self.new_comm_thread(self.timer, rel_to_vi)
         bg_thread.start(cmd)
         pipe = bg_thread.get_output_pipe()
         while pipe is None:

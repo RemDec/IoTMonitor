@@ -2,7 +2,15 @@ from modules.abcActiveModule import *
 # import logging is done in superclass abcModule
 from src.utils.misc_fcts import log_feedback_available
 
+
 class AModNameMod(ActiveModule):
+    """This class is a skeleton to copy/paste in order to implement a new Active Module with detailed operations.
+
+    If you don't want implement it from scratch based on this skeleton, you can subclass abcFacilityActiveModule that
+    already fully implements usage of facilities provided by ActiveModule. It provides less fine-grained control but
+    is easier than fill this skeleton.
+
+    """
 
     def __init__(self, params=None, netmap=None):
         super().__init__(netmap)

@@ -12,6 +12,10 @@ desc_PARAMS = {"IP": "Target IP address(es) acceptable as Nmap syntax",
 
 
 class AModNmapExplorer(ActiveModule):
+    """Active Module designed to explore the network and discover which equipments are active on it.
+
+    Generally discover all MAC and IP addresses of responding equipments quickly.
+    """
 
     def __init__(self, params=None, netmap=None):
         super().__init__(netmap)
