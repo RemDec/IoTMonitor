@@ -5,6 +5,11 @@ import abc
 
 
 class FacilityActiveModule(PassiveModule):
+    """Subclass of PassiveModule fully implementing facilities it provides, minimizing required work.
+
+    The abstract methods of this class are really specific to the program to abstract, so it is your job to implement it
+    You can find information about their purposes and job to implement in superclass Module.
+    """
 
     def __init__(self, read_interval=20, params=None, timer=None, netmap=None):
         super().__init__(timer, netmap)
@@ -38,6 +43,14 @@ class FacilityActiveModule(PassiveModule):
 
     @abc.abstractmethod
     def build_final_cmd(self, rel_to_vi=[]):
+        """Compute the command to pass in CLI from current parameters values and their scheme
+
+        Args:
+            rel_to_vi: mapids of Virtual Instance the execution should be relative to
+
+        Returns:
+            final_cmd: a string or list that is the command to call in system CLI, as specified in subprocess library
+        """
         pass
 
     @abc.abstractmethod

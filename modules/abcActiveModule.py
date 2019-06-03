@@ -5,6 +5,14 @@ import subprocess
 
 
 class ActiveModule(Module):
+    """Abstract class defining requirements for a module abstracting a program associated with active archetype
+
+    Some methods in parent class Module should also be implemented in concrete Module classes inheriting ActiveModule.
+    This class is abstract but provides concrete facilities to manage execution scheme of program recognized as active.
+    Such facilities are related with threads management, because execution of the underlying Module program should be
+    done in a new thread to dissociate from main execution flow. By inheriting this class you have access to, but you
+    are free to use it or no (if you want to implement you own Module linked threads management).
+    """
 
     def __init__(self, netmap):
         self.netmap = netmap
@@ -83,7 +91,6 @@ class ScriptThread(threading.Thread):
     def run(self):
         cmd_as_shell = isinstance(self.cmd, str)
         log_feedback_available(f"Starting {super().getName()}", 'debug')
-        # logging.getLogger("debug").debug(f"Starting {super().getName()}")
         self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE,
                                       stderr=subprocess.STDOUT, universal_newlines=True,
                                       shell=cmd_as_shell)

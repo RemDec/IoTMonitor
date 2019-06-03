@@ -70,7 +70,6 @@ class PModPing(PassiveModule):
 
     def distrib_output(self, buffer_read, rel_to_vi=[]):
         str_out = buffer_read.decode()
-        # log_feedback_available(f"[{self.m_id}] DATA from bg thread output of length {len(str_out)}:\n{str_out}")
         lines = str_out.strip().split('\n')
         most_recent = lines[-1] if len(lines) > 0 else None
         ip, state = self.parse_host_state(most_recent)

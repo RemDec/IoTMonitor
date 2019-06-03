@@ -21,9 +21,11 @@ setup(name='IoTMonitor',
       author_email='remy.decocq@student.umons.ac.be',
       license='GNU',
       packages=['src', 'modules'],
-      install_requires=['lxml'])
+      install_requires=['PyYAML', 'lxml'])
 
 print("--- Project specific operations ---\n")
+print("  Be aware to install external dependencies with\n"
+      "sudo apt-get install python-yaml python3-lxml libxml2-dev libxslt1-dev xterm")
 print("  Cleaning target files for auto-save purpose...")
 clean()
 print("  Rewriting modules library based on programmatically defined default modules...")

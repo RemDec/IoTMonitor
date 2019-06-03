@@ -4,6 +4,15 @@ import logging
 
 
 class EventsCenter:
+    """Gathering object for all Events modules desire to register in the app (not only pure logging)
+
+    This object has 2 jobs :
+       - Being a congruence center for Events declaration and registering, where Events are objects of 2 types : Threats
+       and Modifications. Such objects can be instantiated outside this class, but methods provided in permit to avoid
+       instantiation (see register_*)
+       - Customizing logging modules by declaring new methods for loggers. So these methods can be accessed from
+       anywhere just by importing logging and calling new methods set on it by EventCenter at instantiation
+    """
 
     def __init__(self, loggers=[]):
         self.loggers = loggers if isinstance(loggers, list) else [loggers]

@@ -147,10 +147,12 @@ class Netmap:
         if save_vi_event:
             if not self.event_already_saved(event):
                 self.register_threat_event(event)
+                return event
             else:
                 if not avoid_duplicate:
                     self.register_threat_event(event)
-        return event
+                    return event
+        return None
 
     def register_modif(self, modified_res, obj_type='app_res', obj_id=None, modificator='app',
                        old_state=None, new_state=None,

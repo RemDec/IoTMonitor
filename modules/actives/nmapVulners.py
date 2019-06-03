@@ -3,7 +3,7 @@ from src.parsers.nmapOutputParser import NmapParser, cpes_to_dict, iplist_to_nma
 from src.net.virtualInstance import PortTable
 from src.utils.misc_fcts import get_ip, log_feedback_available
 from lxml import etree
-
+import logging
 
 class AModNmapVulners(FacilityActiveModule):
     """Active Module pulling service version infos from host accessible ports and searching known vulnerabilities.
@@ -72,7 +72,7 @@ class AModNmapVulners(FacilityActiveModule):
         except etree.XMLSyntaxError:
             return
         hosts = parser.get_hosts()
-        nbr_threats = 0
+        threats = []
         for host_elmt in hosts:
             mac, ip, _ = parser.addr_from_host(host_elmt)
             hostname = parser.hostname_from_host(host_elmt)
@@ -112,10 +112,16 @@ class AModNmapVulners(FacilityActiveModule):
                     lvl = float(dict_infos.get('severity', 1))
                     threat = self.netmap.register_threat(self.get_module_id(), level=lvl, mapid=mapid,
                                                          msg=msg, patch=patch, logit_with_lvl=40)
-                    nbr_threats += 1
+                    if threat is not None:
+                        threats.append(threat)
 
-        if nbr_threats:
-            log_feedback_available(f"Module [{self.get_module_id()}] found {nbr_threats} vulnerabilities/threats")
+        if len(threats):
+            msg = f"Module [{self.get_module_id()}] found {len(threats)} vulnerabilities/threats"
+            log_feedback_available(msg)
+            # Sending recap email with threats
+            threats = list(map(lambda th: th.detail_str(4), threats))
+            msg += "\n Description of discovered threats :\n\n" + '\n\n'.join(threats)
+            logging.getLogger('mail').critical(msg)
         else:
             log_feedback_available(f"Module [{self.get_module_id()}] did not find any threat")
 
