@@ -1,15 +1,14 @@
 <?xml version='1.0' encoding='ASCII'?>
 <xmlsave>
-  <routine running="True">
-    <queue running="True" nbr_mods="1">
-      <modconfig modid="nmapvulners" setid="nmapvulners">
+  <routine running="False">
+    <queue running="False" nbr_mods="0"/>
+    <panel running="False" nbr_mods="1">
+      <modconfig modid="pingit" setid="pingit">
         <savedparams>
-          <param code="nbrports" value="5"/>
-          <param code="XMLfile" value="/tmp/nmap_vulners.xml"/>
-          <param code="IP" value="192.168.0.19/24"/>
+          <param code="interv" value="5"/>
+          <param code="IP" value="192.168.0.21"/>
         </savedparams>
       </modconfig>
-    </queue>
-    <panel running="True" nbr_mods="0"/>
+    </panel>
   </routine>
 </xmlsave>

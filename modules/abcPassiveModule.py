@@ -221,7 +221,10 @@ class CommunicationThread(threading.Thread, TimerInterface):
             self.must_read = True
         if not new_dumb_thread:
             # we are at the end of dumb decr() thread
-            self.decr_threads.remove(threading.current_thread())
+            try:
+                self.decr_threads.remove(threading.current_thread())
+            except ValueError:
+                pass
 
     def call_parsing_fct(self, output):
         if self.read_fct is not None:

@@ -26,14 +26,14 @@ class Netmap:
         self.map = {}
         self.svd_events = {}
 
-    def create_VI(self, mapid=None, append_netmap=True, create_event=False,
+    def create_VI(self, mapid=None, append_netmap=True, create_event=False, creator='unknownMod',
                   mac=None, ip=None, hostname=None, div=None, ports=None, user_created=False):
         vi = VirtualInstance(mac=mac, ip=ip, hostname=hostname, div=div, ports=ports, user_created=user_created)
         if append_netmap:
             mapid = self.add_VI(vi, given_mapid=mapid)
             if create_event:
-                self.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, old_state="Non-existing VI",
-                                    new_state="Registered VI in netmap", logit_with_lvl=20)
+                self.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=creator,
+                                    old_state="Non-existing VI", new_state="Registered VI in netmap", logit_with_lvl=20)
         return str(mapid), vi
 
     def rename_VI(self, oldmapid, newmapid):

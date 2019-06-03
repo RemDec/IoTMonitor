@@ -2,313 +2,35 @@
 <xmlsave>
   <netmap>
     <instances>
-      <virtinst mapid="device0" usercreated="False">
-        <mainfields mac="A0:21:B7:52:B1:69" ip="192.168.0.1"/>
+      <virtinst mapid="device0" usercreated="True">
+        <mainfields ip="192.168.0.1"/>
         <divfields/>
-        <portstable>
-          <port portnum="21">
-            <maininfos service="ftp" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="22">
-            <maininfos service="ssh" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="23">
-            <maininfos service="telnet" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="80">
-            <maininfos service="tcpwrapped" protocol="TCP" state="open"/>
-            <divportinfos conf="10"/>
-          </port>
-          <port portnum="443">
-            <maininfos service="https" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-        </portstable>
+        <portstable/>
       </virtinst>
-      <virtinst mapid="device1" usercreated="False">
-        <mainfields mac="E0:94:67:56:EF:C3" ip="192.168.0.7"/>
+      <virtinst mapid="device1" usercreated="True">
+        <mainfields ip="192.168.0.21"/>
         <divfields/>
-        <portstable>
-          <port portnum="21">
-            <maininfos service="ftp" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="22">
-            <maininfos service="ssh" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="23">
-            <maininfos service="telnet" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="80">
-            <maininfos service="http" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="443">
-            <maininfos service="https" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-        </portstable>
-      </virtinst>
-      <virtinst mapid="device2" usercreated="False">
-        <mainfields mac="B8:27:EB:62:34:38" ip="192.168.0.15"/>
-        <divfields/>
-        <portstable>
-          <port portnum="22">
-            <maininfos service="ssh" protocol="TCP" state="open"/>
-            <divportinfos extrainfo="protocol 2.0" conf="10"/>
-          </port>
-        </portstable>
-      </virtinst>
-      <virtinst mapid="device3" usercreated="False">
-        <mainfields mac="70:4F:57:EC:95:E3" ip="192.168.0.25"/>
-        <divfields/>
-        <portstable>
-          <port portnum="22">
-            <maininfos service="ssh" protocol="TCP" state="open"/>
-            <divportinfos product="Dropbear sshd" version="2012.55" extrainfo="protocol 2.0" conf="10" App="cpe:/a:matt_johnston:dropbear_ssh_server:2012.55" Os="cpe:/o:linux:linux_kernel"/>
-          </port>
-          <port portnum="80">
-            <maininfos service="http" protocol="TCP" state="open"/>
-            <divportinfos product="TP-LINK TD-W8968 http admin" conf="10" Hw="cpe:/h:tp-link:td-w8968"/>
-          </port>
-        </portstable>
-      </virtinst>
-      <virtinst mapid="device4" usercreated="False">
-        <mainfields ip="192.168.0.19"/>
-        <divfields/>
-        <portstable>
-          <port portnum="80">
-            <maininfos service="http" protocol="TCP" state="open"/>
-            <divportinfos product="Apache httpd" version="2.4.18" extrainfo="(Ubuntu)" conf="10" App="cpe:/a:apache:http_server:2.4.18"/>
-          </port>
-        </portstable>
-      </virtinst>
-      <virtinst mapid="device5" usercreated="False">
-        <mainfields mac="C4:9D:ED:92:DE:DE" ip="192.168.0.18"/>
-        <divfields/>
-        <portstable>
-          <port portnum="21">
-            <maininfos service="ftp" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="22">
-            <maininfos service="ssh" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="23">
-            <maininfos service="telnet" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="80">
-            <maininfos service="http" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-          <port portnum="443">
-            <maininfos service="https" protocol="TCP" state="filtered"/>
-            <divportinfos conf="3"/>
-          </port>
-        </portstable>
+        <portstable/>
       </virtinst>
     </instances>
     <savedevents>
-      <vievents mapid="device0">
-        <modifevent target="PortsTable VI device0" type="virt_inst">
-          <oldstate>Registered ports with &lt;service, protocol, state&gt; and diverse fields
- | &lt; ftp, TCP, filtered &gt;
- |    +- divs: conf:3
- | &lt; ssh, TCP, filtered &gt;
- |    +- divs: conf:3
- | &lt; telnet, TCP, filtered &gt;
- |    +- divs: conf:3
- | &lt; http, TCP, filtered &gt;
- |    +- divs: conf:3
- | &lt; https, TCP, filtered &gt;
- |    +- divs: conf:3
-</oldstate>
-          <newstate>Registered ports with &lt;service, protocol, state&gt; and diverse fields
- | &lt; ftp, TCP, filtered &gt;
- |    +- divs: conf:3
- | &lt; ssh, TCP, filtered &gt;
- |    +- divs: conf:3
- | &lt; telnet, TCP, filtered &gt;
- |    +- divs: conf:3
- | &lt; tcpwrapped, TCP, open &gt;
- |    +- divs: conf:10
- | &lt; https, TCP, filtered &gt;
- |    +- divs: conf:3
-</newstate>
-          <diveventinfos objid="device0" modificator="nmapvulners"/>
-        </modifevent>
-        <modifevent target="VI device0" type="virt_inst">
-          <oldstate>Non-existing VI</oldstate>
-          <newstate>New VI instance with PortTable:
-Registered ports with &lt;service, protocol, state&gt;
- | 21 : &lt; ftp, TCP, filtered &gt; [+]
- | 22 : &lt; ssh, TCP, filtered &gt; [+]
- | 23 : &lt; telnet, TCP, filtered &gt; [+]
- | 80 : &lt; http, TCP, filtered &gt; [+]
- | 443 : &lt; https, TCP, filtered &gt; [+]
-</newstate>
-          <diveventinfos objid="device0" modificator="nmapvulners"/>
-        </modifevent>
-      </vievents>
       <vievents mapid="device1">
         <modifevent target="VI device1" type="virt_inst">
+          <oldstate>Network state: unknown</oldstate>
+          <newstate>Network state: up</newstate>
+          <diveventinfos objid="device1" modificator="pingit"/>
+        </modifevent>
+        <modifevent target="VI device1" type="virt_inst">
           <oldstate>Non-existing VI</oldstate>
-          <newstate>New VI instance with PortTable:
-Registered ports with &lt;service, protocol, state&gt;
- | 21 : &lt; ftp, TCP, filtered &gt; [+]
- | 22 : &lt; ssh, TCP, filtered &gt; [+]
- | 23 : &lt; telnet, TCP, filtered &gt; [+]
- | 80 : &lt; http, TCP, filtered &gt; [+]
- | 443 : &lt; https, TCP, filtered &gt; [+]
-</newstate>
-          <diveventinfos objid="device1" modificator="nmapvulners"/>
+          <newstate>Registered VI in netmap</newstate>
+          <diveventinfos objid="device1" modificator="pingit"/>
         </modifevent>
       </vievents>
-      <vievents mapid="device2">
-        <modifevent target="VI device2" type="virt_inst">
-          <oldstate>Non-existing VI</oldstate>
-          <newstate>New VI instance with PortTable:
-Registered ports with &lt;service, protocol, state&gt;
- | 22 : &lt; ssh, TCP, open &gt; [+]
-</newstate>
-          <diveventinfos objid="device2" modificator="nmapvulners"/>
-        </modifevent>
-      </vievents>
-      <vievents mapid="device3">
-        <modifevent target="VI device3" type="virt_inst">
-          <oldstate>Non-existing VI</oldstate>
-          <newstate>New VI instance with PortTable:
-Registered ports with &lt;service, protocol, state&gt;
- | 22 : &lt; ssh, TCP, open &gt; [+]
- | 80 : &lt; http, TCP, open &gt; [+]
-</newstate>
-          <diveventinfos objid="device3" modificator="nmapvulners"/>
-        </modifevent>
-      </vievents>
-      <vievents mapid="device4">
-        <threatevent originmod="nmapvulners" level="3">
-          <alertmsg>Threat found registered as CVE-2016-8612</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2016-8612</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="3">
-          <alertmsg>Threat found registered as CVE-2018-1283</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2018-1283</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="4">
-          <alertmsg>Threat found registered as CVE-2018-11763</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2018-11763</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="4">
-          <alertmsg>Threat found registered as CVE-2016-1546</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2016-1546</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="4">
-          <alertmsg>Threat found registered as CVE-2016-4975</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2016-4975</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="5">
-          <alertmsg>Threat found registered as CVE-2018-1333</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2018-1333</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="5">
-          <alertmsg>Threat found registered as CVE-2016-8740</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2016-8740</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="5">
-          <alertmsg>Threat found registered as CVE-2017-9798</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2017-9798</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="5">
-          <alertmsg>Threat found registered as CVE-2016-4979</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2016-4979</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="5">
-          <alertmsg>Threat found registered as CVE-2016-8743</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2016-8743</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="5">
-          <alertmsg>Threat found registered as CVE-2017-15710</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2017-15710</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="5">
-          <alertmsg>Threat found registered as CVE-2018-17199</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2018-17199</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="6">
-          <alertmsg>Threat found registered as CVE-2018-1312</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2018-1312</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="6">
-          <alertmsg>Threat found registered as CVE-2017-15715</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2017-15715</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="7">
-          <alertmsg>Threat found registered as CVE-2019-0211</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2019-0211</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="7">
-          <alertmsg>Threat found registered as CVE-2017-7679</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2017-7679</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="7">
-          <alertmsg>Threat found registered as CVE-2017-3167</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2017-3167</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="7">
-          <alertmsg>Threat found registered as CVE-2017-3169</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2017-3169</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <threatevent originmod="nmapvulners" level="7">
-          <alertmsg>Threat found registered as CVE-2017-7668</alertmsg>
-          <patchmsg>Online CVE details : https://vulners.com/cve/CVE-2017-7668</patchmsg>
-          <diveventinfos objid="device4"/>
-        </threatevent>
-        <modifevent target="VI device4" type="virt_inst">
-          <oldstate>Non-existing VI</oldstate>
-          <newstate>New VI instance with PortTable:
-Registered ports with &lt;service, protocol, state&gt;
- | 80 : &lt; http, TCP, open &gt; [+]
-</newstate>
-          <diveventinfos objid="device4" modificator="nmapvulners"/>
-        </modifevent>
-      </vievents>
-      <vievents mapid="device5">
-        <modifevent target="VI device5" type="virt_inst">
-          <oldstate>Non-existing VI</oldstate>
-          <newstate>New VI instance with PortTable:
-Registered ports with &lt;service, protocol, state&gt;
- | 21 : &lt; ftp, TCP, filtered &gt; [+]
- | 22 : &lt; ssh, TCP, filtered &gt; [+]
- | 23 : &lt; telnet, TCP, filtered &gt; [+]
- | 80 : &lt; http, TCP, filtered &gt; [+]
- | 443 : &lt; https, TCP, filtered &gt; [+]
-</newstate>
-          <diveventinfos objid="device5" modificator="nmapvulners"/>
+      <vievents mapid="device0">
+        <modifevent target="VI device0" type="virt_inst">
+          <oldstate>Network state: unknown</oldstate>
+          <newstate>Network state: up</newstate>
+          <diveventinfos objid="device0" modificator="pingit"/>
         </modifevent>
       </vievents>
     </savedevents>

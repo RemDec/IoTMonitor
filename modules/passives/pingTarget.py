@@ -1,11 +1,14 @@
 from modules.abcPassiveModule import *
 from src.utils.misc_fcts import log_feedback_available, treat_params, get_ip
+from ipaddress import ip_address
 import shlex
+import re
 
-desc_PARAMS = {"IP": "Target IP adress(es) in ping command syntax",
-               "interv": "Interval between each ping",
-               "nbr": "Integer if should ping limited times",
+desc_PARAMS = {"IP": "Target IP adress in ping command syntax (only one specifiable)",
+               "interv": "Interval between each ping (seconds)",
                "divargs": "Other acceptable args for ping command"}
+
+IPv4_addr = r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b'
 
 
 class PModPing(PassiveModule):
@@ -16,8 +19,7 @@ class PModPing(PassiveModule):
         super().__init__(timer, netmap)
         self.m_id = "pingit"
         self.CMD = "ping"
-        self.PARAMS = {"nbr": ("", False, "-c"),
-                       "interv": ("5", False, "-i"),
+        self.PARAMS = {"interv": ("5", True, "-i "),
                        "divargs": ("", False, ""),
                        "IP": (get_ip(), True, "")}
         self.desc_PARAMS = desc_PARAMS
@@ -48,15 +50,61 @@ class PModPing(PassiveModule):
     def get_read_interval(self):
         return self.read_interval
 
+    def parse_host_state(self, most_recent):
+        if most_recent is not None:
+            foundip = re.findall(IPv4_addr, most_recent)
+            ip = None
+            state = None
+            if len(foundip) > 0:
+                try:
+                    ip_address(foundip[0])
+                except ValueError:
+                    return None, None
+                ip = foundip[0]
+            if re.search(r'time=', most_recent):
+                state = 'up'
+            if re.search(r'[Uu]nreachable', most_recent):
+                state = 'down'
+            return ip, state
+        return None, None
+
     def distrib_output(self, buffer_read, rel_to_vi=[]):
-        log_feedback_available(f"[{self.m_id}] DATA from bg thread output of length {len(buffer_read.decode())}")
+        str_out = buffer_read.decode()
+        # log_feedback_available(f"[{self.m_id}] DATA from bg thread output of length {len(str_out)}:\n{str_out}")
+        lines = str_out.strip().split('\n')
+        most_recent = lines[-1] if len(lines) > 0 else None
+        ip, state = self.parse_host_state(most_recent)
+        if not(None in [self.netmap, ip, state]):
+            mapid = self.netmap.get_similar_VI(mac=None, ip=ip)
+            if mapid is None:
+                mapid, vi = self.netmap.create_VI(create_event=True, creator=self.m_id, ip=ip)
+            else:
+                vi = self.netmap.get_VI(mapid)
+            old_state = vi.state
+            if old_state == state:
+                log_feedback_available(f"Module [{self.m_id}] didn't modify {ip} state ({state})")
+                return
+            vi.set_state(state)
+            self.netmap.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
+                                       old_state=f"Network state: {old_state}", new_state=f"Network state: {vi.state}",
+                                       logit_with_lvl=20)
+            log_feedback_available(f"Module [{self.m_id}] determined new state for {ip} : {state}")
 
     def launch(self, rel_to_vi=[]):
         cmd = [self.CMD]
         for param, val in self.params.items():
             if param != "divargs":
-                cmd.append(self.PARAMS[param][2] + val)
-        if "divargs" in self.params:
+                if param == 'IP':
+                    target_ip = val
+                    if len(rel_to_vi) > 0:
+                        list_ips = self.netmap.get_IPs_from_mapids(rel_to_vi)
+                        if len(list_ips) > 0 and list_ips[0] is not None:
+                            target_ip = list_ips[0]
+                    cmd.append(target_ip)  # Doesn't need prefix
+                else:
+                    cmd.append(self.PARAMS[param][2] + val)
+
+        if self.params.get('divars', '') != '':
             cmd.append(shlex.split(self.params["divargs"]))
         bg_thread = self.new_bg_thread()
         read_thread = self.new_comm_thread(self.timer, rel_to_vi)
@@ -80,12 +128,15 @@ class PModPing(PassiveModule):
 
 
 if __name__ == '__main__':
-    ping = PModPing(read_interval=2, timer=TimerThread())
+    from src.net.netmap import Netmap
+    netmap = Netmap()
+    netmap.create_VI(mac='2D-8E-53-17-26-D9', ip='192.168.0.1', hostname='myfalseVI')
+    ping = PModPing(read_interval=2, params={'IP': '192.168.0.1', 'interv': '3'}, timer=TimerThread(), netmap=netmap)
     ping.launch()
     ping.timer.launch()
     from time import sleep
     for i in range(6):
-        sleep(1)
+        sleep(2)
         print("\n##############################\n", ping)
     print("####### TERMINATING MODULE #######")
     ping.terminate_threads()

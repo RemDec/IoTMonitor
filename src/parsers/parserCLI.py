@@ -43,30 +43,33 @@ class CLIparser:
 
     def loop_parsing(self):
         while self.get_input:
-            # Entering current menu, compute available choices from corresponding menu dict, wait for an input choice
-            self.curr_choices = self.compute_curr_choices()
-            header = self.header_from_menu(include_header=self.display_header)
-            user_in = input(header)
-            self.display_header = True
-            if not self.check_reserved_kw(user_in):
-                # Handling regular input, try to match to an available current choice or taking default value if defined
-                if user_in == "" and self.curr_menu.get('dflt_choice', False):
-                    user_in = self.curr_menu['dflt_choice']
-                # Select choice if no ambiguity with given letters
-                completed_in = self.match_input_to_choice(user_in)
-                if len(completed_in) == 0:
-                    print(f"No corresponding choice for this menu [id:{self.get_currmenu_index()}]"
-                          f" (type $choices or $help)")
-                    self.no_wipe_next()
-                elif len(completed_in) > 1:
-                    print("Ambiguous choice between", ', '.join(completed_in))
-                    self.no_wipe_next()
-                else:
-                    # Correct choice, call corresponding menu function on the choice value, do process in it
-                    user_in = completed_in[0]
-                    self.curr_menu['fct_choice'](user_in)
-                self.clear_console()
-                self.clear_cls = True
+            try:
+                # Entering current menu, compute available choices from corresponding menu dict,wait for an input choice
+                self.curr_choices = self.compute_curr_choices()
+                header = self.header_from_menu(include_header=self.display_header)
+                user_in = input(header)
+                self.display_header = True
+                if not self.check_reserved_kw(user_in):
+                    # Handling regular input,try to match to an available current choice or taking dflt value if defined
+                    if user_in == "" and self.curr_menu.get('dflt_choice', False):
+                        user_in = self.curr_menu['dflt_choice']
+                    # Select choice if no ambiguity with given letters
+                    completed_in = self.match_input_to_choice(user_in)
+                    if len(completed_in) == 0:
+                        print(f"No corresponding choice for this menu [id:{self.get_currmenu_index()}]"
+                              f" (type $choices or $help)")
+                        self.no_wipe_next()
+                    elif len(completed_in) > 1:
+                        print("Ambiguous choice between", ', '.join(completed_in))
+                        self.no_wipe_next()
+                    else:
+                        # Correct choice, call corresponding menu function on the choice value, do process in it
+                        user_in = completed_in[0]
+                        self.curr_menu['fct_choice'](user_in)
+                    self.clear_console()
+                    self.clear_cls = True
+            except Exception as e:
+                print("\nUnhandled specific error, return to menu considered as current one :\n", e)
 
     # ----- Internal utilities functions -----
 
@@ -415,7 +418,7 @@ class CLIparser:
         timer_name = f"{'queue expiration' if is_mod_act else 'reading'} interval timer"
         dflt_val = modinst.get_default_timer() if is_mod_act else modinst.get_read_interval()
         marker = f"Set {timer_name} if desired (numeric) or enter to pass\n[default:{dflt_val}] :"
-        input_timer = self.get_user_in_or_dflt(dflt_val, marker=marker).strip()
+        input_timer = self.get_user_in_or_dflt(str(dflt_val), marker=marker).strip()
         try:
             timer = abs(int(input_timer))
             if input_timer != '' and is_mod_act:
@@ -703,6 +706,9 @@ class CLIparser:
                            'fct_choice': self.after_mod_slct}
 
         self.create_VI = {'desc': "Create a new 'virtual instance' ie a network equipment in-app representation",
+                          'help': "A VI is the unit aggregating informations retrieved from Modules results parsing\n"
+                                  "also modifiable/craftable manually. 'scratch' allows to specify more details and \n"
+                                  "fields values for new VI crafting than 'basic' (but still editable later).",
                           'choices': [['basic', 'scratch']],
                           'dflt_choice': 'basic',
                           'fct_choice': self.iv_creation}
