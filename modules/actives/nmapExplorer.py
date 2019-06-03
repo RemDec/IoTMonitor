@@ -45,10 +45,8 @@ class AModNmapExplorer(ActiveModule):
         if self.netmap is None:
             return
         try:
-            parser = NmapParser(output)
+            parser = NmapParser(output.read().encode())
         except etree.XMLSyntaxError:
-            import logging
-            logging.getLogger('error').exception("Nmapparser were unable to parse XML tree result of nmapExplorer")
             return
         hosts = parser.get_hosts()
         changed = 0

@@ -8,7 +8,7 @@ class Core:
     def __init__(self, coreconfig=None):
         if coreconfig is None:
             coreconfig = CoreConfig()
-        log_feedback_available('Instantiation of AppCore considering CoreConfig'+coreconfig.detail_str(level=0))
+        log_feedback_available('Instantiation of AppCore considering '+coreconfig.detail_str(level=0))
         signal.signal(signal.SIGINT, self.interrupt_handler)
         self.coreconfig = coreconfig
         self.logger_setup = coreconfig.logger_setup

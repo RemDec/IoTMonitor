@@ -1,11 +1,19 @@
+from src.utils.misc_fcts import log_feedback_available
 from lxml import etree
 
 
 class NmapParser:
 
     def __init__(self, xml_source):
-        self.tree = etree.parse(xml_source)
-        self.root = self.tree.getroot()
+        try:
+            if isinstance(xml_source, bytes):
+                self.tree = etree.ElementTree(etree.fromstring(xml_source))
+            else:
+                self.tree = etree.parse(xml_source)
+            self.root = self.tree.getroot()
+        except etree.XMLSyntaxError as e:
+            log_feedback_available(f"Nmapparser were unable to parse XML tree result from a source {type(xml_source)}")
+            raise e
 
     def get_root(self):
         return self.root

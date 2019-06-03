@@ -68,10 +68,8 @@ class AModNmapVulners(FacilityActiveModule):
         if self.netmap is None:
             return
         try:
-            parser = NmapParser(output_stream)
+            parser = NmapParser(output_stream.read().encode())
         except etree.XMLSyntaxError:
-            import logging
-            logging.getLogger('error').exception("Nmapparser were unable to parse XML tree result of Vulnerscan")
             return
         hosts = parser.get_hosts()
         nbr_threats = 0
@@ -162,7 +160,7 @@ class AModNmapVulners(FacilityActiveModule):
 if __name__ == '__main__':
     # from src.utils.moduleManager import ModDescriptor
     from src.net.netmap import Netmap
-    vulners = AModNmapVulners(params={'nbrports': '10', 'IP': '192.168.1.1/24'}, netmap=Netmap())
+    vulners = AModNmapVulners(params={'nbrports': '2', 'IP': '192.168.0.1'}, netmap=Netmap())
     vulners.launch()
     # desc = ModDescriptor(mod_inst=vulners, include_nondefault_param=True)
     # desc.modinfos_to_xml()

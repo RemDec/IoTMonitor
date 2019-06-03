@@ -29,6 +29,7 @@ class ActiveModule(Module):
         self.curr_threads = [th for th in self.curr_threads if th.is_alive()]
 
     def terminate_threads(self, wait_for_purge=0):
+        log_feedback_available(f"[{self.get_module_id()}] termination of current threads")
         for thread in self.curr_threads:
             thread.interrupt()
         if wait_for_purge:

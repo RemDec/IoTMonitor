@@ -102,26 +102,32 @@ if user_email is not None:
 
 mail_infos = (user_email, pwd, mail_server)
 
-if args.interface == 'cli':
-    if must_test_email:
-        from smtplib import SMTPException
-        # Doesn't immediatly start parsing that is blocking
-        appcli = AppCLI(mode=args.mode, level=args.lvldisplay, start_parsing=False, start_pull_output=False,
-                        save_on_exit=auto_save, use_last_coreconfig=use_last_cfg, target_coreconfig=args.fileconfig,
-                        mail_infos=mail_infos)
-        try:
-            print(f"Testing email with parameters : address {user_email}, SMTP server"
-                  f"{appcli.coreconfig.logger_setup.mail_server}\n(check your mailbox) ...")
-            appcli.coreconfig.logger_setup.test_mail_service()
-        except (SMTPException, OSError) as e:
-            print("Email test resulted in an error :", e)
-            appcli.stop_app(oppose_to_saving=True)
-            exit(1)
-        appcli.start_app()
+try:
+    if args.interface == 'cli':
+        if must_test_email:
+            from smtplib import SMTPException
+            # Doesn't immediatly start parsing that is blocking
+            appcli = AppCLI(mode=args.mode, level=args.lvldisplay, start_parsing=False, start_pull_output=False,
+                            save_on_exit=auto_save, use_last_coreconfig=use_last_cfg, target_coreconfig=args.fileconfig,
+                            mail_infos=mail_infos)
+            try:
+                print(f"Testing email with parameters : address {user_email}, SMTP server"
+                      f"{appcli.coreconfig.logger_setup.mail_server}\n(check your mailbox) ...")
+                appcli.coreconfig.logger_setup.test_mail_service()
+            except (SMTPException, OSError) as e:
+                print("Email test resulted in an error :", e)
+                appcli.stop_app(oppose_to_saving=True)
+                exit(1)
+            appcli.start_app()
+        else:
+            AppCLI(mode=args.mode, level=args.lvldisplay, save_on_exit=auto_save,
+                   use_last_coreconfig=use_last_cfg, target_coreconfig=args.fileconfig,
+                   mail_infos=mail_infos)
     else:
-        AppCLI(mode=args.mode, level=args.lvldisplay, save_on_exit=auto_save,
-               use_last_coreconfig=use_last_cfg, target_coreconfig=args.fileconfig,
-               mail_infos=mail_infos)
-else:
-    print("Only CLI interface is implemented ATM, please use argument -i cli or none")
+        print("Only CLI interface is implemented ATM, please use argument -i cli or none")
+except Exception as e:
+    print("An unexpected exception occurred, try to run the app with -clean and check the parameters you gave are\n"
+          "correct following --help description. Also ensure paths present in superconfig file (default\n"
+          "svd/configs/last_coreconfig.yaml) are correct.\nPlease report traceback :\n")
+    raise e
 

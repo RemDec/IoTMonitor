@@ -1,6 +1,17 @@
-from src.utils.filesManager import clean_last_files
-from src.utils.misc_fcts import write_modlib
 from setuptools import setup
+
+
+def clean():
+    from src.utils.filesManager import clean_last_files
+    clean_last_files()
+
+
+def rewrite():
+    from src.utils.misc_fcts import write_modlib
+    from src.utils.filesManager import clean_last_files
+    write_modlib()
+    clean_last_files()
+
 
 setup(name='IoTMonitor',
       version='1.0',
@@ -14,6 +25,7 @@ setup(name='IoTMonitor',
 
 print("--- Project specific operations ---\n")
 print("  Cleaning target files for auto-save purpose...")
-clean_last_files()
+clean()
 print("  Rewriting modules library based on programmatically defined default modules...")
-write_modlib()
+print("  Empty autosave files...")
+rewrite()

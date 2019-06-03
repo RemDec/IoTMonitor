@@ -17,8 +17,10 @@ spec_cmds =  "There are some commands callable everywhere (not menu choices rela
 
 CLIparser = {
     'main_help': "This interactive CLI works as a menus navigation system where typing one of the proposed choice\n"
-                 "redirect in the corresponding menu (if no ambiguity first choice letters suffice)(if defined,\n"
-                 "default choice is < > surrounded and selected pressing enter). Each menu is identified by an id.\n\n"
+                 "redirect in the corresponding menu. If no ambiguity first choice letters suffice, others terminal\n"
+                 "facilities as autocompletion are available. Each menu is identified by an id.\nTo start, inspect\n"
+                 "Library content by going show menu and create your automated monitoring routine by instantiating\n"
+                 "desired Modules from create menu. After that, launch the Routine execution with resume menu.\n\n"
                  + spec_cmds,
     'create_help': "Build diverse elements to append in the application environment : virtual instance, module, etc.\n"
                    "Redirect to an interactive form taking parameters for the new element instance, or defaults.",
@@ -31,7 +33,8 @@ CLIparser = {
     'clear_help': "Clear (meaning empty) target container in the app, or all of them. All objects in target and their\n"
                   " information/job will be dropped and cancelled without possible return.",
     'show_help': "Print in this console the current state of selected resource considering the current detail level\n"
-                 " level (settable with $set level [0<= int <= 10]).",
+                 " level (settable with $set level [0<= int <= 10]). To start you should try to show library content\n"
+                 "from which Module instantiation can be done to build Routine automation system.",
     'save_help': "Write a file in a predefined structured format to save an application resource state or config.\n"
                  "Targetable resources are routine and netmap and general app config file (indicating their paths)",
     'pause_help': "Control the routine execution state, pause the panel kill all working background processes and \n"
