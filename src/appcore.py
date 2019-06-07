@@ -4,6 +4,10 @@ import signal
 
 
 class Core:
+    """This objects represents the app itself, maintaining references to all its components.
+
+    It is the upper level of the logic part through all elements can be managed.
+    """
 
     def __init__(self, coreconfig=None):
         if coreconfig is None:
@@ -127,11 +131,6 @@ class Core:
         if to_str_lvl < 0:
             return event_list
         return '\n'.join(map(lambda e: e.detail_str(level=to_str_lvl), event_list))
-
-    # ----- Output visualisation -----
-
-    def get_diagram_view(self):
-        pass
 
     # ----- Logging and events -----
 

@@ -7,6 +7,14 @@ import subprocess
 
 
 class PassiveModule(Module):
+    """Abstract class defining requirements for a module abstracting a program associated with passive archetype
+
+    Some methods in parent class Module should also be implemented in concrete Module classes inheriting PassiveModule.
+    This class is abstract but provides concrete facilities to manage execution scheme of program recognized as passive.
+    Such facilities are related with threads management, because execution of the underlying Module program should be
+    done in a new thread to dissociate from main execution flow. By inheriting this class you have access to, but you
+    are free to use it or no (if you want to implement you own Module linked threads management).
+    """
 
     def __init__(self, timer, netmap):
         self.timer = timer
