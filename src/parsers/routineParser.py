@@ -9,11 +9,13 @@ from src.routine.routine import Routine, Queue, Panel
 # --- Translating routine components to XML and writing it ---
 
 def queue_to_XML(queue):
-    qids = queue.get_idlist()
     queue_XML = E.queue(running=str(queue.is_running), nbr_mods=str(queue.get_nbr_mods()))
-    for qid in qids:
-        mod_inst = queue.get_mod_by_id(qid)
-        queue_XML.append(ModDescriptor(mod_inst=mod_inst, include_nondefault_param=True).modconfig_to_xml(qid))
+    for modentry in queue.get_modentries():
+        qid, mod_inst, exptimer = modentry.qid, modentry.module, modentry.exp_timer
+        if exptimer < 1:
+            exptimer = modentry.init_timer
+        mod_desc = ModDescriptor(mod_inst=mod_inst, include_nondefault_param=True)
+        queue_XML.append(mod_desc.modconfig_to_xml(set_id=qid, timer_val=exptimer))
     return queue_XML
 
 
@@ -22,7 +24,8 @@ def panel_to_XML(panel):
     panel_XML = E.panel(running=str(panel.is_running), nbr_mods=str(panel.get_nbr_mods()))
     for pid in pids:
         mod_inst = panel.get_mod_by_id(pid)
-        panel_XML.append(ModDescriptor(mod_inst=mod_inst, include_nondefault_param=True).modconfig_to_xml(pid))
+        mod_desc = ModDescriptor(mod_inst=mod_inst, include_nondefault_param=True)
+        panel_XML.append(mod_desc.modconfig_to_xml(set_id=pid, timer_val=mod_inst.get_read_interval()))
     return panel_XML
 
 
@@ -42,22 +45,23 @@ def write_routine_XML(routine, filepath=None):
 
 # --- Parse XML files to build routine elements instances ---
 
-def XML_to_queue(queue_elmt, timer=None, netmap=None,
-                 modmanager=ModManager(load_direct=True)):
+def XML_to_queue(queue_elmt, timer=None, netmap=None, modmanager=None):
+    modmanager = modmanager if modmanager is not None else ModManager(load_direct=True)
     running = bool(queue_elmt.get('running'))
     queue = Queue(timer, netmap)
     for modconfig in queue_elmt.findall('modconfig'):
-        mod_inst, qid = modmanager.modinst_from_modconfig(modconfig, timer=timer, netmap=netmap)
-        queue.add_module(mod_inst, given_id=qid)
+        mod_inst, qid, timer_val = modmanager.modinst_from_modconfig(modconfig, timer=timer, netmap=netmap)
+        queue.add_module(mod_inst, given_timer=timer_val, given_id=qid)
     return queue, running
 
 
-def XML_to_panel(panel_elmt, timer=None, netmap=None,
-                 modmanager=ModManager(load_direct=True)):
+def XML_to_panel(panel_elmt, timer=None, netmap=None, modmanager=None):
+    modmanager = modmanager if modmanager is not None else ModManager(load_direct=True)
     running = bool(panel_elmt.get('running'))
     panel = Panel(netmap=netmap)
     for modconfig in panel_elmt.findall('modconfig'):
-        mod_inst, pid = modmanager.modinst_from_modconfig(modconfig, timer=timer, netmap=netmap)
+        mod_inst, pid, read_interval_timer = modmanager.modinst_from_modconfig(modconfig, timer=timer, netmap=netmap)
+        mod_inst.set_read_interval(read_interval_timer)
         panel.add_module(mod_inst, given_id=pid)
     return panel, running
 

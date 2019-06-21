@@ -1,8 +1,10 @@
 ### TODO
 
 - Bug autocompletion
-- Easier new Module integration + more verifications (is program callable, desc non-empty, ...)
-- Save mod inst timers in XML
+- Bug save config doesn't reference current file desc previously redefined?
+- Menus : cmd to backward previous menu
+- [OK] Easier new Module integration + more verifications (is program callable, desc non-empty, ...)
+- [OK] Save mod inst timers in XML
 - Passable desired terminal for View
 - Multiline display for containers (avoid wrapping in View)
 - Management of dependencies/requirements for underlying programs
@@ -25,6 +27,7 @@
 - Sorting/filtering of events
 - More possible manipulations with library file
 
+- Possibility to load components from files in app
 - Chaining and dependencies between Modules
 - Elaborated VI fields completion/replacement
 - Traffic deviation from router

@@ -69,7 +69,9 @@ class CLIparser:
                     self.clear_console()
                     self.clear_cls = True
             except Exception as e:
-                print("\nUnhandled specific error, return to menu considered as current one :\n", e)
+                import logging
+                logging.getLogger('errorfile').exception(f"Unexpected exception catched during parsing")
+                print(f"\nUnhandled specific error of type {type(e)} :\n{e}\n --> Check logs, return to current menu")
 
     # ----- Internal utilities functions -----
 

@@ -100,7 +100,8 @@ class ModManager:
         if self.is_available(mod_desc.m_id):
             mod_inst = self.get_mod_from_id(mod_desc.m_id, timer=timer, netmap=netmap)
             mod_inst.set_params(mod_desc.curr_params)
-            return mod_inst, mod_desc.setid
+            timer_val = mod_desc.def_timer if not(mod_desc.def_timer is None or mod_desc.def_timer < 1) else 0
+            return mod_inst, mod_desc.setid, timer_val
 
     def get_mod_desc(self, id):
         for desc in self.available_mods:
@@ -218,14 +219,17 @@ class ModDescriptor:
                 modattr)
         return xml
 
-    def modconfig_to_xml(self, set_id=None):
+    def modconfig_to_xml(self, set_id=None, timer_val=None):
         # generate a XML saving module configuration and set identifier (pid or qid)
         # reference the m_id of the module so it can be reinstancied using a modinfo entry
         # (which indicates corresponding python module to import, classname, ...)
         if set_id is None:
             xml = E.modconfig(modid=self.m_id)
         else:
-            xml = E.modconfig(modid=self.m_id, setid=set_id)
+            if timer_val is None:
+                xml = E.modconfig(modid=self.m_id, setid=set_id)
+            else:
+                xml = E.modconfig(modid=self.m_id, setid=set_id, timer=str(timer_val))
         xml.append(self.curr_param_to_xml())
         return xml
 
@@ -264,6 +268,10 @@ class ModDescriptor:
         # defined in self in addition to do it with self.get_mod_instance())
         self.m_id = xml_tree.get("modid")
         self.setid = xml_tree.get("setid")
+        try:
+            self.def_timer = int(xml_tree.get("timer"))
+        except (ValueError, TypeError):
+            pass
         self.parse_savedparam(xml_tree)
 
     def parse_defparam(self, xml_tree):

@@ -53,6 +53,10 @@ loggers:
     level: ERROR
     handlers: [errorstream, genfile]
     propagate: no
+  errorfile:
+    level: ERROR
+    handlers: [genfile]
+    propagate: no
   cli:
     level: DEBUG
     handlers: [console]

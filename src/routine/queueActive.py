@@ -107,13 +107,16 @@ class Queue(TimerInterface):
                 return entry.module
 
     def get_corresp_entry(self, field):
-        # field either module instance or id
+        # field either module instance or qid
         for entry in self.set:
             if field is entry.module or field == entry.qid:
                 return entry
 
     def get_idlist(self):
         return [entry.qid for entry in self.set]
+
+    def get_modentries(self):
+        return self.set
 
     def adaptive_display(self, fct_to_entry, header=True):
         s = ""
