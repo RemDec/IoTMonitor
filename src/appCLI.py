@@ -9,11 +9,16 @@ import os
 
 
 cli_modes = ('noout', 'outpiped', 'outscreen')
+terms = {'xterm': ['xterm', '-geometry', '150x70+0+0', '+aw', '-e'],
+         'konsole': ['konsole', '-e'],
+         'gnome': ['gnome-terminal', '-e'],
+         'gnome-terminal': ['gnome-terminal', '-e'],
+         'auto': ['x-terminal-emulator', '-e']}
 
 
 class AppCLI(TimerInterface):
 
-    def __init__(self, mode=cli_modes[2], level=1, start_parsing=True, start_pull_output=True,
+    def __init__(self, mode=cli_modes[2], terminal=None, level=1, start_parsing=True, start_pull_output=True,
                  save_on_exit=True, use_last_coreconfig=True, target_coreconfig=None, check_files=True,
                  mail_infos=None):
         self.mode = mode
@@ -42,7 +47,7 @@ class AppCLI(TimerInterface):
         self.paths = self.coreconfig.paths
 
         self.to_disp = "app"
-        self.output = self.config_output()  # Init output controller object depending on mode selected
+        self.output = self.config_output(terminal)  # Init output controller object depending on mode selected
         self.cli = CLIparser(self.core, core_controller=self)
 
         self.start_app(start_parsing, start_pull_output)
@@ -111,7 +116,7 @@ class AppCLI(TimerInterface):
 
     # ----- Managing independent display interface (other terminal, graphical text field, ..)
 
-    def config_output(self):
+    def config_output(self, terminal=None):
         if isinstance(self.mode, int):
             ind = min(max(self.mode, 0), len(cli_modes))
             self.mode = cli_modes[ind]
@@ -120,7 +125,7 @@ class AppCLI(TimerInterface):
         elif self.mode == 'outpiped':
             return PipeOutput()
         elif self.mode == 'outscreen':
-            return ConsoleOutput()
+            return ConsoleOutput(terminal)
         elif self.mode == 'tkinter':
             return TkinterOutput(self)
 
@@ -228,11 +233,14 @@ class PipeOutput:
 
 class ConsoleOutput:
 
-    def __init__(self):
+    def __init__(self, terminal=None):
+        from src.utils.misc_fcts import verify_program
         self.PIPE_PATH = "/tmp/output_monitor"
         self.reading = False
         self.popen = None
-        self.terminal = 'xterm'
+        terminal_key = 'xterm' if terminal is None else terminal
+        self.terminal_cmd = terms.get(terminal_key, [terminal_key])
+        verify_program(self.terminal_cmd[0])
 
     def write(self, to_output):
         # Write where this object want to bufferise the information to display
@@ -249,7 +257,7 @@ class ConsoleOutput:
         if os.path.exists(self.PIPE_PATH):
             os.remove(self.PIPE_PATH)
         os.mkfifo(self.PIPE_PATH)
-        self.popen = subprocess.Popen([self.terminal, '-geometry', '150x70+0+0', '+aw', '-e', 'watch', '-t', '-n 0,5', 'cat %s' % self.PIPE_PATH],
+        self.popen = subprocess.Popen(self.terminal_cmd+['watch', '-t', '-n 0,5', 'cat %s' % self.PIPE_PATH],
                                       stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL)
 
     def stop_reading(self):

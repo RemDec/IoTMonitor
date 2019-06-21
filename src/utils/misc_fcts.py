@@ -79,12 +79,25 @@ def write_modlib(file_dest=None):
 
 
 def is_program_callable(prog):
-    """Check whether prog is on PATH and marked as executable."""
+    """Check whether prog is on PATH or existing file and marked as executable."""
     from shutil import which
     if which(prog) is not None:
         return True
     import os
     return os.access(prog, os.F_OK or os.X_OK)
+
+
+class NonExecutableError(Exception):
+
+    def __init__(self, tried_prog_call):
+        super().__init__(f"The program called by command '{tried_prog_call}' does not exist in PATH or the file is not"
+                         f" marked as executable.")
+
+
+def verify_program(prog):
+    """Raise an exception if the command is not in path or an existing file marked as executable"""
+    if not is_program_callable(prog):
+        raise NonExecutableError(prog)
 
 
 def str_param_comp(current, defaults, descriptions={}, prefix=''):

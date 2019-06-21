@@ -5,7 +5,7 @@
 - Menus : cmd to backward previous menu
 - [OK] Easier new Module integration + more verifications (is program callable, desc non-empty, ...)
 - [OK] Save mod inst timers in XML
-- Passable desired terminal for View
+- [OK] Passable desired terminal for View
 - Multiline display for containers (avoid wrapping in View)
 - Management of dependencies/requirements for underlying programs
 - state of VI through time

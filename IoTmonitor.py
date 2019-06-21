@@ -76,6 +76,9 @@ parser.add_argument("--mserver", help="SMTP server to use for sending mails, not
 parser.add_argument("--testmail", help="Set it to send a test email to specified address before app launching",
                     action="store_true")
 
+parser.add_argument("--term", default='xterm',
+                    help="Terminal to use for view in cli mode, should be in path or constant 'auto' (default 'xterm')")
+
 args = parser.parse_args()
 
 auto_save = not args.noautosave
@@ -85,6 +88,7 @@ user_email = args.mail
 pwd = None
 mail_server = args.mserver
 must_test_email = args.testmail
+term_cmd = args.term
 
 if clean_last:
     filesmanager.clean_last_files()
@@ -107,7 +111,8 @@ try:
         if must_test_email:
             from smtplib import SMTPException
             # Doesn't immediatly start parsing that is blocking
-            appcli = AppCLI(mode=args.mode, level=args.lvldisplay, start_parsing=False, start_pull_output=False,
+            appcli = AppCLI(mode=args.mode, terminal=term_cmd, level=args.lvldisplay, start_parsing=False,
+                            start_pull_output=False,
                             save_on_exit=auto_save, use_last_coreconfig=use_last_cfg, target_coreconfig=args.fileconfig,
                             mail_infos=mail_infos)
             try:
@@ -120,7 +125,7 @@ try:
                 exit(1)
             appcli.start_app()
         else:
-            AppCLI(mode=args.mode, level=args.lvldisplay, save_on_exit=auto_save,
+            AppCLI(mode=args.mode, terminal=term_cmd, level=args.lvldisplay, save_on_exit=auto_save,
                    use_last_coreconfig=use_last_cfg, target_coreconfig=args.fileconfig,
                    mail_infos=mail_infos)
     else:
