@@ -1,0 +1,33 @@
+### TODO
+
+- Bug autocompletion
+- Easier new Module integration + more verifications (is program callable, desc non-empty, ...)
+- Save mod inst timers in XML
+- Passable desired terminal for View
+- Multiline display for containers (avoid wrapping in View)
+- Management of dependencies/requirements for underlying programs
+- state of VI through time
+- strict format for VI fields
+- Make uniform methods/attributes/notions in code
+- DOC
+
+- Restructure containers Panel & Queue with a superclass
+- Management of Independent Modules
+- Intermediate Tkinter interface for multifields forms
+- New Modules !
+
+
+### TO SEE
+
+- Full feedback in View
+- Keep nbr events per mod inst
+- Summary mail (cumulative threats)
+- Sorting/filtering of events
+- More possible manipulations with library file
+
+- Chaining and dependencies between Modules
+- Elaborated VI fields completion/replacement
+- Traffic deviation from router
+- Management of passwords (wifi + equipments)
+- Management of network interfaces
+- Full GUI

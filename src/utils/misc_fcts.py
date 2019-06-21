@@ -49,6 +49,44 @@ def get_infoname_py(fun):
     return fun.__name__, modname
 
 
+def get_available_modules(stringnames=True):
+    from pkgutil import iter_modules
+    import modules.actives as actpackage
+    import modules.passives as paspackage
+    actives, passives = [], []
+    for _, modname, ispkg in iter_modules(actpackage.__path__):
+        if not ispkg:
+            actives.append(modname)
+    for _, modname, ispkg in iter_modules(paspackage.__path__):
+        if not ispkg:
+            passives.append(modname)
+    return passives, actives
+
+
+def write_modlib(file_dest=None):
+    from modules.actives import arbitraryCmd, nmapExplorer, nmapPortDiscovery, nmapVulners
+    from modules.passives import arbitraryCmdBg, pingTarget
+    from src.utils.moduleManager import ModManager
+    from src.utils.filesManager import get_dflt_entry
+
+    if file_dest is None:
+        file_dest = get_dflt_entry('dflt_lib')
+    actives = [arbitraryCmd.AModArbitraryCmd(), nmapExplorer.AModNmapExplorer(), nmapPortDiscovery.AModNmapPortDisc(),
+               nmapVulners.AModNmapVulners()]
+    passives = [arbitraryCmdBg.PModArbitraryCmdBg(), pingTarget.PModPing()]
+    mod_instances = actives + passives
+    ModManager(str(file_dest)).create_modlib(mod_instances)
+
+
+def is_program_callable(prog):
+    """Check whether prog is on PATH and marked as executable."""
+    from shutil import which
+    if which(prog) is not None:
+        return True
+    import os
+    return os.access(prog, os.F_OK or os.X_OK)
+
+
 def str_param_comp(current, defaults, descriptions={}, prefix=''):
     """Illustrate which value would be given for each param
 
@@ -155,7 +193,21 @@ def str_multiframe(strlist, by_pack_of=3):
     | str    |  | str2   |
     | longer |  | same l |
     +--------+  +--------+
-    """
+
+
+def write_modlib(file_dest=None):
+    from modules.actives import arbitraryCmd, nmapExplorer, nmapPortDiscovery, nmapVulners
+    from modules.passives import arbitraryCmdBg, pingTarget
+    from src.utils.moduleManager import ModManager
+    from src.utils.filesManager import get_dflt_entry
+
+    if file_dest is None:
+        file_dest = get_dflt_entry('dflt_lib')
+    actives = [arbitraryCmd.AModArbitraryCmd(), nmapExplorer.AModNmapExplorer(), nmapPortDiscovery.AModNmapPortDisc(),
+               nmapVulners.AModNmapVulners()]
+    passives = [arbitraryCmdBg.PModArbitraryCmdBg(), pingTarget.PModPing()]
+    mod_instances = actives + passives
+    ModManager(str(file_dest)).create_modlib(mod_instances)  """
     final = ""
     pack = 0
     while pack < len(strlist):
@@ -179,21 +231,6 @@ def get_root_path():
     """
     from pathlib import Path
     return Path(__file__).parent.parent.parent
-
-
-def write_modlib(file_dest=None):
-    from modules.actives import arbitraryCmd, nmapExplorer, nmapPortDiscovery, nmapVulners
-    from modules.passives import arbitraryCmdBg, pingTarget
-    from src.utils.moduleManager import ModManager
-    from src.utils.filesManager import get_dflt_entry
-
-    if file_dest is None:
-        file_dest = get_dflt_entry('dflt_lib')
-    actives = [arbitraryCmd.AModArbitraryCmd(), nmapExplorer.AModNmapExplorer(), nmapPortDiscovery.AModNmapPortDisc(),
-               nmapVulners.AModNmapVulners()]
-    passives = [arbitraryCmdBg.PModArbitraryCmdBg(), pingTarget.PModPing()]
-    mod_instances = actives + passives
-    ModManager(str(file_dest)).create_modlib(mod_instances)
 
 
 if __name__ == '__main__':

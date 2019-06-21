@@ -274,6 +274,11 @@ class CLIparser:
         # [[actives m_id] , [passives m_id]]
         return self.core.get_available_mods(only_names=True)
 
+    def get_mods_in_pkgs(self):
+        # Retrieve all written python modules in packages modules.actives and modules.passives
+        from src.utils.misc_fcts import get_available_modules
+        return get_available_modules()
+
     def get_routine_setids(self):
         # Get all modules in the current routine as their set_id
         # [[mod in panel pid] , [mod in queue qid]]
@@ -573,26 +578,22 @@ class CLIparser:
             self.core.add_to_netmap(vi, mapid)
         self.back_main_menu()
 
-    def after_integrate_slct(self, archetype):
-        if archetype == 'active':
-            py_pkg = 'modules.actives'
-        else:
-            py_pkg = 'modules.passives'
-        marker = f"Type de python module name in package {py_pkg} containing the class definition\n" \
-                 f"of the new Module to integrate (enter to cancel)\n[pymod name] :"
-        pymod_name = self.get_user_in_or_dflt(default='', marker=marker)
+    def after_integrate_slct(self, pymod_name):
         if pymod_name != '':
-            from src.utils.filesManager import ModuleIntegrator as MI
+            from src.utils.filesManager import ModuleIntegrator, ModuleIntegrationError
             try:
-                integrator = MI(f"{py_pkg}.{pymod_name}", library=self.core.modmanager, auto_integrate=False)
+                py_pkg = 'modules.passives' if pymod_name in self.curr_choices[0] else 'modules.actives'
+                target = f"{py_pkg}.{pymod_name}"
+                integrator = ModuleIntegrator(target, library=self.core.modmanager, auto_integrate=False)
                 print(integrator)
                 integrate_ok = self.get_user_confirm(marker="Validate Module integration (Y/n) ? ")
                 if integrate_ok:
                     integrator.integrate_module()
-            except (ModuleNotFoundError, NotImplementedError) as e:
-                print(e)
+            except ModuleIntegrationError as e:
+                print("     Integration FAILED\n", e)
                 self.no_wipe_next()
-            self.curr_menu = self.main_menu
+            else:
+                self.curr_menu = self.main_menu
         else:
             self.back_main_menu()
 
@@ -696,8 +697,11 @@ class CLIparser:
                        'dflt_choice': 'entire routine',
                        'fct_choice': self.after_resume_slct}
 
-        self.integrate = {'desc': "Integrate a new written module in the application (library)",
-                          'help': get_res_CLI('integrate_help'), 'choices': [['active', 'passive']],
+        self.integrate = {'desc': "Integrate a new written module in the app (including it in library)",
+                          'help': get_res_CLI('integrate_help'), 'choices': self.get_mods_in_pkgs,
+                          'marker': "Type the python module name in package modules.[actives|passives] containing\n"
+                                    "the class definition of the new Module to integrate permanently\n"
+                                    "[pymod name] :",
                           'fct_choice': self.after_integrate_slct}
 
         # -- Secondary menu --

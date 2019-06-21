@@ -121,10 +121,28 @@ class FileEntryError(Exception):
 
 
 class ModuleIntegrator:
+    """Flexible helper to new module integration in the application environment
+
+    After a new module writing as a class inheriting abc(Facility)[Active|Passive]Module it should be properly
+    integrated in the application. It means being included in the modules library, from where it can later be
+    instantiated to manipulate instances of this new module in the application. It can be done programmatically
+    with this helper object.
+
+    """
 
     def __init__(self, module, module_class=None, library=None, auto_integrate=True):
+        """
+
+        Args:
+            module (str or Module): target Module, if str it must correspond to python package where Module class is
+            module_class: name of the class corresponding to the Module, not given implies autosearch by prefix [A|P]mod
+            library: the library in which the Module will be included
+            auto_integrate (bool): whether should integrate it after instantiating this object
+        """
+        # Try to find corresponding module class and instantiate it
         self.modinst = self.compute_modinst(module, module_class)
         self.library = self.compute_library(library)
+        self.verify_module(self.modinst)
         if auto_integrate:
             self.integrate_module()
 
@@ -137,17 +155,40 @@ class ModuleIntegrator:
             try:
                 pymodule = import_module(module)
                 if module_class is None:
-                    # Searching in module dir for the module class name
+                    # Searching in module class dir for the module class name
                     for direntry in dir(pymodule):
                         if direntry.startswith('AMod') or direntry.startswith('PMod'):
                             module_class = direntry
                             break
                     if module_class is None:
-                        raise NotImplementedError(f"Class guessing for Module in python module {module} failed.\n"
-                                                  f"Check that the class name begins with 'AMod' or 'PMod'")
+                        raise ModuleIntegrationError(f"Class guessing for Module in python module {module} failed.\n"
+                                                     f"Check that the class name begins with 'AMod' or 'PMod'")
                 return getattr(pymodule, module_class)()
-            except ModuleNotFoundError as e:
-                raise ModuleNotFoundError(f"Unable to import python {module} supposed to contain Module class def.")
+            except ModuleNotFoundError:
+                raise ModuleIntegrationError(f"Unable to import python module {module} supposed to contain the module\n"
+                                             f"class definition abstracting an underlying program (inheriting Module).")
+            except AttributeError:
+                raise ModuleIntegrationError(f"Given python module {module} does not have class {module_class}\n"
+                                             f"in its attributes.")
+
+    def verify_module(self, instance):
+        from modules.abcModule import Module
+        from src.utils.misc_fcts import is_program_callable
+        err_msg = ''
+        if not isinstance(instance, Module):
+            err_msg += "! The class designed as the Module implementation does not inherit of superclass Module"
+        else:
+            modid = instance.get_module_id().strip()
+            if modid == '' or self.library.is_available(modid):
+                err_msg += "! The module id must be a non-empty string unique among modules already present in library"
+            cmd = instance.get_cmd().split()
+            if cmd == [] or not is_program_callable(cmd[0]):
+                err_msg += "\n! The command calling underlying program must be in the PATH or an executable filepath"
+            archetype = instance.is_active()
+            if not isinstance(archetype, bool):
+                err_msg += "\n! The Module must indicate its corresponding execution archetype with is_active (boolean)"
+        if err_msg != '':
+            raise ModuleIntegrationError(err_msg)
 
     def compute_library(self, library):
         from src.utils.moduleManager import ModManager
@@ -159,6 +200,9 @@ class ModuleIntegrator:
             return ModManager()
 
     def integrate_module(self):
+        """Include the module in the library collection
+
+        """
         self.library.add_to_modlib_file(self.modinst)
         self.library.load_modlib()
 
@@ -174,6 +218,13 @@ class ModuleIntegrator:
         s += f"| Module parameters :\n"
         s += str_param_comp(curr_params, dflt_params, descriptions=desc_PARAMS, prefix='|  ')
         return s
+
+
+class ModuleIntegrationError(Exception):
+
+    def __init__(self, error):
+        header = "Module integration resulted to an error with following feedback :\n"
+        super().__init__(header + error)
 
 
 if __name__ == '__main__':
