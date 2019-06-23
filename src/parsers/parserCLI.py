@@ -14,8 +14,9 @@ class CLIparser:
         self.setup_menus()
         self.get_input = False
         self.curr_menu = {}
+        self.previous_menu = self.curr_menu
         self.curr_choices = []
-        self.reserved = {'main': self.back_main_menu, 'exit': self.exit,
+        self.reserved = {'main': self.back_main_menu, 'previous': self.back_previous_menu, 'exit': self.exit,
                          'help': self.ask_help, 'choices': self.ask_choices, 'cmds': self.ask_cmds,
                          'output': self.ctrl_output, 'set': self.set_cfg_param}
         self.display_header = True
@@ -35,6 +36,7 @@ class CLIparser:
 
     def start_parsing(self):
         self.get_input = True
+        self.curr_menu = self.main_menu
         self.back_main_menu()
         self.loop_parsing()
 
@@ -189,7 +191,15 @@ class CLIparser:
     def back_main_menu(self, args=[]):
         self.clear_console()
         self.clear_cls = True
+        self.previous_menu = self.curr_menu
         self.curr_menu = self.main_menu
+
+    def back_previous_menu(self, args=[]):
+        self.clear_console()
+        self.clear_cls = True
+        new_previous = self.curr_menu
+        self.curr_menu = self.previous_menu
+        self.previous_menu = new_previous
 
     def exit(self, kill_app=True, args=[]):
         if self.core_ctrl is not None:
@@ -293,6 +303,7 @@ class CLIparser:
 
     def transit_menu(self, menu_input_name):
         target_menu_index = self.curr_menu['choices'][menu_input_name]
+        self.previous_menu = self.curr_menu
         self.curr_menu = self.index_menus[target_menu_index]
 
     def after_mod_slct(self, mod_id):
@@ -464,8 +475,10 @@ class CLIparser:
                'threat events': "threats", 'modification events': "modifs", 'app': "app"}
         res_to_show = map.get(show_input_name, "app")
         if res_to_show == "vi":
+            self.previous_menu = self.curr_menu
             self.curr_menu = self.show_VI
         elif res_to_show == "entry":
+            self.previous_menu = self.curr_menu
             self.curr_menu = self.show_modentry
         else:
             lvl_info = f"(increase it with $set lvl {self.curr_display_lvl + 1}" if self.curr_display_lvl < 10 else ''
@@ -595,6 +608,7 @@ class CLIparser:
                 print("     Integration FAILED\n", e)
                 self.no_wipe_next()
             else:
+                self.previous_menu = self.curr_menu
                 self.curr_menu = self.main_menu
         else:
             self.back_main_menu()

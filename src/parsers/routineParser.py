@@ -11,9 +11,7 @@ from src.routine.routine import Routine, Queue, Panel
 def queue_to_XML(queue):
     queue_XML = E.queue(running=str(queue.is_running), nbr_mods=str(queue.get_nbr_mods()))
     for modentry in queue.get_modentries():
-        qid, mod_inst, exptimer = modentry.qid, modentry.module, modentry.exp_timer
-        if exptimer < 1:
-            exptimer = modentry.init_timer
+        qid, mod_inst, exptimer = modentry.qid, modentry.module, modentry.init_timer
         mod_desc = ModDescriptor(mod_inst=mod_inst, include_nondefault_param=True)
         queue_XML.append(mod_desc.modconfig_to_xml(set_id=qid, timer_val=exptimer))
     return queue_XML

@@ -2,10 +2,11 @@
 
 - Bug autocompletion
 - Bug save config doesn't reference current file desc previously redefined?
-- Menus : cmd to backward previous menu
+- [OK] Menus : cmd to backward previous menu
 - [OK] Easier new Module integration + more verifications (is program callable, desc non-empty, ...)
 - [OK] Save mod inst timers in XML
 - [OK] Passable desired terminal for View
+- More control on View terminal process
 - Multiline display for containers (avoid wrapping in View)
 - Management of dependencies/requirements for underlying programs
 - state of VI through time
