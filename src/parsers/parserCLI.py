@@ -261,8 +261,16 @@ class CLIparser:
                 if not self.core_ctrl.set_current_todisplay(args[1]):
                     print("Error, give a viewable resource name :", ','.join(self.core_ctrl.poss_display))
             print("Current viewed resource :", self.core_ctrl.to_disp)
+        elif args[0] in ['mode', 'change', 'switch']:
+            if arg_l >= 2:
+                self.core_ctrl.change_view_mode(args[1], None if arg_l == 2 else args[2])
+            print("Current View mode :", self.core_ctrl.output)
         elif args[0] == 'infos':
             print("Current controller maintaining application view :\n", self.core_ctrl)
+        elif args[0] == 'reset':
+            self.core_ctrl.reset_view()
+        elif args[0] == 'stop':
+            self.core_ctrl.exit_view()
         self.no_wipe_next()
 
     def set_cfg_param(self, args=[]):

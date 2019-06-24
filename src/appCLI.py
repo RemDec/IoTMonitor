@@ -17,11 +17,26 @@ terms = {'xterm': ['xterm', '-geometry', '150x70+0+0', '+aw', '-e'],
 
 
 class AppCLI(TimerInterface):
+    """Global controller instantiating and maintaining all parts of application : logic, CLI interface and View"""
 
     def __init__(self, mode=cli_modes[2], terminal=None, level=1, start_parsing=True, start_pull_output=True,
                  save_on_exit=True, use_last_coreconfig=True, target_coreconfig=None, check_files=True,
                  mail_infos=None):
-        self.mode = mode
+        """
+
+        Args:
+            mode(str): a constant string corresponding to the desired View mode : nouout, outpiped or outsreen
+            terminal(str): if outscreen, indicates the terminal emulator to use for view screen
+            level(int): the detail level for displayed resource in view
+            start_parsing(bool): make the current terminal as the CLI interface directly after all parts instantiated
+            start_pull_output(bool): start the view display directly after all parts instantiated
+            save_on_exit(bool): whether state of app components should be saved in their attributed file at exiting
+            use_last_coreconfig(bool): whether should load from files given in last_coreconfig.xml
+            target_coreconfig(str): the master file to use for configuration (not used if use_last_coreconfig is true)
+            check_files(str): whether a verification of existence of used files should be done before app running
+            mail_infos(str tuple): mail information given by the user, form (email, email_pwd, mail_server)
+        """
+        self.mode = self.correct_mode(mode)
         self.level = level
         self.save_on_exit = save_on_exit # Save core components state at regular app exiting
         self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library",
@@ -55,7 +70,7 @@ class AppCLI(TimerInterface):
     # ----- Control application execution/interactive CLI -----
 
     def start_app(self, start_parsing=True, start_display=True):
-        if self.mode != 'noout' and start_display:
+        if start_display:
             self.start_display_output()
         if start_parsing:
             # blocking on input waiting
@@ -114,7 +129,10 @@ class AppCLI(TimerInterface):
     def save_target(self, target, filepath):
         pass
 
-    # ----- Managing independent display interface (other terminal, graphical text field, ..)
+    # ----- Managing the view (other terminal, graphical text field, ..)
+
+    def correct_mode(self, mode):
+        return mode if mode in cli_modes else cli_modes[2]
 
     def config_output(self, terminal=None):
         if isinstance(self.mode, int):
@@ -134,6 +152,23 @@ class AppCLI(TimerInterface):
 
     def stop_display_output(self):
         self.output.stop_reading()
+
+    def exit_view(self):
+        self.output.stop_reading()
+        self.output.exit()
+
+    def reset_view(self):
+        self.output.stop_reading()
+        self.output.exit()
+        self.output.start_reading()
+
+    def change_view_mode(self, new_mode, terminal=None):
+        self.timer.unsub(self)
+        self.exit_view()
+        self.mode = self.correct_mode(new_mode)
+        self.output = self.config_output(terminal)
+        self.start_display_output()
+        self.timer.subscribe(self)
 
     def set_level(self, new_lvl):
         if 0 <= new_lvl <= 10:
@@ -168,58 +203,77 @@ class AppCLI(TimerInterface):
                f"displaying {self.to_disp}"
 
 
-class NoOutput:
+# --- Manipulation of app View ---
+
+class BaseOutput:
+    """Object managing the View part of the application, allowing user to see what's going on during its execution
+
+    The view can be presented in various ways, but is basically a string to write somewhere and after perhaps read it
+    to retrieve display information to user. This string is the representation of the targeted resource to view,
+    selected by the user in function of what he would like to observe.
+    """
 
     def __init__(self):
-        pass
+        self.reading = False
 
     def write(self, to_output):
+        """Define the way the information to display should be manipulated, called regularly if set as 'reading'
+
+        Args:
+            to_output(str): the string to display, representation of the selected resource
+        """
         pass
 
     def pull_output(self):
+        """Action triggered after each writing, likely displaying the information visually to the user"""
         pass
 
     def start_reading(self):
-        pass
+        self.reading = True
 
     def stop_reading(self):
+        self.reading = False
+
+    def is_reading(self):
+        """Whether the View should be updated with new display information"""
+        return self.reading
+
+    def exit(self):
+        """Stop the displaying activity and all underlying processes involved in"""
         pass
+
+    def __str__(self):
+        return "Base class for an object allowing manipulation of application View"
+
+
+class NoOutput(BaseOutput):
 
     def is_reading(self):
         return False
 
-    def exit(self):
-        pass
-
     def __str__(self):
-        return "NoOutput object - informations taken from app core are not automatically displayed"
+        return "NoOutput object - information taken from app core are not automatically displayed"
 
 
-class PipeOutput:
+class PipeOutput(BaseOutput):
+    """Feed information to normally display in a readable pipe, usable by the user as he pleases
+
+    Especially useful for user in a non graphical environment (using app remotely with ssh for example)
+    """
 
     def __init__(self):
+        super().__init__()
         self.PIPE_PATH = "/tmp/output_monitor"
-        self.reading = False
 
     def write(self, to_output):
         with open(self.PIPE_PATH, 'w') as pipe_w:
             pipe_w.write(to_output)
-
-    def pull_output(self):
-        # Let the user make it's own utility of information in pipe
-        pass
 
     def start_reading(self):
         self.reading = True
         if os.path.exists(self.PIPE_PATH):
             os.remove(self.PIPE_PATH)
         os.mkfifo(self.PIPE_PATH)
-
-    def is_reading(self):
-        return self.reading
-
-    def stop_reading(self):
-        self.reading = False
 
     def exit(self):
         self.stop_reading()
@@ -231,15 +285,19 @@ class PipeOutput:
                " use watch command on it).\nPipe descriptor : " + self.PIPE_PATH
 
 
-class ConsoleOutput:
+class ConsoleOutput(BaseOutput):
+    """Usable view in a graphical environment, displaying the targeted resource regularly
+
+    In background, feed a pipe but also spawn a terminal emulator in a new window, running 'watch' Linux command on
+    its content to update the view of the resource to display."""
 
     def __init__(self, terminal=None):
+        super().__init__()
         from src.utils.misc_fcts import verify_program
         self.PIPE_PATH = "/tmp/output_monitor"
-        self.reading = False
         self.popen = None
-        terminal_key = 'xterm' if terminal is None else terminal
-        self.terminal_cmd = terms.get(terminal_key, [terminal_key])
+        self.terminal_key = 'xterm' if terminal is None else terminal
+        self.terminal_cmd = terms.get(self.terminal_key, [self.terminal_key])
         verify_program(self.terminal_cmd[0])
 
     def write(self, to_output):
@@ -260,12 +318,6 @@ class ConsoleOutput:
         self.popen = subprocess.Popen(self.terminal_cmd+['watch', '-t', '-n 0,5', 'cat %s' % self.PIPE_PATH],
                                       stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL)
 
-    def stop_reading(self):
-        self.reading = False
-
-    def is_reading(self):
-        return self.reading
-
     def exit(self):
         self.stop_reading()
         if self.popen is not None:
@@ -274,7 +326,7 @@ class ConsoleOutput:
                 self.popen.kill()
 
     def __str__(self):
-        return f"ConsoleOutput spawning {self.terminal} monitoring app state pulling info from pipe\n" \
+        return f"ConsoleOutput spawning {self.terminal_key} monitoring app state pulling info from pipe\n" \
                f"{self.PIPE_PATH} using watch command to regularly display it"
 
 

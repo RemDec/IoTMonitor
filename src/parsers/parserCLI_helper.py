@@ -1,6 +1,7 @@
 
 spec_cmds =  "There are some commands callable everywhere (not menu choices relative), to prefix with a '$':\n" \
              "   -main : brings back to main menu, aborting current action\n" \
+             "   -previous : backward to the previous menu\n" \
              "   -exit : shut down the application and this interactive CLI\n" \
              "   -help [menuid] : print help page for given menu (current one if not specified)\n" \
              "   -choices [menuid] : print available choices for the current or any given menu with detail level" \
@@ -10,6 +11,9 @@ spec_cmds =  "There are some commands callable everywhere (not menu choices rela
              "                  L 0 for less details, 10 is maximum level\n" \
              "      + view [resource] : print or set current app resource displayed in the output view\n" \
              "                  L 'any' to display possible code values for available resources\n" \
+             "      + mode [viewmode] : switch or display the current view mode to [noout|outpiped|outscreen]\n" \
+             "      + stop : stop to update the view and terminate linked processes\n" \
+             "      + reset : restore the view considering current mode (restart it if already working)\n" \
              "   -set : change a general parameter value or print all currents one if no argument given\n" \
              "      + level [new level] print or set detail level for printing information in this terminal\n" \
              "   -cmds : display above special commands description"
