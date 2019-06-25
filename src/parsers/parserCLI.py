@@ -315,7 +315,7 @@ class CLIparser:
         self.curr_menu = self.index_menus[target_menu_index]
 
     def after_mod_slct(self, mod_id):
-        dflts = self.get_user_confirm(f"[{mod_id}] use defaults params (Y/n)? ")
+        dflts = self.get_user_confirm(f"[{mod_id}] use defaults params (Y/n) ? ")
         in_rout = self.get_user_confirm(f"[{mod_id}] append it in routine (Y/n) ?")
         if dflts:
             mod_inst = self.core.instantiate_module(mod_id)
@@ -336,7 +336,7 @@ class CLIparser:
                     input_params[code_param] = user_in
             mod_inst = self.core.instantiate_module(mod_id, curr_params=input_params)
         # Taking VIs mapids the mod exec will be relative to
-        marker = f"\nIndicate specific VIs the [{mod_id}] execution should be relative to ? (y/N) :"
+        marker = f"\nIndicate specific VIs the [{mod_id}] execution should be relative to (y/N) ?"
         take_vi = self.get_user_confirm(marker=marker, empty_ok=False)
         vis = []
         all_vis = self.core.get_all_mapids().copy()

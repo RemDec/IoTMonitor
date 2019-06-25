@@ -12,9 +12,11 @@ IPv4_addr = r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b'
 
 
 class PModPing(PassiveModule):
-    """Passive Module used to confirm that an equipment behind an IP address is still responding (ICMP echo requests)
+    """Passive Module used to confirm that an equipment behind an IP address is still responding (ICMP echo requests).
 
+    Written using skeleton.
     """
+
     def __init__(self, read_interval=10, params=None, timer=None, netmap=None):
         super().__init__(timer, netmap)
         self.m_id = "pingit"
@@ -27,6 +29,12 @@ class PModPing(PassiveModule):
         self.params = params
         self.set_params(params)
 
+    def get_description(self):
+        return f"[{self.m_id}] Module pinging constantly a given target"
+
+    def get_module_id(self):
+        return self.m_id
+
     def get_cmd(self):
         return self.CMD
 
@@ -34,7 +42,6 @@ class PModPing(PassiveModule):
         return self.params, self.PARAMS, self.desc_PARAMS
 
     def set_params(self, params):
-        # fix missing execution params with defaults
         self.params = treat_params(self.PARAMS, {} if params is None else params)
 
     def new_bg_thread(self):
@@ -108,22 +115,12 @@ class PModPing(PassiveModule):
         bg_thread = self.new_bg_thread()
         read_thread = self.new_comm_thread(self.timer, rel_to_vi)
         bg_thread.start(cmd)
-        pipe = bg_thread.get_output_pipe()
-        while pipe is None:
-            sleep(0.3)
-            pipe = bg_thread.get_output_pipe()
+        pipe = bg_thread.wait_for_output_pipe()
         read_thread.start(pipe)
         super().register_threadpair((bg_thread, read_thread))
 
     def stop(self):
         super().terminate_threads()
-
-    def get_description(self):
-        return f"[{self.m_id}] Module pinging constantly a given target"
-
-    def get_module_id(self):
-        # unique short string identifying this module
-        return self.m_id
 
 
 if __name__ == '__main__':

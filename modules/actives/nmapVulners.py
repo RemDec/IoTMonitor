@@ -5,10 +5,15 @@ from src.utils.misc_fcts import get_ip, log_feedback_available
 from lxml import etree
 import logging
 
+
 class AModNmapVulners(FacilityActiveModule):
     """Active Module pulling service version infos from host accessible ports and searching known vulnerabilities.
 
-    It performs an online search in Vulners database that contains some CVEs entries to match to version of services
+    It performs an online search in Vulners database that contains some CVEs entries to match to version of services.
+    This is implemented in the NSE script nmap-vulners. Vulnerabilities are returned in the XML output but in one block,
+    requiring extra parsing to get individual CVE information and instantiating corresponding threat, registering it
+    in the application and alerting it by mail.
+    Written using provided facility for active modules.
     """
 
     def __init__(self, params=None, netmap=None):
@@ -26,15 +31,15 @@ class AModNmapVulners(FacilityActiveModule):
                      }
         super().__init__(params, netmap)
 
+    def get_description(self):
+        return f"[{self.get_module_id()}] Nmap scan using NSE script Vulners, checking for services CVE in online DB " \
+               f"but also good at services discovery"
+
     def get_module_id(self):
         return "nmapvulners"
 
     def get_cmd(self):
         return "nmap -sV -script=nmap-vulners"
-
-    def get_description(self):
-        return f"[{self.get_module_id()}] Nmap scan using NSE script Vulners, checking for services CVE in online DB " \
-               f"but also good at services discovery"
 
     def get_scheme_params(self):
         return self.scheme
@@ -126,6 +131,7 @@ class AModNmapVulners(FacilityActiveModule):
             log_feedback_available(f"Module [{self.get_module_id()}] did not find any threat")
 
     def fill_ports_table_and_vulners_output(self, parser, host_elmt):
+        # Returns a dict from which PortTable of host is built and a second dict with found CVE(s) for each port
         table = {}
         vulns = {}
         div_port_attrs = ('product', 'version', 'extrainfo', 'conf')
@@ -137,6 +143,7 @@ class AModNmapVulners(FacilityActiveModule):
             script_elmts = port_fields['script']
             for script in script_elmts:
                 if script.get('id') == 'vulners':
+                    # Update vulns dict with portnum -> corresp CVE entries
                     self.treat_vulnscript_output(portnum, script, vulns)
             # Test relevant
             port_service_elmt = port_fields['service'][0]
@@ -152,6 +159,7 @@ class AModNmapVulners(FacilityActiveModule):
         return table, vulns
 
     def treat_vulnscript_output(self, portnum, script_elmt, vulns_dict):
+        # Split CVEs list in individual entries, update dict value corresponding to portnum with new parsed CVE(s) list
         service_cpe_elmt = script_elmt.find('elem')
         service_cpe = service_cpe_elmt.get('key')
         vulns_txt = service_cpe_elmt.text.strip()

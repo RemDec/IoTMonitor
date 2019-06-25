@@ -10,6 +10,7 @@ class AModNmapPortDisc(ActiveModule):
     def __init__(self, params=None, netmap=None):
         """Active Module whose purpose is used host ports discovery and service running on it.
 
+        Written from skeleton.
         """
         super().__init__(netmap)
         self.m_id = "nmapports"
@@ -27,6 +28,12 @@ class AModNmapPortDisc(ActiveModule):
                             "IP": "Target IP address(es) acceptable as Nmap syntax"}
         self.set_params(params)
         self.max_exec_time = 340
+
+    def get_description(self):
+        return f"[{self.m_id}] Nmap scan focusing on used ports discovery, attempting on a nbr of top most common ports"
+
+    def get_module_id(self):
+        return self.m_id
 
     def get_cmd(self):
         return self.CMD
@@ -147,12 +154,6 @@ class AModNmapPortDisc(ActiveModule):
 
     def get_default_timer(self):
         return 60
-
-    def get_description(self):
-        return f"[{self.m_id}] Nmap scan focusing on used ports discovery, attempting on a nbr of top most common ports"
-
-    def get_module_id(self):
-        return self.m_id
 
 
 if __name__ == '__main__':

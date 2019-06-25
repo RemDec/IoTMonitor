@@ -158,6 +158,18 @@ class BackgroundThread(threading.Thread):
         else:
             return True, ret
 
+    def wait_for_output_pipe(self, steps=4, time=2):
+        time = max(time, 5)
+        step_time = max(time / steps, 0.1)
+        c = 0
+        while self.get_output_pipe() is None:
+            if c > time:
+                log_feedback_available(f"Unable to get output pipe for {super().getName()}", logitin='error')
+                return None
+            sleep(step_time)
+            c += step_time
+        return self.get_output_pipe()
+
     def get_output_pipe(self):
         return self.pipe_w
 

@@ -14,7 +14,7 @@ desc_PARAMS = {"IP": "Target IP address(es) acceptable as Nmap syntax",
 class AModNmapExplorer(ActiveModule):
     """Active Module designed to explore the network and discover which equipments are active on it.
 
-    Generally discover all MAC and IP addresses of responding equipments quickly.
+    Generally discover all MAC and IP addresses of responding equipments quickly. Written from skeleton.
     """
 
     def __init__(self, params=None, netmap=None):
@@ -31,6 +31,13 @@ class AModNmapExplorer(ActiveModule):
         self.desc_PARAMS = desc_PARAMS
 
         self.set_params(params)
+
+    def get_description(self):
+        return f"[{self.m_id}] Nmap scan to discover hosts (-sn mode, no port scanning)" \
+               f" by SYN/UDP probing on common ports (really fast)"
+
+    def get_module_id(self):
+        return self.m_id
 
     def get_cmd(self):
         return self.CMD
@@ -116,13 +123,6 @@ class AModNmapExplorer(ActiveModule):
 
     def get_default_timer(self):
         return 60
-
-    def get_description(self):
-        return f"[{self.m_id}] Nmap scan to discover hosts (-sn mode, no port scanning)" \
-               f" by SYN/UDP probing on common ports (really fast)"
-
-    def get_module_id(self):
-        return self.m_id
 
 
 if __name__ == '__main__':

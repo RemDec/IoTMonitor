@@ -8,6 +8,7 @@ class AModArbitraryCmd(ActiveModule):
     """Active Module used to call any program accessible in the system, without any special output treatment
 
     It can be used to automatise diverse tasks by including it in the routine as any other module
+    Written from skeleton.
     """
 
     def __init__(self, params=None, netmap=None):
@@ -20,6 +21,12 @@ class AModArbitraryCmd(ActiveModule):
 
         self.set_params(params)
 
+    def get_description(self):
+        return f"[{self.m_id}] Blackbox module executing any command given as prog parameter"
+
+    def get_module_id(self):
+        return self.m_id
+
     def get_cmd(self):
         return "arbitrary"
 
@@ -27,7 +34,6 @@ class AModArbitraryCmd(ActiveModule):
         return self.params, self.PARAMS, self.desc_PARAMS
 
     def set_params(self, params):
-        # fix missing execution params with defaults
         self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
     def parse_output(self, output):
@@ -48,7 +54,6 @@ class AModArbitraryCmd(ActiveModule):
                                    logitin='error', lvl='error')
 
     def launch(self, rel_to_vi=[]):
-        # start a thread for cmd + params execution
         super().purge_threadlist()
         s_thread = self.get_script_thread()
         if self.params.get("args") is None:
@@ -62,22 +67,15 @@ class AModArbitraryCmd(ActiveModule):
         super().purge_threadlist()
 
     def get_script_thread(self, rel_to_vi=[]):
-        # instancing generic thread defined in superclass for active modules
         return ScriptThread(callback_fct=self.distrib_output, rel_to_vi=rel_to_vi, max_exec_time=30)
 
     def get_default_timer(self):
         return 60
 
-    def get_description(self):
-        return f"[{self.m_id}] Blackbox module executing any command given as prog parameter"
-
-    def get_module_id(self):
-        return self.m_id
-
 
 if __name__ == '__main__':
-    arb = AModArbitraryCmd({"prog": "sleep", "args":"10"})
-    arb2 = AModArbitraryCmd({"prog": "sleep", "args":"20"})
+    arb = AModArbitraryCmd({"prog": "sleep", "args": "10"})
+    arb2 = AModArbitraryCmd({"prog": "sleep", "args": "20"})
     print("Thread list before start :", arb.str_threads())
     arb.launch()
     arb2.launch()
