@@ -72,7 +72,7 @@ class EventsCenter:
                 lvl = lvl.upper()
                 map_lvl = {'DEBUG': logging.DEBUG, 'INFO': logging.INFO, 'WARNING': logging.WARNING,
                            'ERROR': logging.ERROR, 'CRITICAL': logging.CRITICAL}
-                lvl = map_lvl[lvl]
+                lvl = map_lvl.get(lvl, logging.DEBUG)
             if lvl > 0:
                 logging.getLogger(logitin).log(lvl, msg)
         self.feedback(msg)

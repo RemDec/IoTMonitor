@@ -60,7 +60,7 @@ class ActiveModule(Module):
         return s
 
     def str_summary(self):
-        s = f"[{self.get_module_id()}] ~ Thlist[{self.get_nbr_running()}/{len(self.curr_threads)}]"
+        s = f"[{self.get_module_id()}] thlist[{self.get_nbr_running()}/{len(self.curr_threads)}]"
         return s
 
     def __str__(self):

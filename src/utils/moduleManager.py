@@ -212,10 +212,10 @@ class ModDescriptor:
         modattr = {"modid": self.m_id, "cmd": self.cmd, "pymod": self.pymod, "pyclass": self.pyclass}
         saved_params = self.curr_param_to_xml() if include_nondefault_param else E.savedparams()
         xml = E(modtype,
-                    E.desc(self.txt_desc),
-                    self.defparam_to_xml(),
-                    saved_params,
-                    E.dependencies(),
+                E.desc(self.txt_desc),
+                self.defparam_to_xml(),
+                saved_params,
+                E.dependencies(),
                 modattr)
         return xml
 

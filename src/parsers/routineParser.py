@@ -11,19 +11,19 @@ from src.routine.routine import Routine, Queue, Panel
 def queue_to_XML(queue):
     queue_XML = E.queue(running=str(queue.is_running), nbr_mods=str(queue.get_nbr_mods()))
     for modentry in queue.get_modentries():
-        qid, mod_inst, exptimer = modentry.qid, modentry.module, modentry.init_timer
+        setid, mod_inst, exptimer = modentry.get_setid(), modentry.get_mod_inst(), modentry.init_timer
         mod_desc = ModDescriptor(mod_inst=mod_inst, include_nondefault_param=True)
-        queue_XML.append(mod_desc.modconfig_to_xml(set_id=qid, timer_val=exptimer))
+        queue_XML.append(mod_desc.modconfig_to_xml(set_id=setid, timer_val=exptimer))
     return queue_XML
 
 
 def panel_to_XML(panel):
-    pids = panel.get_idlist()
+    setids = panel.get_idlist()
     panel_XML = E.panel(running=str(panel.is_running), nbr_mods=str(panel.get_nbr_mods()))
-    for pid in pids:
-        mod_inst = panel.get_mod_by_id(pid)
+    for setid in setids:
+        mod_inst = panel.get_mod_by_id(setid)
         mod_desc = ModDescriptor(mod_inst=mod_inst, include_nondefault_param=True)
-        panel_XML.append(mod_desc.modconfig_to_xml(set_id=pid, timer_val=mod_inst.get_read_interval()))
+        panel_XML.append(mod_desc.modconfig_to_xml(set_id=setid, timer_val=mod_inst.get_read_interval()))
     return panel_XML
 
 
@@ -48,8 +48,8 @@ def XML_to_queue(queue_elmt, timer=None, netmap=None, modmanager=None):
     running = bool(queue_elmt.get('running'))
     queue = Queue(timer, netmap)
     for modconfig in queue_elmt.findall('modconfig'):
-        mod_inst, qid, timer_val = modmanager.modinst_from_modconfig(modconfig, timer=timer, netmap=netmap)
-        queue.add_module(mod_inst, given_timer=timer_val, given_id=qid)
+        mod_inst, setid, timer_val = modmanager.modinst_from_modconfig(modconfig, timer=timer, netmap=netmap)
+        queue.add_module(mod_inst, setid=setid, given_timer=timer_val)
     return queue, running
 
 
@@ -58,9 +58,9 @@ def XML_to_panel(panel_elmt, timer=None, netmap=None, modmanager=None):
     running = bool(panel_elmt.get('running'))
     panel = Panel(netmap=netmap)
     for modconfig in panel_elmt.findall('modconfig'):
-        mod_inst, pid, read_interval_timer = modmanager.modinst_from_modconfig(modconfig, timer=timer, netmap=netmap)
+        mod_inst, setid, read_interval_timer = modmanager.modinst_from_modconfig(modconfig, timer=timer, netmap=netmap)
         mod_inst.set_read_interval(read_interval_timer)
-        panel.add_module(mod_inst, given_id=pid)
+        panel.add_module(mod_inst, setid=setid)
     return panel, running
 
 

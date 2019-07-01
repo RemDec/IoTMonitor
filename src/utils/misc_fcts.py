@@ -29,6 +29,11 @@ def log_feedback_available(msg, logitin='info', lvl=20):
     if has_method(logging, 'log_feedback'):
         logging.log_feedback(msg, logitin=logitin, lvl=lvl)
     else:
+        if isinstance(lvl, str):
+            lvl = lvl.upper()
+            map_lvl = {'DEBUG': logging.DEBUG, 'INFO': logging.INFO, 'WARNING': logging.WARNING,
+                       'ERROR': logging.ERROR, 'CRITICAL': logging.CRITICAL}
+            lvl = map_lvl.get(lvl, logging.DEBUG)
         logging.getLogger(logitin).log(level=lvl, msg=msg)
 
 
@@ -197,7 +202,7 @@ def str_lines_frame(str_to_frame):
     return '\n'.join([top] + adjusted + [bot]) + '\n'
 
 
-def str_multiframe(strlist, by_pack_of=3):
+def str_multiframe(strlist, by_pack_of=3, add_interspace=True):
     """Nice formatting for several multilines str at the same level
 
     Adjust multilines strings on same horizontal basis
@@ -206,34 +211,25 @@ def str_multiframe(strlist, by_pack_of=3):
     | str    |  | str2   |
     | longer |  | same l |
     +--------+  +--------+
+    """
 
-
-def write_modlib(file_dest=None):
-    from modules.actives import arbitraryCmd, nmapExplorer, nmapPortDiscovery, nmapVulners
-    from modules.passives import arbitraryCmdBg, pingTarget
-    from src.utils.moduleManager import ModManager
-    from src.utils.filesManager import get_dflt_entry
-
-    if file_dest is None:
-        file_dest = get_dflt_entry('dflt_lib')
-    actives = [arbitraryCmd.AModArbitraryCmd(), nmapExplorer.AModNmapExplorer(), nmapPortDiscovery.AModNmapPortDisc(),
-               nmapVulners.AModNmapVulners()]
-    passives = [arbitraryCmdBg.PModArbitraryCmdBg(), pingTarget.PModPing()]
-    mod_instances = actives + passives
-    ModManager(str(file_dest)).create_modlib(mod_instances)  """
+    sep = '  ' if add_interspace else ''  # horizontal space between frames
     final = ""
     pack = 0
     while pack < len(strlist):
         pack_to = min(pack+by_pack_of, len(strlist))
         frames = [s.split('\n') for s in strlist[pack:pack_to]]
-        deepest = max(list(map(len, frames)))
+        frames = list(map(lambda frame: list(filter(lambda str: str != '', frame)), frames))
+        deepest = max(map(len, frames))  # longer (with most \n) frame in the pack to adjust others with blanklines
         for frame in frames:
-            frame.remove('')
             if len(frame) < deepest:
-                frame_wide = max(list(map(len, frame)))
+                frame_wide = max(map(len, frame))
                 frame.extend([' '*frame_wide]*(deepest-len(frame)))
         for level in range(deepest):
-            final += '  '.join([lvl_str[level] for lvl_str in frames]) + '\n'
+            linesep = '\n'
+            if level == deepest-1 and add_interspace:
+                linesep = '\n\n'  # vertical space between lines of packed frames
+            final += sep.join([lvl_str[level] for lvl_str in frames]) + linesep
         pack += by_pack_of
     return final
 

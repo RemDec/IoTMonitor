@@ -69,7 +69,7 @@ class Core:
     def add_to_routine(self, id_or_mod, given_setid=None, given_timer=None):
         if isinstance(id_or_mod, str):
             id_or_mod = self.instantiate_module(id_or_mod)
-        return self.routine.add_module(id_or_mod, given_setid, given_timer)
+        return self.routine.add_module(id_or_mod, setid=given_setid, given_timer=given_timer)
 
     def change_mod_params(self, setid, new_params):
         self.routine.change_mod_params(setid, new_params)

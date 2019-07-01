@@ -1,65 +1,29 @@
-from src.utils.misc_fcts import str_frame, str_param_comp
+from src.routine.moduleContainer import *
+from src.utils.misc_fcts import str_lines_frame, str_param_comp, str_multiframe
 
 
-class Panel:
+class Panel(ModContainer):
 
     def __init__(self, netmap=None):
-        self.netmap = netmap
+        super().__init__(netmap=netmap)
 
-        self.set = []
-        self.is_running = False
-
-    def add_module(self, passive_mod, given_id=None):
+    def add_module(self, mod_inst, setid=None, rel_to_vi=[]):
         # create+add a PanelEntry object if the passive_mod instance not yet in an entry within the panel
-        if passive_mod.is_active() or self.get_presence(passive_mod) > -1:
+        if mod_inst.is_active() or self.get_presence(mod_inst) > -1:
             return False
-        new_entry = self.get_mod_entry(passive_mod, given_id)
+        new_entry = self.get_mod_entry(mod_inst, setid)
         self.set.append(new_entry)
         return new_entry
-
-    def remove_module(self, mod):
-        # remove a module given his instance or pid in the Panel
-        ind = self.get_presence(mod)
-        if ind >= 0:
-            self.set.pop(ind)
-            return True
-        return False
 
     def clear(self):
         self.pause(kill_thmods=True)
         self.set = []
 
-    def get_mod_entry(self, mod, given_id=None):
+    def get_mod_entry(self, mod_inst, setid=None):
         # return a PanelEntry with adapted pid (no duplicate)
-        m_id = mod.get_module_id()
-        pid = self.get_unique_pid(m_id) if given_id is None else self.get_unique_pid(given_id)
-        return PanelEntry(mod, pid)
-
-    def get_unique_pid(self, try_id):
-        idlist = self.get_idlist()
-        if not(try_id in idlist):
-            return try_id
-        counter = 1
-        while try_id + str(counter) in idlist:
-            counter += 1
-        return try_id + str(counter)
-
-    def get_presence(self, mod):
-        # mod is in panel where mod is a module instance or pid : -1 if absent, PanelEntry indice in set else
-        for i, entry in enumerate(self.set):
-            if isinstance(mod, str) and mod == entry.pid:
-                return i
-            if mod is entry.module:
-                return i
-        return -1
-
-    def pause(self, kill_thmods=True):
-        # for panel pause means interrupt current continuously working threads so kill_thmods should be true
-        if self.is_running:
-            if kill_thmods:
-                for entry in self.set:
-                    entry.stop_module()
-            self.is_running = False
+        m_id = mod_inst.get_module_id()
+        setid = self.get_unique_setid(m_id) if setid is None else self.get_unique_setid(setid)
+        return PanelEntry(mod_inst, setid)
 
     def resume(self):
         if not self.is_running:
@@ -67,79 +31,30 @@ class Panel:
                 entry.launch_module()
             self.is_running = True
 
-    def rename(self, old_pid, new_pid):
-        pids = self.get_idlist()
-        if old_pid in pids:
-            if new_pid in pids:
-                # Have to rename already so named entry
-                wrong_named = self.get_corresp_entry(new_pid)
-                wrong_named.pid = self.get_unique_pid(new_pid)
-            curr_entry = self.get_corresp_entry(old_pid)
-            curr_entry.pid = new_pid
-
-    def is_empty(self):
-        return len(self.set) == 0
-
-    def get_nbr_mods(self):
-        return len(self.set)
-
-    def get_mod_by_id(self, pid):
-        for entry in self.set:
-            if entry.pid == pid:
-                return entry.module
-
-    def get_corresp_entry(self, field):
-        # field either module instance or id
-        for entry in self.set:
-            if field is entry.module or field == entry.pid:
-                return entry
-
-    def get_idlist(self):
-        return [entry.pid for entry in self.set]
-
-    def adaptive_display(self, fct_to_entry, header=True):
+    def adaptive_display(self, fct_to_entry, frameit, nbr_per_line=4, header=True):
         s = ""
         if header:
             s = f"Panel composed of {len(self.set)} passive modules (running : {self.is_running})\n"
         if self.is_empty():
             s += " "*5 + "[ empty panel ]\n"
         else:
-            inter = ""
-            for entry in self.set:
-                inter += f" {fct_to_entry(entry)} |"
-            s += str_frame(inter[:-1])
+            if frameit:
+                strlist = [str_lines_frame(fct_to_entry(entry)) for entry in self.set]
+                s += str_multiframe(strlist, by_pack_of=nbr_per_line, add_interspace=False)
+            else:
+                sep = "+" * max(len(s), 20) + "\n"
+                for entry in self.set:
+                    s += sep
+                    s += fct_to_entry(entry)
+                s += sep
+                return s
         return s
 
-    def detail_str(self, level=0):
-        if level == 0:
-            return self.__str__()
-        elif level == 1:
-            return self.adaptive_display(lambda entry: f"{entry.pid} {entry.module.str_summary()}")
-        else:
-            s = f"Panel composed of {len(self.set)} passive modules (running : {self.is_running})\n"
-            sep = "+"*len(s) + "\n"
-            for entry in self.set:
-                s += sep
-                s += entry.detail_str(level=2)
-            s += sep
-            return s
 
-    def __str__(self):
-        return self.adaptive_display(lambda entry: entry.pid)
+class PanelEntry(Entry):
 
-
-class PanelEntry:
-
-    def __init__(self, module, pid, rel_to_vi=[]):
-        self.module = module
-        self.pid = pid
-        self.rel_to_vi = rel_to_vi
-
-    def set_vi_relative(self, rel_to_vi):
-        if isinstance(rel_to_vi, str):
-            self.rel_to_vi = [rel_to_vi]
-        else:
-            self.rel_to_vi = rel_to_vi
+    def __init__(self, module, setid, rel_to_vi=[]):
+        super().__init__(mod_inst=module, setid=setid, rel_to_vi=rel_to_vi)
 
     def launch_module(self):
         self.module.launch(rel_to_vi=self.rel_to_vi)
@@ -147,11 +62,30 @@ class PanelEntry:
     def stop_module(self):
         self.module.stop()
 
+    def get_container_name(self):
+        return "PANEL"
+
     def detail_str(self, level=0):
-        s = str_frame(f"{self.pid} {self.module.str_summary()}")
+        s = f"{self.setid} ~ {self.module.get_read_interval()}s"
         if level == 0:
-            return s
+            return str_lines_frame(s)
         elif level == 1:
+            return s + f" [{self.get_mod_inst().get_module_id()}]"
+        elif level == 2:
+            return s + f"\n{self.get_mod_inst().str_summary()}"
+        elif level == 3:
+            if len(self.rel_to_vi) == 0:
+                vistr = "Not specific VI relative"
+            else:
+                vistr = "VIs: " + ','.join(self.rel_to_vi)
+            return s + f"\n{self.get_mod_inst().str_summary()}\n{vistr[:40]}"
+        elif level == 4:
+            if len(self.rel_to_vi) == 0:
+                vistr = "Not specific VI relative"
+            else:
+                vistr = "VIs: " + ','.join(self.rel_to_vi)
+            return s + f"\n{self.get_mod_inst().str_summary()}\n{vistr[:40]}\nThreats /!\\ Modifs -o-"
+        elif level == 5:
             curr_params, dflt_params, desc_PARAMS = self.module.get_params()
             rel_vi_str = '| < no specific VI >' if len(self.rel_to_vi) == 0 else ', '.join(self.rel_to_vi)
             s += f"| PASSIVE module whose description is given as :\n"
@@ -181,28 +115,23 @@ class PanelEntry:
 
 
 if __name__ == '__main__':
-    from modules.passives.pingTarget import *
-    from src.utils.timer import *
-    panel = Panel()
-    timer = TimerThread()
-    ping = PModPing(timer=timer)
-    panel.add_module(ping)
-    panel.add_module(ping, given_id="sameinst_ping")
-    ping2 = PModPing(timer=timer)
-    panel.add_module(ping2)
+    from src.utils.timer import TimerThread
+    from time import sleep
+    from modules.passives import *
 
-    print("Simple call __str__()\n", panel)
-    print("\nCall detailed display\n", panel.detail_str(level=1))
-
-    print("\nLaunching pingit")
-    ping.timer.launch()
-    ping.set_read_interval(3)
-    ping2.set_read_interval(4)
-    panel.resume()
-    for i in range(10):
-        sleep(1)
-        print(panel.detail_str(level=1))
-    panel.pause()
+    timer = TimerThread(autostart=True)
+    p = Panel()
+    p.add_module(pingTarget.PModPing(timer=timer))
+    p.add_module(arbitraryCmdBg.PModArbitraryCmdBg(timer=timer))
+    print("### BEFORE RESUMING ###")
+    print(p.detail_str(4))
+    p.resume()
+    i = 0
+    while i < 5:
+        sleep(5)
+        i += 1
+        print("## Running ...\n", p.detail_str(3))
+    p.pause()
+    print("### AFTER PAUSING ###\n", p.detail_str(4))
+    sleep(5)
     timer.stop()
-    sleep(2)
-    print("\nAfter interrupt :\n", panel.detail_str(level=2))

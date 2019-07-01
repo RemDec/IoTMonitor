@@ -1,33 +1,26 @@
 from src.utils.timer import *
-from src.utils.misc_fcts import str_frame, str_param_comp
+from src.utils.misc_fcts import str_lines_frame, str_multiframe, str_param_comp
+from src.routine.moduleContainer import *
 
 
-class Queue(TimerInterface):
+class Queue(ModContainer, TimerInterface):
 
     def __init__(self, timer=None, netmap=None):
+        super().__init__(netmap)
         self.timer = timer
-        self.netmap = netmap
 
-        self.set = []
-        self.is_running = False
-
-    def add_module(self, active_mod, given_timer=0, given_id=None):
-        if not(active_mod.is_active()) or self.get_presence(active_mod) >= 0:
+    def add_module(self, mod_inst, setid=None, rel_to_vi=[], given_timer=0):
+        if not(mod_inst.is_active()) or self.get_presence(mod_inst) >= 0:
             return False
-        new_entry = self.get_mod_entry(active_mod, given_timer, given_id)
+        new_entry = self.get_mod_entry(mod_inst, setid, given_timer)
         for i in range(len(self.set)):
             if new_entry <= self.set[i]:
                 self.set.insert(i, new_entry)
                 return new_entry
         self.set.append(new_entry)
+        if len(rel_to_vi) > 0:
+            new_entry.set_vi_relative(rel_to_vi)
         return new_entry
-
-    def remove_module(self, mod):
-        ind = self.get_presence(mod)
-        if ind >= 0:
-            self.set.pop(ind)
-            return True
-        return False
 
     def clear(self):
         self.pause(kill_thmods=True)
@@ -36,44 +29,16 @@ class Queue(TimerInterface):
     def reorganize(self):
         self.set = sorted(self.set, key=lambda mod: mod.get_timer())
 
-    def get_mod_entry(self, active_mod, given_timer, given_id):
-        exp_timer = active_mod.get_default_timer() if not given_timer else given_timer
-        m_id = active_mod.get_module_id()
-        qid = self.get_unique_qid(given_id) if given_id is not None else self.get_unique_qid(m_id)
-        return QueueEntry(active_mod, exp_timer, qid)
+    def get_mod_entry(self, mod_inst, setid=None, given_timer=0):
+        exp_timer = mod_inst.get_default_timer() if not given_timer else given_timer
+        m_id = mod_inst.get_module_id()
+        setid = self.get_unique_setid(setid) if setid is not None else self.get_unique_setid(m_id)
+        return QueueEntry(mod_inst, setid, exp_timer)
 
-    def get_unique_qid(self, try_id):
-        idlist = self.get_idlist()
-        if not(try_id in idlist):
-            return try_id
-        counter = 1
-        while try_id + str(counter) in idlist:
-            counter += 1
-        return try_id + str(counter)
-
-    def get_presence(self, mod):
-        for i, entry in enumerate(self.set):
-            if isinstance(mod, str) and mod == entry.qid:
-                return i
-            if mod is entry.module:
-                return i
-        return -1
-
-    def run(self):
+    def resume(self):
         if self.timer is None:
             self.timer = TimerThread()
             self.timer.launch()
-        self.timer.subscribe(self)
-        self.is_running = True
-
-    def pause(self, kill_thmods=True):
-        # for queue pause means stop decrementing launching countdown, kill_thmods kill also threads launched newly
-        self.is_running = False
-        if kill_thmods:
-            for entry in self.set:
-                entry.module.stop()
-
-    def resume(self):
         self.timer.subscribe(self)
         self.is_running = True
 
@@ -85,86 +50,41 @@ class Queue(TimerInterface):
             entry.decr()
         self.reorganize()
 
-    def rename(self, old_qid, new_qid):
-        qids = self.get_idlist()
-        if old_qid in qids:
-            if new_qid in qids:
-                # Have to rename already so named entry
-                wrong_named = self.get_corresp_entry(new_qid)
-                wrong_named.pid = self.get_unique_qid(new_qid)
-            curr_entry = self.get_corresp_entry(old_qid)
-            curr_entry.pid = new_qid
-
-    def is_empty(self):
-        return len(self.set) == 0
-
-    def get_nbr_mods(self):
-        return len(self.set)
-
-    def get_mod_by_id(self, qid):
-        for entry in self.set:
-            if entry.qid == qid:
-                return entry.module
-
-    def get_corresp_entry(self, field):
-        # field either module instance or qid
-        for entry in self.set:
-            if field is entry.module or field == entry.qid:
-                return entry
-
-    def get_idlist(self):
-        return [entry.qid for entry in self.set]
-
-    def get_modentries(self):
-        return self.set
-
-    def adaptive_display(self, fct_to_entry, header=True):
+    def adaptive_display(self, fct_to_entry, frameit, nbr_per_line=4, header=True):
         s = ""
         if header:
             s = f"Queue of {len(self.set)} active modules (running : {self.is_running})\n"
         if self.is_empty():
             s += " "*5 + "[ empty queue ]\n"
         else:
-            inter = ""
-            for entry in self.set:
-                inter += f" {fct_to_entry(entry)} |=>|"
-            s += str_frame(inter[:-4])
+            if frameit:
+                strlist = []
+                for i, entry in enumerate(self.set):
+                    framed = str_lines_frame(fct_to_entry(entry))
+                    strlist.append(framed)
+                    if i < self.get_nbr_mods()-1:
+                        height = len(strlist[-1].split('\n')) - 3
+                        sep = '=>\n'
+                        nbr_padding = height//2 if height % 2 == 1 else (height-1)//2
+                        padding = '  \n'*nbr_padding
+                        strlist.append(f"--\n{padding}{sep*(height-nbr_padding*2)}{padding}--\n")
+                s += str_multiframe(strlist, by_pack_of=2*nbr_per_line-1, add_interspace=False)
+            else:
+                sep = "+"*max(len(s), 20) + "\n"
+                for entry in self.set:
+                    s += sep
+                    s += fct_to_entry(entry)
+                s += sep
+                return s
         return s
 
-    def detail_str(self, level=0):
-        if level == 0:
-            return self.__str__()
-        elif level == 1:
-            return self.adaptive_display(lambda entry: f"{entry.qid} {entry.exp_timer}s [{entry.init_timer}]" +
-                                                       f"{entry.module.str_summary()}")
-        else:
-            s = f"Queue of {len(self.set)} active modules (running : {self.is_running})\n"
-            sep = "+"*len(s) + "\n"
-            s += f"triggered by {self.timer}\n"
-            for entry in self.set:
-                s += sep
-                s += entry.detail_str(level=2)
-            s += sep
-            return s
 
-    def __str__(self):
-        return self.adaptive_display(lambda entry: f"{entry.qid} ~ {str(entry.exp_timer)}s")
+class QueueEntry(Entry):
 
-
-class QueueEntry:
-
-    def __init__(self, module, exp_timer, qid, rel_to_vi=[]):
-        self.module = module
+    def __init__(self, module, setid, exp_timer, rel_to_vi=[]):
+        super().__init__(module, setid, rel_to_vi)
         self.exp_timer = exp_timer
         self.init_timer = exp_timer
-        self.qid = qid
-        self.rel_to_vi = rel_to_vi
-
-    def set_vi_relative(self, rel_to_vi):
-        if isinstance(rel_to_vi, str):
-            self.rel_to_vi = [rel_to_vi]
-        else:
-            self.rel_to_vi = rel_to_vi
 
     def decr(self):
         if self.exp_timer >= 1:
@@ -182,11 +102,30 @@ class QueueEntry:
     def __le__(self, other):
         return self.get_timer() <= other.get_timer()
 
+    def get_container_name(self):
+        return "QUEUE"
+
     def detail_str(self, level=0):
-        s = str_frame(f"{self.qid} {self.exp_timer}s [{self.init_timer}]")
+        s = f"{self.setid} ~ {self.exp_timer}s/{self.init_timer}"
         if level == 0:
-            return s
+            return str_lines_frame(s)
         elif level == 1:
+            return s + f" [{self.get_mod_inst().get_module_id()}]"
+        elif level == 2:
+            return s + f"\n{self.get_mod_inst().str_summary()}"
+        elif level == 3:
+            if len(self.rel_to_vi) == 0:
+                vistr = "Not specific VI relative"
+            else:
+                vistr = "VIs: " + ','.join(self.rel_to_vi)
+            return s + f"\n{self.get_mod_inst().str_summary()}\n{vistr[:40]}"
+        elif level == 4:
+            if len(self.rel_to_vi) == 0:
+                vistr = "Not specific VI relative"
+            else:
+                vistr = "VIs: " + ','.join(self.rel_to_vi)
+            return s + f"\n{self.get_mod_inst().str_summary()}\n{vistr[:40]}\nThreats /!\\ Modifs -o-"
+        elif level == 5:
             curr_params, dflt_params, desc_PARAMS = self.module.get_params()
             rel_vi_str = '| < no specific VI >' if len(self.rel_to_vi) == 0 else ', '.join(self.rel_to_vi)
             s += f"| ACTIVE module whose description is given as :\n"
@@ -215,33 +154,27 @@ class QueueEntry:
         return self.detail_str()
 
 
-if __name__=="__main__":
-    q = Queue()
-    print(q)
-    from modules.actives.nmapExplorer import *
-    from modules.actives.arbitraryCmd import *
-
-    nmap = AModNmapExplorer()
-    sleep = AModArbitraryCmd({"prog": "sleep", "args": "5"})
-    ping = AModArbitraryCmd({"prog": "ping", "args": "-c 1 8.8.8.8"})
-
-    q.add_module(nmap, given_timer=5, given_id="nmapmodule")
-    q.add_module(sleep, given_timer=10)
-    q.add_module(ping, given_timer=3)
-    q.add_module(nmap) # duplicate should not be added
-    print("\n#########################\nBefore running queue :\n", q)
-    print("\n #### with details level = 1", q.detail_str(level=1))
-    print("\n #### with details level = 2", q.detail_str(level=2))
-    print("\n Starting ..")
-    q.run()
-    cnt = 25
-    import time
-    while cnt > 0:
-        time.sleep(5)
-        cnt -= 5
-        print(q.detail_str(level=1))
-    q.pause(kill_thmods=True)
+if __name__ == '__main__':
+    from modules.actives import *
+    from src.net.netmap import Netmap
+    q = Queue(netmap=Netmap())
+    q.add_module(mod_inst=nmapExplorer.AModNmapExplorer(), given_timer=20)
+    q.add_module(mod_inst=nmapPortDiscovery.AModNmapPortDisc(), given_timer=20)
+    q.add_module(mod_inst=nmapPortDiscovery.AModNmapPortDisc(), given_timer=10, setid='nmap2')
+    q.add_module(mod_inst=arbitraryCmd.AModArbitraryCmd(), rel_to_vi=['device1', 'device2', 'modem'], given_timer=2000)
+    entry = q.add_module(mod_inst=nmapVulners.AModNmapVulners(), given_timer=200)
+    q.add_module(mod_inst=nmapVulners.AModNmapVulners(), given_timer=100, setid='toolongsetid01234567')
+    entry.set_vi_relative(['othervi'])
+    print("### BEFORE RESUMING ###")
+    print(q.detail_str(4))
+    q.resume()
+    i = 0
+    while i < 5:
+        sleep(5)
+        i += 1
+        print("## Running ...\n", q.detail_str(3))
+    q.pause()
+    print("### AFTER PAUSING ###\n", q.detail_str(4))
+    sleep(5)
     q.timer.stop()
-    print("\n#########################\nAfter pausing queue :\n", q)
-    print(q.detail_str(level=2))
-
+    print(q.netmap.detail_str(level=2))

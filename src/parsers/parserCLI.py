@@ -395,11 +395,7 @@ class CLIparser:
         self.back_main_menu()
 
     def after_edit_modentry_slct(self, setid):
-        pmodentry, amodentry = self.core.get_from_routine(setid, whole_entry=True)
-        modentry = pmodentry if pmodentry is not None else amodentry
-        if pmodentry is not None and amodentry is not None:
-            p_ok = self.get_user_confirm(marker="Edit the active or passive entry? (p/a)", val=('p', 'pass', 'passive'))
-            modentry = pmodentry if p_ok else amodentry
+        modentry = self.core.get_from_routine(setid, whole_entry=True)
         modinst = modentry.module
         # Module instance parameters
         take_param = True
@@ -497,7 +493,7 @@ class CLIparser:
 
     def after_show_vi_slct(self, mapid):
         vi = self.core.get_from_netmap(mapid)
-        lvl_info = f"(increase it with $set lvl {self.curr_display_lvl+1}" if self.curr_display_lvl < 2 else ''
+        lvl_info = f"(increase it with $set lvl {self.curr_display_lvl+1})" if self.curr_display_lvl < 4 else ''
         print(f"Displaying VI informations with level {self.curr_display_lvl} {lvl_info}\n")
         print(vi.detail_str(self.curr_display_lvl))
         show_threats = self.get_user_confirm(marker=f"[{mapid}] Display threats linked with ? (y/N) :", empty_ok=False)
@@ -515,16 +511,13 @@ class CLIparser:
         self.no_wipe_next()
 
     def after_show_modentry_slct(self, setid):
-        modentry_panel, modentry_queue = self.core.get_from_routine(setid, whole_entry=True)
-        lvl_info = f"(increase it with $set lvl {self.curr_display_lvl+1}" if self.curr_display_lvl < 2 else ''
-        print(f"Displaying module entry in routine with level {self.curr_display_lvl} {lvl_info})\n")
+        modentry = self.core.get_from_routine(setid, whole_entry=True)
+        lvl_info = f"(increase it with $set lvl {self.curr_display_lvl+1})" if self.curr_display_lvl < 4 else ''
+        print(f"Displaying module entry in routine with level {self.curr_display_lvl} {lvl_info}\n")
         s = ""
-        if modentry_panel is not None:
-            s += f"Module entry in routine PANEL referenced by setid {setid} :\n" \
-                 f"{modentry_panel.detail_str(self.curr_display_lvl)}\n"
-        if modentry_queue is not None:
-            s += f"Module entry in routine QUEUE referenced by setid {setid} :\n" \
-                 f"{modentry_queue.detail_str(self.curr_display_lvl)}\n"
+        if modentry is not None:
+            s += f"Module entry in routine {modentry.get_container_name()} referenced by setid {setid} :\n" \
+                 f"{modentry.detail_str(self.curr_display_lvl)}\n"
         print(s if s is not "" else f"   < No module entry in routine referenced by setid {setid} >")
         self.no_wipe_next()
 

@@ -113,9 +113,7 @@ class PassiveModule(Module):
         return s
 
     def str_summary(self):
-        s = f"[{self.get_module_id()}] ~ BG[{self.nbr_alive_subproc()}/{len(self.get_bg_threads())}]" \
-            f" COMM[{self.nbr_reading_comm()}/{len(self.get_comm_threads())} ~ {self.get_read_interval()}s]"
-        return s
+        return f"[{self.get_module_id()}] BGth[{self.nbr_alive_subproc()}/{len(self.get_bg_threads())}]"
 
     def __str__(self):
         return self.str_pair_threads()

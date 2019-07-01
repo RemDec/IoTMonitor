@@ -13,8 +13,9 @@
 - strict format for VI fields
 - Make uniform methods/attributes/notions in code
 - DOC
+- DTDs
 
-- Restructure containers Panel & Queue with a superclass
+- [OK] Restructure containers Panel & Queue with a superclass
 - Management of Independent Modules
 - Intermediate Tkinter interface for multifields forms
 - New Modules !

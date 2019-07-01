@@ -1,26 +1,7 @@
 <?xml version='1.0' encoding='ASCII'?>
 <xmlsave>
   <netmap>
-    <instances>
-      <virtinst mapid="device0" usercreated="False">
-        <mainfields ip="192.168.1.10"/>
-        <divfields/>
-        <portstable/>
-      </virtinst>
-    </instances>
-    <savedevents>
-      <vievents mapid="device0">
-        <modifevent target="VI device0" type="virt_inst">
-          <oldstate>Network state: unknown</oldstate>
-          <newstate>Network state: up</newstate>
-          <diveventinfos objid="device0" modificator="pingit"/>
-        </modifevent>
-        <modifevent target="VI device0" type="virt_inst">
-          <oldstate>Non-existing VI</oldstate>
-          <newstate>Registered VI in netmap</newstate>
-          <diveventinfos objid="device0" modificator="pingit"/>
-        </modifevent>
-      </vievents>
-    </savedevents>
+    <instances/>
+    <savedevents/>
   </netmap>
 </xmlsave>
