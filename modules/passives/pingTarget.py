@@ -81,7 +81,7 @@ class PModPing(PassiveModule):
         most_recent = lines[-1] if len(lines) > 0 else None
         ip, state = self.parse_host_state(most_recent)
         if not(None in [self.netmap, ip, state]):
-            mapid = self.netmap.get_similar_VI(mac=None, ip=ip)
+            mapid = self.netmap.get_similar_VI(ip=ip)
             if mapid is None:
                 mapid, vi = self.netmap.create_VI(create_event=True, creator=self.m_id, ip=ip)
             else:

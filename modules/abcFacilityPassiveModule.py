@@ -16,7 +16,7 @@ class FacilityActiveModule(PassiveModule):
         self.read_interval = read_interval
         self.params = params
         # care to have defined self.scheme in subclass before calling super().__init__(.) because this constructor calls
-        # set_params which needs self.get_scheme_params() to be called (or define scheme as a returned constant in it)
+        # set_params() which needs self.get_scheme_params() to be called (or define scheme as a returned constant by it)
         self.set_params(params)
 
     # ------------- To implement -------------

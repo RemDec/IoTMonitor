@@ -7,13 +7,18 @@
 - [OK] Save mod inst timers in XML
 - [OK] Passable desired terminal for View
 - [OK] More control on View terminal process
-- Multiline display for containers (avoid wrapping in View)
+- [OK] Multiline display for containers (avoid wrapping in View)
 - Management of dependencies/requirements for underlying programs
-- state of VI through time
-- strict format for VI fields
+- State of VI through time
+- Strict format for VI fields
 - Make uniform methods/attributes/notions in code
 - DOC
 - DTDs
+- Help for starting in app usage
+- Constants for events target types
+- Limit nbr of displayed events and redundant threats alerts in stdin
+- Proper way to leave app with sig
+- More feedback communications
 
 - [OK] Restructure containers Panel & Queue with a superclass
 - Management of Independent Modules
@@ -31,6 +36,7 @@
 
 - Possibility to load components from files in app
 - Chaining and dependencies between Modules
+- Strict mod parameters format with RE
 - Elaborated VI fields completion/replacement
 - Traffic deviation from router
 - Management of passwords (wifi + equipments)

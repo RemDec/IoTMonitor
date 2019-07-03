@@ -173,7 +173,8 @@ class BackgroundThread(threading.Thread):
 
     def start(self, cmd):
         self.cmd = cmd
-        super().setName(f"Background thread running {' '.join(cmd)}")
+        cmd_str = ' '.join(cmd) if isinstance(cmd, list) else cmd
+        super().setName(f"Background thread running {cmd_str}")
         super().start()
         return self.pipe_w
 
