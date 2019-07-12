@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='ASCII'?>
 <modlib>
   <actives>
     <actmod modid="arbcmd" cmd="arbitrary" pymod="modules.actives.arbitraryCmd" pyclass="AModArbitraryCmd">
@@ -16,7 +17,7 @@
         <param code="SYNports" mandatory="True" default="21,22,23,80,443,3389" prefix="-PS">Ports targeted for SYN probing</param>
         <param code="UDPports" mandatory="True" default="53,135,137,161" prefix="-PU">Ports targeted for UDP probing</param>
         <param code="XMLfile" mandatory="True" default="/tmp/nmapexplo.xml" prefix="-oX ">The temp file where scan output will be written</param>
-        <param code="IP" mandatory="True" default="10.0.0.19/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
+        <param code="IP" mandatory="True" default="192.168.1.36/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams/>
       <dependencies/>
@@ -28,7 +29,7 @@
         <param code="nbrports" mandatory="True" default="50" prefix="--top-ports ">How many of top most used ports should be probed</param>
         <param code="version" mandatory="True" default="false" prefix="-sV">Should try to guess running version of services (heavy in time)</param>
         <param code="XMLfile" mandatory="True" default="/tmp/nmap_portdisc.xml" prefix="-oX ">The temp file where scan output will be written</param>
-        <param code="IP" mandatory="True" default="10.0.0.19/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
+        <param code="IP" mandatory="True" default="192.168.1.36/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams/>
       <dependencies/>
@@ -40,7 +41,7 @@
         <param code="nbrports" mandatory="True" default="5" prefix="--top-ports ">The number of top most used ports considered if specific ports are not specified</param>
         <param code="XMLfile" mandatory="True" default="/tmp/nmap_vulners.xml" prefix="-oX ">The temp file where scan output will be written</param>
         <param code="options" mandatory="False" default="" prefix="">other options compatible with -sn to pass to nmap</param>
-        <param code="IP" mandatory="True" default="10.0.0.19/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
+        <param code="IP" mandatory="True" default="192.168.1.36/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams/>
       <dependencies/>
@@ -61,7 +62,7 @@
       <defparams>
         <param code="interv" mandatory="True" default="5" prefix="-i ">Interval between each ping (seconds)</param>
         <param code="divargs" mandatory="False" default="" prefix="">Other acceptable args for ping command</param>
-        <param code="IP" mandatory="True" default="10.0.0.19" prefix="">Target IP adress in ping command syntax (only one specifiable)</param>
+        <param code="IP" mandatory="True" default="192.168.1.36" prefix="">Target IP adress in ping command syntax (only one specifiable)</param>
       </defparams>
       <savedparams/>
       <dependencies/>
@@ -72,8 +73,8 @@
         <param code="period" mandatory="True" default="30000" prefix="-p ">time (ms) between reping each individual host</param>
         <param code="interval" mandatory="True" default="10" prefix="-i ">time (ms) between different host pings</param>
         <param code="retry" mandatory="True" default="1" prefix="-r ">number of retries for each host</param>
-        <param code="netIP" mandatory="True" default="192.168.1.50/24" prefix="-g ">entire network in which all hosts will be pinged</param>
-        <param code="indivIP" mandatory="False" default="192.168.1.50" prefix="">specific IP(s) to target given one per one (overwrite netIP ones)</param>
+        <param code="netIP" mandatory="True" default="192.168.1.36/24" prefix="-g ">entire network in which all hosts will be pinged</param>
+        <param code="indivIP" mandatory="False" default="192.168.1.36" prefix="">specific IP(s) to target given one per one (overwrite netIP ones)</param>
       </defparams>
       <savedparams/>
       <dependencies/>

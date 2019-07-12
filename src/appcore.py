@@ -198,7 +198,7 @@ class Core:
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
             s += f" || Routine independent modules :\n || {','.join(indeps)}\n"
             s += f" ++------- ROUTINE -------"
-            s += f"{self.routine.detail_str(level=0)}"
+            s += f"{self.routine.detail_str(level=1)}"
             s += f" ||\n ++------- NETMAP  -------\n"
             s += f"{self.netmap.vi_frames()}"
         elif level == 2:
@@ -211,7 +211,7 @@ class Core:
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
             s += f" || Routine independent modules :\n ||  {','.join(indeps)}\n"
             s += f" ||\n ++------- ROUTINE -------"
-            s += f"{self.routine.detail_str(level=1)}"
+            s += f"{self.routine.detail_str(level=2)}"
             s += f" ||\n ++------- NETMAP  -------\n"
             s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=4)}"
         else:
@@ -227,7 +227,7 @@ class Core:
             s += f" || Available PModules : {', '.join(passives)}\n"
             s += f" || Routine independent modules added :\n || {','.join(indeps)}\n"
             s += f" ++------- ROUTINE -------"
-            s += f"{self.routine.detail_str(level=1)}"
+            s += f"{self.routine.detail_str(level=3)}"
             s += f" ||\n ++------- NETMAP -------\n"
             s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=4, max_char_per_vi=35)}"
         return s
