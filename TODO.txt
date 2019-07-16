@@ -9,28 +9,29 @@
 - [OK] More control on View terminal process
 - [OK] Multiline display for containers (avoid wrapping in View)
 - Management of dependencies/requirements for underlying programs
-- State of VI through time
+!- State of VI through time
 - Strict format for VI fields
 - Make uniform methods/attributes/notions in code
 - DOC
 - DTDs
 - Help for starting in app usage
 - Constants for events target types
-- Limit nbr of displayed events and redundant threats alerts in stdin
+!- Limit nbr of displayed events and redundant threats alerts in stdin
 - Proper way to leave app with sig
 - More feedback communications
+- Events/core target unification with constants
 
 - [OK] Restructure containers Panel & Queue with a superclass
 - Management of Independent Modules
 - Intermediate Tkinter interface for multifields forms
-- New Modules !
+!- New Modules !
 
 
 ### TO SEE
 
 - Full feedback in View
 - Keep nbr events per mod inst
-- Summary mail (cumulative threats)
+!- Summary mail (cumulative threats)
 - Sorting/filtering of events
 - More possible manipulations with library file
 

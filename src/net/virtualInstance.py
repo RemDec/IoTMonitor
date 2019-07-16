@@ -7,6 +7,18 @@ div_fields = {'manufacturer': "",
 
 
 class VirtualInstance:
+    """Object standing for a virtual representation in the application of a real/artificial network host
+
+    A network equipment can be summarised using common notions for networks, valid in all classical use cases : namely
+    its MAC address, IP address and hostname. We call those information VI fields, they are strings formatted depending
+    their nature. A VI maintains values for those fields, trying to represent as well as possible the real equipment
+    characteristics. Another main 'field' is the table of used ports, an entire PortTable object is dedicated to it in
+    order to handle all ports and services relative information. Additional information are considered as 'diverse' :
+    manufacturer, model, etc. are represented by an arbitrary string value indexed in the div dictionary.
+    A connection state is also associated with each VI, describing its availability in the network.
+    A VI can be created either automatically by a module either manually by the user who craft it. If a VI is user
+    created, non empty field values are not replaced whenever a new different value is given.
+    """
 
     def __init__(self, mac=None, ip=None, hostname=None, div=None, ports=None, user_created=False):
         self.mac = mac
@@ -22,6 +34,20 @@ class VirtualInstance:
         self.div[key] = value
 
     def complete_fields(self, mac=None, ip=None, hostname=None, div={}):
+        """Fill fields values with ones given, where None means no modification
+
+        If a field is already non empty, its value is replaced by the given one if VI is not user created
+        Args:
+            mac:
+            ip:
+            hostname:
+            div(dict): a dictionary of diverse arbitrary fields, indexed by field name and whose values are fields
+            values. If a field name is not yet present in div dict of VI, the entry is added to it, else normal
+            rules with user crafted applies.
+
+        Returns:
+            changed(bool): whether one field took the corresponding given value
+        """
         changed = False
         if mac is not None and mac != self.mac:
             if self.mac is None or not self.user_created:
@@ -44,11 +70,29 @@ class VirtualInstance:
         return changed
 
     def complete_fields_from_dict(self, fields_dict):
+        """Shortcut for complete field from one dict without passing each value as individual parameter
+
+        Args:
+            fields_dict(dict): combination of div dict and main fields indexed by 'mac', 'ip', 'hostname'. Other key
+            in dict will be considered as div fields, those are extracted to retrieve their values
+
+        Returns:
+            changed(bool): whether one field took the corresponding given value
+        """
         given_div = dict([(key, val) for key, val in fields_dict.items() if key not in ['mac', 'ip', 'hostname']])
         return self.complete_fields(mac=fields_dict.get('mac'), ip=fields_dict.get('ip'),
                                     hostname=fields_dict.get('hostname'), div=given_div)
 
     def complete_ports_table(self, new_vals_dict, replacing=True):
+        """Complete the PortTable instance associated to this VI with new ports information
+
+        Args:
+            new_vals_dict:
+            replacing:
+
+        Returns:
+
+        """
         changed = False
         for portnum, new_port_info in new_vals_dict.items():
             if self.ports_table.complete_portinfos(portnum, new_port_info, replacing):
@@ -76,6 +120,21 @@ class VirtualInstance:
         return [field for field in self.div if self.div.get(field) is not None]
 
     def repr_same_device(self, mac=None, ip=None, hostname=None, div={}):
+        """Decision function determining if there exist a consistent match between given parameters and VI field values
+
+        This is an arbitrary decision process based on the good sense, ordered in that way (return True if one matches):
+            - MAC addresses match
+            - IPs match and hostnames also if given one is not None
+            - Hostnames match and every field value given in div also
+        Args:
+            mac:
+            ip:
+            hostname:
+            div:
+
+        Returns:
+            match(bool) : whether given values can be considered as ones belonging to the same real equipment
+        """
         if mac is not None:
             return self.mac == mac
         elif ip is not None:
@@ -92,6 +151,11 @@ class VirtualInstance:
         return False
 
     def set_state(self, new_state):
+        """Set the network state of the VI
+
+        Args:
+            new_state(str): a constant amongst 'up', 'down', 'unknown'
+        """
         if new_state in self.STATES:
             self.state = new_state
             return True
@@ -165,10 +229,21 @@ class VirtualInstance:
 
 
 class PortTable:
+    """
 
-    # NumPort : {'service': srv_name, 'protocol': netw_protocol, 'state': up|closed|filtered, 'div': {other_fields}}
+    The PortTable aims to provide a list of used ports on an equipment and information relative to each port like the
+    service running on. Other useful common details are the transport protocol and the current state of the port.
+    As for VI, diverse other fields are possible like service version, confidence level in the port information, ...
+    The table is indexed by port numbers (int) and presents the following scheme :
+     NumPort : {'service': srv_name, 'protocol': netw_protocol, 'state': up|closed|filtered, 'div': {other_fields}}
+    """
 
     def __init__(self, table=None):
+        """
+
+        Args:
+            table(dict):
+        """
         self.dflt_entry = {'service': 'unknown',
                            'protocol': 'unknown',
                            'state': 'unknown', 'div': {}}
@@ -187,6 +262,15 @@ class PortTable:
                 self.set_port(num, portinfos)
 
     def tupleinfo_to_dict(self, infos_tuple):
+        """Format an entry given in tuple format in an indexable dict in the PortTable
+
+        Args:
+            infos_tuple(str tuple): values tuple formatted like (service, protocol, state, div_dict), or shorter (any
+            missing value will be set to 'unknown')
+
+        Returns:
+            dictinfos(dict) : a dictionary as could be indexed by a port number in the table.
+        """
         dictinfos = {}
         if len(infos_tuple) < 3:
             infos_tuple += ('unknown', )*(3-len(infos_tuple))
@@ -199,18 +283,39 @@ class PortTable:
         return dictinfos
 
     def set_port(self, num, new_infos):
+        """Index a new entry from the given port information, replace the current values if port was already referenced
+
+        Args:
+            num(int): the concerned port number
+            new_infos(dict): can also be a tuple formatted as (service, protocol, state, div_dict). Given values will
+            replace current ones
+        """
         if isinstance(new_infos, tuple):
             new_entry = self.tupleinfo_to_dict(new_infos)
         else:
             new_entry = self.dflt_entry.copy()
             for field, val in new_infos.items():
                 if field in new_entry:
+                    # Main values
                     new_entry[field] = val
                 else:
+                    # Value set in diverse dict
                     new_entry['div'][field] = val
         self.table[num] = new_entry
 
     def complete_portinfos(self, num, infos, creating=True, replacing=True):
+        """Fill the values for a given port or create a new entry in the table from port information
+
+        Args:
+            num(int): the concerned port number
+            infos(dict): a dict with key that are field value names, either in 'service', 'protocol', 'state' for main
+            fields or any other key that will be placed in div dict with its value
+            creating(bool): whether should create an entry in the port table if port was not already referenced
+            replacing(bool): whether if a field value is already present, the new one should replace it
+
+        Returns:
+            changed(bool) : whether at least on field value has been modified/created
+        """
         entry = self.table.get(num)
         if entry is None:
             if creating:
@@ -220,13 +325,13 @@ class PortTable:
         if isinstance(infos, tuple):
             infos = self.tupleinfo_to_dict(infos)
         for field, val in infos.items():
-            if field in entry:
-                # Main field
+            if isinstance(field, str) and field in entry:
+                # Main field (field key already present in dict but maybe empty value)
                 if val != entry.get(field) and (replacing or entry[field] in ['', 'unknown', {}, None]):
                     entry[field] = val
                     changed = True
             else:
-                # Diverse info in div dict
+                # Diverse info to place in div dict
                 if field in self.get_divinfos(num):
                     if replacing and val != self.get_divinfos(num).get(field):
                         self.set_divinfo(num, field, val)

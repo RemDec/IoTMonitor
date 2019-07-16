@@ -1,8 +1,25 @@
 
 
 class ThreatEvent:
+    """
 
-    def __init__(self, from_module, level=1, mapid=None, msg=None, patch=None):
+    A Threat Event stands for a security risk detection. Such detections are performed by the Modules that establish
+    them at underlying program output parsing time. They are likely relative to a known Virtual Instance (to the real
+    equipment it represents) and should be reported. This Event is the formal way to register it in the app, such that
+    it can be sent up to the user and referenced. An arbitrary threat level can be associated to the threat, ranging
+    from 1 to 10.
+    """
+
+    def __init__(self, from_module, level=3, mapid=None, msg=None, patch=None):
+        """
+
+        Args:
+            from_module(str): Module id of the module that detected the threat
+            level(int): Arbitrary gravity level, ranging from 0 to 10 for serious threats
+            mapid(str): Mapid of the threat concerned VI
+            msg(str): Description of the threat, may be straightforward to understand for the user
+            patch(str): Some possible solution to correct the problem
+        """
         self.from_module = from_module
         self.level = level
         self.set_threat_lvl(level)

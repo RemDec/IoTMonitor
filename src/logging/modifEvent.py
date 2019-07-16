@@ -1,7 +1,25 @@
 
 class ModifEvent:
+    """
+
+    A Modification Event is mainly represented by an 'old state' and a 'new state', state is relative to a value of
+    something in the application (it is arbitrary). However, the concerned element must be of a type in a defined list.
+    The modification is likely relative to a resource of the element. For example the value of IP field (resource) for
+    a given Virtual Instance (element of type virt_inst). If the element has an id that identifies it in the app like
+    a mapid for a VI or a setid for a routine Module, it may be passed to the constructor.
+    """
 
     def __init__(self, modified_res, obj_type='app_res', obj_id=None, modificator='app', old_state=None, new_state=None):
+        """
+
+        Args:
+            modified_res(str): arbitrary string describing the modified resource
+            obj_type(str): one of available element whose resource can be modified, or 'app_res' if not determined
+            obj_id(str): the id of the element identifying it in the app component or None if undetermined
+            modificator(str): a string describing the origin of the modification (likely a module id or the user)
+            old_state(str): the resource state before modification
+            new_state(str): the resource state after modification
+        """
         self.OBJ_TYPES = ['app_res', 'app_cfg', 'library', 'routine', 'module', 'netmap', 'virt_inst',
                           'indep', 'indep_mod']
         self.modified_res = modified_res

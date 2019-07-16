@@ -6,6 +6,14 @@ from src.utils.misc_fcts import str_multiframe
 
 
 class Netmap:
+    """The Netmap is the object representing the network and its hosts, a set of Virtual Instances
+
+    In this set, each VI is identified by an unique id (mapid) which can be used to retrieve the VI and its fields.
+    A Netmap also manages Events : it maintains a reference to an EventCenter (meaning 'events for this network') and
+    can be used as a bridge to feed it with new events. Additionally, as events in EventCenter are limited in number,
+    Netmap can retain indefinitely desired events for each VI (especially threats that are important to keep in memory).
+    A set of event is associated with each VI, indexed by mapid.
+    """
 
     def __init__(self, map=None, event_center=None):
         self.map = {} if map is None else map
@@ -15,28 +23,60 @@ class Netmap:
     # ----- Interactions with the network map maintaining Virtual Instances -----
 
     def add_VI(self, vi, given_mapid=None):
+        """Append a new VI to the current set with an unused mapid
+
+        Args:
+            vi(VirtualInstance): the VI object to index in the Netmap
+            given_mapid(str): desired mapid, if already exists the given mapid is extended by an increasing digit until
+            result is unique. If None, the base mapid is 'device'.
+
+        Returns:
+            The final mapid used to index the VI
+        """
         mapid = self.get_unique_id(given_mapid)
         self.map[mapid] = vi
         return mapid
 
     def remove_VI(self, mapid):
-        self.map.pop(mapid)
+        """Remove an indexed VI by its mapid if exists"""
+        if mapid in self.map:
+            self.map.pop(mapid)
 
     def clear(self):
+        """Empty netmap and saved events"""
         self.map = {}
         self.svd_events = {}
 
-    def create_VI(self, mapid=None, append_netmap=True, create_event=False, creator='unknownMod',
+    def create_VI(self, mapid=None, append_netmap=True, create_event=False, creator='unknown',
                   mac=None, ip=None, hostname=None, div=None, ports=None, user_created=False):
+        """Instantiate a VI from given parameters, append it in netmap and register creation event (as a modification)
+
+        Args:
+            mapid(str): desired mapid for the created VI index in netmap
+            append_netmap(bool): whether the VI instance should be indexed in netmap
+            create_event(bool): whether a ModifEvent should be instantiated and registered for the VI creation
+            creator(str): arbitrary string naming the agent who created the VI (likely a Module so its modid)
+            mac(str): host MAC address used to fill the corresponding VI field
+            ip(str): host IP address used to fill the corresponding VI field
+            hostname(str): hostname of the host used to fill the corresponding VI field
+            div(dict): others diverse fields associated with the VI, formatted as specified by VirtualInstance usage
+            ports(PortTable): table of ports used by the host, as specified by PortTable usage
+            user_created(bool): whether this VI were created from scratch by the user himself
+
+        Returns:
+            infos(tuple) : first element is the final mapid used for indexing the created VI, second one is the VI
+                           instance
+        """
         vi = VirtualInstance(mac=mac, ip=ip, hostname=hostname, div=div, ports=ports, user_created=user_created)
         if append_netmap:
             mapid = self.add_VI(vi, given_mapid=mapid)
             if create_event:
                 self.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=creator,
                                     old_state="Non-existing VI", new_state="Registered VI in netmap", logit_with_lvl=20)
-        return str(mapid), vi
+        return mapid, vi
 
     def rename_VI(self, oldmapid, newmapid):
+        """Replace an existing mapid by a new one. If newmapid already present, it is renamed before to free it."""
         if newmapid != '' and oldmapid in self.map:
             vi_to_rename = self.map.pop(oldmapid)
             if newmapid in self.map:
@@ -51,16 +91,37 @@ class Netmap:
             return mapid in self.map
 
     def get_VI_mapids(self, subset_mapids=None, filter_fct=lambda vi_inst: True):
+        """Get mapids of some filtered VIs amongst all indexed or a subset
+
+        Args:
+            subset_mapids(str list): list of mapids to consider for the filtering
+            filter_fct(function): an arbitrary function taking one parameter (the VI instance) returning a bool
+
+        Returns:
+            ids(list) : mapids of so indexed VIs for which filter_fct returns true
+        """
         ids = []
         for mapid in self.map if subset_mapids is None else subset_mapids:
-            if filter_fct(self.get_VI(mapid)):
-               ids.append(mapid)
+            if self.vi_present(mapid) and filter_fct(self.get_VI(mapid)):
+                ids.append(mapid)
         return ids
 
     def get_VIs_from_mapids(self, mapids_list):
         return [self.get_VI(mapid) for mapid in mapids_list if self.get_VI(mapid) is not None]
 
     def get_similar_VI(self, mac=None, ip=None, hostname=None, div={}):
+        """Find the best matching in indexed IVs, given some VI fields
+
+        Args:
+            mac(str): MAC address to match
+            ip(str): IP address to match
+            hostname(str): hostname to match
+            div(dict): diverse fields values
+
+        Returns:
+            mapid(str) : the index of a matching VI based on given field values or None if no VI corresponds. Matching
+            rules are defined in VirtualInstance class doc.
+        """
         for mapid in self.map:
             vi = self.map[mapid]
             if vi.repr_same_device(mac, ip, hostname, div):
@@ -80,6 +141,15 @@ class Netmap:
     # -- from saved events in this netmap instance --
 
     def get_saved_events_for_vi(self, mapid, target='all'):
+        """Retrieve permanent events stocked in this netmap and indexed by the given mapid
+
+        Args:
+            mapid(str): index of the target VI
+            target(str): 'all' for modifications and threats, 'threats' for only threats, 'modifs' or any for modifs
+
+        Returns:
+            events(list): the list of events with first element as the most recent event
+        """
         events = self.svd_events.get(mapid, [])
         if target == 'all':
             return events
@@ -95,6 +165,13 @@ class Netmap:
         return self.get_saved_events_for_vi(mapid, 'modifs')
 
     def event_already_saved(self, tomatch):
+        """Check if an event is already present in the list indexed by the corresponding VI mapid
+
+        Args:
+            tomatch(Event): the Event instance to check presence
+        Returns:
+            present(bool): whether tomatch is already registered in event list corresponding to given mapid in the event
+        """
         mapid = tomatch.rel_to_vi()
         if mapid:
             events = self.get_saved_events_for_vi(mapid)
@@ -106,6 +183,14 @@ class Netmap:
     # -- from events in eventcenter memory --
 
     def get_events_for_vi(self, mapid, target='all'):
+        """Retrieve Events currently registered in the netmap EventCenter concerning a given mapid
+
+        Args:
+            mapid(str): mapid of the VI
+            target(str): 'all' for modifications and threats, 'threats' for only threats, 'modifs' or any for modifs
+        Returns:
+            events(list): the list of events with first element as the most recent event
+        """
         vi = self.get_VI(mapid)
         if self.event_center is None or vi is None:
             return None
@@ -137,9 +222,25 @@ class Netmap:
             vi_ev_list.insert(0, event)
 
     def register_threat(self, from_module, level=1, mapid=None, msg=None, patch=None,
-                        logit_with_lvl=-1, target_logger="threat",
+                        logit_with_lvl=-1, target_logger="threats",
                         save_vi_event=True, avoid_duplicate=True):
+        """Instantiate and register a Threat Event through the Event Center and may index it in netmap if mapid provided
 
+        Args:
+            from_module(str): id of module raising the threat
+            level(int): dangerosity level of the threat (ranges from 0 to 10)
+            mapid(str): mapid indexing the VI the threat is relaticve to
+            msg(str): description of the threat
+            patch(str): possible patch to correct the problem
+            logit_with_lvl(int): whether the threat alert should be logged in a normal way (not just registered in
+            center). A level < 0 means no such logging, other value meanings are as defined in logging standard library
+            target_logger(str): name of the target logger, 'threats' by default as defined in default loggers config.
+            save_vi_event(bool): whether the event should be indexed in the netmap with the concerned mapid
+            avoid_duplicate(bool): whether should verify if event already saved in netmap before indexing it
+
+        Returns:
+            event(ThreatEvent) : the event instance if saved in netmap (None if duplicate)
+        """
         if self.event_center is None:
             return None
         event = self.event_center.register_threat(from_module, level, mapid, msg, patch,
@@ -152,20 +253,42 @@ class Netmap:
                 if not avoid_duplicate:
                     self.register_threat_event(event)
                     return event
-        return None
 
     def register_modif(self, modified_res, obj_type='app_res', obj_id=None, modificator='app',
                        old_state=None, new_state=None,
                        logit_with_lvl=-1, target_logger="modifs",
-                       save_vi_event=True):
+                       save_vi_event=True, avoid_duplicate=True):
+        """Instantiate and register a Modif Event through the Event Center and may index it in netmap if mapid provided
 
+        Args:
+            modified_res(str): description of the modified resource
+            obj_type(str): type of the element whose resource has been modified
+            obj_id(str): element id in the app
+            modificator(str): agent that modified the resource
+            old_state(str): representation of the old resource state
+            new_state(str): representation of the new resource state
+            logit_with_lvl(int): whether the modif event should be logged in a normal way (not just registered in
+            center). A level < 0 means no such logging, other value meanings are as defined in logging standard library
+            target_logger(str): name of the target logger, 'modifs' by default as defined in default loggers config.
+            save_vi_event(bool): whether the event should be indexed in the netmap with the concerned mapid
+            avoid_duplicate(bool): whether should verify if event already saved in netmap before indexing it
+
+        Returns:
+            event(ModifEvent) : the event instance if saved in netmap (None if duplicate)
+        """
         if self.event_center is None:
             return None
         event = self.event_center.register_modif(modified_res, obj_type, obj_id, modificator,
                                                  old_state, new_state,
                                                  logit_with_lvl, target_logger)
         if save_vi_event:
-            self.register_modif_event(event)
+            if not self.event_already_saved(event):
+                self.register_modif_event(event)
+                return event
+            else:
+                if not avoid_duplicate:
+                    self.register_modif_event(event)
+                    return event
 
     def register_event(self, event):
         vi_relative = event.rel_to_vi()

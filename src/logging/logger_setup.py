@@ -7,10 +7,29 @@ import logging.handlers
 
 
 class CustomLoggerSetup:
+    """Setup of the app logging system from a configuration file (.yaml) formatted as specified by logging std lib
+
+    Instantiate the Event Center with desired loggers obtained from the configuration file. Event Center is the way
+    to maintain in the application events to log in the application environment (as object of dedicated classes, not
+    only messages). The setup also manages user email configuration : getting corresponding SMTP server, authentication
+    to it, reachability test. As loggers are instantiated from a static file, some dynamic modifications may be
+    necessary, handled in the form of a function to apply on dictionary obtained from .yaml file parsing.
+    """
 
     def __init__(self, event_center=None, loggers_capture_events="all",
                  email=None, email_pwd=None, mail_server=None,
                  cfg_file=None, fct_modify_loggers=None):
+        """
+
+        Args:
+            event_center(EventCenter): an instance of EventCenter, None for auto instantiation and loggers customization
+            loggers_capture_events(str): target loggers to customize, list of str for multiple or 'all'
+            email(str): user email or None for no mail service
+            email_pwd(str): user email account password on authenticated SMTP server
+            mail_server(str): SMTP server name to use, smtp.gmail.com for exemple. If None, deduced from email
+            cfg_file(str): path of the .yaml file to parse in dict from which loggers/handlers are instantiated
+            fct_modify_loggers(function): a function to apply on obtained dict, returning the final dict to use
+        """
 
         self.user_email = email
         self.user_pwd = email_pwd
@@ -29,6 +48,25 @@ class CustomLoggerSetup:
             cfg_dic = yaml.safe_load(f.read())
         self.curr_cfg = fct_modify_loggers(cfg_dic)
         logging.config.dictConfig(cfg_dic)
+
+    def cfg_to_defaults(self, loaded_cfg):
+        general_logs = get_dflt_entry("logs", suffix='general_logs.log')
+        replace_in_dicts(loaded_cfg, 'genfile', lambda handler: handler.__setitem__('filename', general_logs))
+        event_logs = get_dflt_entry("logs", suffix='events.log')
+        replace_in_dicts(loaded_cfg, 'eventfile', lambda handler: handler.__setitem__('filename', event_logs))
+        return loaded_cfg
+
+    def setup_event_center(self, which_loggers):
+        if which_loggers == "all":
+            loggers = self.get_all_loggers()
+        elif isinstance(which_loggers, str):
+            loggers = [which_loggers]
+        else:
+            loggers = which_loggers
+        loggers_obj = [logging.getLogger(log_name) for log_name in loggers]
+        return EventsCenter(loggers_obj)
+
+    # --- Email services ---
 
     def email_to_server(self, user_email, mail_server):
         if user_email is None:
@@ -66,25 +104,10 @@ class CustomLoggerSetup:
                                  "https://github.com/RemDec/IoTMonitor")
             mail_logger.handlers = old_hdlers
 
-    def cfg_to_defaults(self, loaded_cfg):
-        general_logs = get_dflt_entry("logs", suffix='general_logs.log')
-        replace_in_dicts(loaded_cfg, 'genfile', lambda handler: handler.__setitem__('filename', general_logs))
-        event_logs = get_dflt_entry("logs", suffix='events.log')
-        replace_in_dicts(loaded_cfg, 'eventfile', lambda handler: handler.__setitem__('filename', event_logs))
-        return loaded_cfg
+    # --- Misc ---
 
     def get_all_loggers(self):
         return self.curr_cfg.get('loggers', {}).keys()
-
-    def setup_event_center(self, which_loggers):
-        if which_loggers == "all":
-            loggers = self.get_all_loggers()
-        elif isinstance(which_loggers, str):
-            loggers = [which_loggers]
-        else:
-            loggers = which_loggers
-        loggers_obj = [logging.getLogger(log_name) for log_name in loggers]
-        return EventsCenter(loggers_obj)
 
     def get_event_center(self):
         return self.event_center
