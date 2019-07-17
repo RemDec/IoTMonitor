@@ -124,12 +124,15 @@ class QueueEntry(Entry):
                 vistr = "Not specific VI relative"
             else:
                 vistr = "VIs: " + ','.join(self.rel_to_vi)
-            return s + f"\n{self.get_mod_inst().str_summary()}\n{vistr[:40]}\nThreats /!\\ Modifs -o-"
+            modifs, threats = self.module.get_nbr_events()
+            return s + f"\n{self.get_mod_inst().str_summary()}\n{vistr[:40]}\n      {threats} /!\\   {modifs} -o-"
         elif level == 5:
             curr_params, dflt_params, desc_PARAMS = self.module.get_params()
             rel_vi_str = '| < no specific VI >' if len(self.rel_to_vi) == 0 else ', '.join(self.rel_to_vi)
             s += f"| ACTIVE module whose description is given as :\n"
             s += f"|  {self.module.get_description()}\n"
+            modifs, threats = self.module.get_nbr_events()
+            s += f"| Events : {threats} /!\\   {modifs} -o-\n"
             s += f"| Execution relative to VIs : {rel_vi_str}\n"
             s += f"| Associated underlying program : {self.module.get_cmd()}\n"
             s += f"| Module parameters :\n"
@@ -139,14 +142,17 @@ class QueueEntry(Entry):
             rel_vi_str = '| < no specific VI >'
             if len(self.rel_to_vi) > 0 and self.module.netmap is not None:
                 rel_vi_str = self.module.netmap.vi_frames(self.module.netmap.get_VI_mapids(subset_mapids=self.rel_to_vi))
-            s += f"| PASSIVE module whose description is given as :\n"
+            s += f"| ACTIVE module whose description is given as :\n"
             s += f"|  {self.module.get_description()}\n"
             s += f"| Associated underlying program : {self.module.get_cmd()}\n"
+            modifs, threats = self.module.get_nbr_events()
+            s += f"| Threats {threats} /!\\  Modifications {modifs} -o-\n"
             s += f"| Module parameters :\n"
             s += str_param_comp(curr_params, dflt_params, descriptions=desc_PARAMS, prefix='|  ')
             s += f"| Threads registered :\n"
             s += self.module.str_threads() + "|\n"
             b = '\n'
+            s += f"| "
             s += f"| Execution relative to VIs :\n{rel_vi_str}{b if rel_vi_str[-1] != b else ''}"
         return s
 

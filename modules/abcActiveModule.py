@@ -15,6 +15,7 @@ class ActiveModule(Module):
     """
 
     def __init__(self, netmap):
+        super().__init__()
         self.netmap = netmap
         self.curr_threads = []
 

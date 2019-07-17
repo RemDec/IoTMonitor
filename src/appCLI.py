@@ -40,7 +40,8 @@ class AppCLI(TimerInterface):
         self.level = level
         self.save_on_exit = save_on_exit # Save core components state at regular app exiting
         self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library",
-                             "events", "threats", "modifs"]
+                             "events", "threats", "modifs", "feedback"]
+        self.to_disp = "app"
         # Check whether essential files are in place
         self.filemanager = FilesManager()
         if check_files:
@@ -61,7 +62,6 @@ class AppCLI(TimerInterface):
         self.core = Core(self.coreconfig)
         self.paths = self.coreconfig.paths
 
-        self.to_disp = "app"
         self.output = self.config_output(terminal)  # Init output controller object depending on mode selected
         self.cli = CLIparser(self.core, core_controller=self)
 

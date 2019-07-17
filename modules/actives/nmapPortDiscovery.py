@@ -65,7 +65,7 @@ class AModNmapPortDisc(ActiveModule):
                 port_fields = parser.get_host_fields(port_elmt, fields=('state', 'service', 'script'))
                 port_state = port_fields['state'][0].get('state')
                 conf = int(port_fields['service'][0].get('conf', 10))
-                if port_state == 'closed' and conf <= 3:
+                if port_state in ['closed', 'filtered'] and conf <= 3:
                     # Avoid abusive information feedback certainly wrong
                     continue
                 prot, port_nbr = port_elmt.get('protocol'), port_elmt.get('portid')
@@ -108,6 +108,7 @@ class AModNmapPortDisc(ActiveModule):
                                                new_state=new_portstable, logit_with_lvl=20)
         name = f"Module [{self.m_id}]"
         if changed_vi+changed_table:
+            super().did_modification(changed_vi+changed_table)
             log_feedback_available(f"{name} created/updated {changed_vi} VIs and {changed_table} of their ports tables")
         else:
             log_feedback_available(f"{name} didn't find any new information amongst {len(hosts)} hosts analyzed")

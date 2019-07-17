@@ -19,6 +19,19 @@ class Module(abc.ABC):
     PassiveModule.
     """
 
+    def __init__(self):
+        self.nbr_modifs = 0
+        self.nbr_threats = 0
+
+    def did_modification(self, nbr=1):
+        self.nbr_modifs += nbr
+
+    def found_threat(self, nbr=1):
+        self.nbr_threats += nbr
+
+    def get_nbr_events(self):
+        return self.nbr_modifs, self.nbr_threats
+
     @abc.abstractmethod
     def get_description(self):
         """A short description of module activity and purpose of underlying program"""

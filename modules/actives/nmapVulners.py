@@ -48,6 +48,7 @@ class AModNmapVulners(FacilityActiveModule):
         return self.desc
 
     def build_final_cmd(self, rel_to_vi=[]):
+        use_spec_ports = False
         cmd = self.get_cmd() + ' '
         for param, val in self.get_curr_params().items():
             if param == 'IP':
@@ -56,6 +57,12 @@ class AModNmapVulners(FacilityActiveModule):
                     # Replace IPs to consider by specified ones
                     iplist = iplist_to_nmap(self.netmap.get_IPs_from_mapids(rel_to_vi))
                 cmd += iplist + ' '
+            elif param == 'ports':
+                if val != 'usetop':
+                    use_spec_ports = True
+                    cmd += self.scheme[param][2] + val
+            elif param == 'nbrports' and use_spec_ports:
+                continue  # Do not use and include the top-port flag in the command
             else:
                 prefix = self.scheme[param][2]
                 cmd += prefix + val + ' '
@@ -93,22 +100,28 @@ class AModNmapVulners(FacilityActiveModule):
                                            modificator=self.get_module_id(), old_state='Non-existing VI',
                                            new_state='New VI instance with PortTable:\n'+port_table.detail_str(1),
                                            logit_with_lvl=20)
+                super().did_modification()
             else:
                 vi = self.netmap.get_VI(mapid)
                 vi.set_state(state)
                 old = vi.detail_str(2)
                 old_portstable = vi.get_ports_table().detail_str(level=3)
+                changed_fields, changed_ports = False, False
                 if vi.complete_fields(mac=mac, ip=ip, hostname=hostname):
                     new = vi.detail_str(2)
                     self.netmap.register_modif('VI ' + mapid, obj_type='virt_inst', obj_id=mapid,
                                                modificator=self.get_module_id(),
                                                old_state=old, new_state=new, logit_with_lvl=20)
+                    changed_fields = True
                 if vi.complete_ports_table(table):
                     new_portstable = vi.get_ports_table().detail_str(level=3)
                     self.netmap.register_modif('PortsTable VI ' + mapid, obj_type='virt_inst', obj_id=mapid,
                                                modificator=self.get_module_id(), old_state=old_portstable,
                                                new_state=new_portstable, logit_with_lvl=20)
-            # Registering CVE threats
+                    changed_ports = True
+                if changed_fields or changed_ports:
+                    super().did_modification()
+            # Registering CVE as threat events
             for portnum in vulns:
                 service_cpe, list_CVEs_infos = vulns.get(portnum)
                 for dict_infos in list_CVEs_infos:
@@ -117,10 +130,11 @@ class AModNmapVulners(FacilityActiveModule):
                     lvl = float(dict_infos.get('severity', 1))
                     threat = self.netmap.register_threat(self.get_module_id(), level=lvl, mapid=mapid,
                                                          msg=msg, patch=patch, logit_with_lvl=40)
-                    if threat is not None:
+                    if threat is not None:  # The threat was not reported yet
                         threats.append(threat)
 
         if len(threats):
+            super().found_threat(len(threats))
             msg = f"Module [{self.get_module_id()}] found {len(threats)} vulnerabilities/threats"
             log_feedback_available(msg)
             # Sending recap email with threats
@@ -128,7 +142,7 @@ class AModNmapVulners(FacilityActiveModule):
             msg += "\n Description of discovered threats :\n\n" + '\n\n'.join(threats)
             logging.getLogger('mail').critical(msg)
         else:
-            log_feedback_available(f"Module [{self.get_module_id()}] did not find any threat")
+            log_feedback_available(f"Module [{self.get_module_id()}] did not find any (new) threat")
 
     def fill_ports_table_and_vulners_output(self, parser, host_elmt):
         # Returns a dict from which PortTable of host is built and a second dict with found CVE(s) for each port
@@ -148,7 +162,7 @@ class AModNmapVulners(FacilityActiveModule):
             # Test relevant
             port_service_elmt = port_fields['service'][0]
             conf = int(port_service_elmt.get('conf', 10))
-            if portstate == 'closed' and conf <= 3:
+            if portstate in ['closed', 'filtered'] and conf <= 3:
                 # Avoid abusive information feedback certainly wrong
                 continue
             # Diverse

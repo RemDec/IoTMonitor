@@ -434,7 +434,7 @@ class PortTable:
         else:
             def fct_per_port(port):
                 service, prot, state, div = self.get_infos(num=port)
-                s = f" | < {service}, {prot}, {state} >\n"
+                s = f" | {port} : < {service}, {prot}, {state} >\n"
                 if len(div) == 0:
                     s = s[:-1] + " (no other div field)\n"
                 else:

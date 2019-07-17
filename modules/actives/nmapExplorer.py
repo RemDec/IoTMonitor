@@ -83,6 +83,7 @@ class AModNmapExplorer(ActiveModule):
                         changed += 1
         name = f"Module [{self.m_id}]"
         if changed:
+            self.did_modification(nbr=changed)
             log_feedback_available(f"{name} created/updated {changed} VIs")
         else:
             log_feedback_available(f"{name} didn't find any new information amongst {len(hosts)} hosts analyzed")

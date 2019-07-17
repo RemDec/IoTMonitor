@@ -27,7 +27,7 @@ class Core:
 
         self.code_components = {'app': self, 'routine': self.routine, 'netmap': self.netmap, 'indep': self.indep_mods,
                                 'timer': self.timer, 'library': self.modmanager,
-                                'events': self.get_event_center()}
+                                'events': self.get_event_center(), 'feedback': self.get_feedback()}
         log_feedback_available('Finished instantiation of AppCore and its components')
 
     # ----- Modules library interactions -----
@@ -140,6 +140,9 @@ class Core:
     def get_event_center(self):
         return self.logger_setup.get_event_center()
 
+    def get_feedback(self):
+        return self.get_event_center().get_feedback()
+
     # ----- Utilities -----
 
     def clear_target(self, target):
@@ -201,7 +204,7 @@ class Core:
             s += f"{self.routine.detail_str(level=1)}"
             s += f" ||\n ++------- NETMAP  -------\n"
             s += f"{self.netmap.vi_frames()}"
-        elif level == 2:
+        elif level < 5:
             last_feedback = self.get_event_center().pull_feedback(nbr_lines=3)
             if last_feedback.strip() != '':
                 s += last_feedback + '_' * 130 + '\n\n'
@@ -211,11 +214,11 @@ class Core:
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
             s += f" || Routine independent modules :\n ||  {','.join(indeps)}\n"
             s += f" ||\n ++------- ROUTINE -------"
-            s += f"{self.routine.detail_str(level=2)}"
+            s += f"{self.routine.detail_str(level=level)}"
             s += f" ||\n ++------- NETMAP  -------\n"
             s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=4)}"
         else:
-            last_feedback = self.get_event_center().pull_feedback(nbr_lines=level)
+            last_feedback = self.get_event_center().pull_feedback(nbr_lines=min(5, level))
             if last_feedback.strip() != '':
                 s += last_feedback + '_'*50 + "^^^ FEEDBACK BAR ^^^" + '_'*50 + '\n\n'
             s += f"=++====== Core application =========\n"

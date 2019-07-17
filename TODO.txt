@@ -8,6 +8,8 @@
 - [OK] Passable desired terminal for View
 - [OK] More control on View terminal process
 - [OK] Multiline display for containers (avoid wrapping in View)
+- NMap parsing errors
+- edit active mod entry timer set current exp timer not exp timer init value
 - Management of dependencies/requirements for underlying programs
 !- State of VI through time
 - Strict format for VI fields

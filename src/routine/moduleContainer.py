@@ -4,6 +4,11 @@ MAX_LENGTH_SETID = 15
 
 
 class ModContainer(abc.ABC):
+    """An abstract class designed to avoid code redundancy for Modules containers
+
+    Queue and Panel are both a set managing some Module instances in a different way, depending their execution control.
+    A Module instance in encapsulated in an overlayer called Entry.
+    """
 
     def __init__(self, netmap):
         self.netmap = netmap
@@ -106,6 +111,7 @@ class ModContainer(abc.ABC):
 
     def detail_str(self, level=0):
         if level < 5:
+            # From level 0 to 4, containers are pretty displayed in frames
             return self.adaptive_display(lambda entry: entry.detail_str(level=level), frameit=True,
                                          nbr_per_line=max(level+2, 4), header=True)
         else:
@@ -116,6 +122,10 @@ class ModContainer(abc.ABC):
 
 
 class Entry(abc.ABC):
+    """An Entry encapsulates a Module instance and maintain a setid identifying it. It should be an unique string
+    amongst all entries of the set.
+
+    """
 
     def __init__(self, mod_inst, setid, rel_to_vi=[]):
         self.module = mod_inst

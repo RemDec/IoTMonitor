@@ -474,9 +474,9 @@ class CLIparser:
         self.back_main_menu()
 
     def after_show_select(self, show_input_name):
-        map = {'routine': "routine", 'netmap': "netmap", 'library': "library", 'independent mods': "indep",
-               'main timer': "timer", 'virtual instance': "vi", 'entry module in routine': "entry",
-               'threat events': "threats", 'modification events': "modifs", 'app': "app"}
+        map = {'app': "app", 'routine': "routine", 'netmap': "netmap", 'library': "library", 'main timer': "timer",
+               'independent mods': "indep", 'virtual instance': "vi", 'entry module in routine': "entry",
+               'threat events': "threats", 'modification events': "modifs", 'feedback': "feedback"}
         res_to_show = map.get(show_input_name, "app")
         if res_to_show == "vi":
             self.previous_menu = self.curr_menu
@@ -492,6 +492,9 @@ class CLIparser:
             self.no_wipe_next()
 
     def after_show_vi_slct(self, mapid):
+        if mapid.strip() == '':
+            self.back_main_menu()
+            return
         vi = self.core.get_from_netmap(mapid)
         lvl_info = f"(increase it with $set lvl {self.curr_display_lvl+1})" if self.curr_display_lvl < 4 else ''
         print(f"Displaying VI informations with level {self.curr_display_lvl} {lvl_info}\n")
@@ -685,7 +688,7 @@ class CLIparser:
                      'help': get_res_CLI('show_help'),
                      'choices': [['app', 'routine', 'netmap', 'library', 'independent mods', 'main timer'],
                                  ['virtual instance', 'entry module in routine'],
-                                 ['threat events', 'modification events']],
+                                 ['threat events', 'modification events', 'feedback']],
                      'dflt_choice': 'routine',
                      'fct_choice': self.after_show_select}
 
@@ -760,7 +763,8 @@ class CLIparser:
                           'marker': "[mapid] :", 'choices': self.get_map_mapids,
                           'fct_choice': self.after_remove_vi_slct}
 
-        self.show_VI = {'desc': "Select an existing virtual instance and show its details (fields, linked events, ..)",
+        self.show_VI = {'desc': "Select an existing virtual instance and show its details (fields, linked events, ..)\n"
+                                "Use $main or $previous to leave this menu.",
                         'marker': "[mapid] :", 'choices': self.get_map_mapids,
                         'fct_choice': self.after_show_vi_slct}
 

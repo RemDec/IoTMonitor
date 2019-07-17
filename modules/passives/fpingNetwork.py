@@ -83,6 +83,7 @@ class PModFping(FacilityActiveModule):
                         modified.append(mapid)
         nbr_modifs = len(set(modified))
         if nbr_modifs > 0:
+            super().did_modification(nbr=nbr_modifs)
             log_feedback_available(f"Module [{self.get_module_id()}] updated state and/or fields of {nbr_modifs} VIs")
 
     def parse_host(self, host_line):

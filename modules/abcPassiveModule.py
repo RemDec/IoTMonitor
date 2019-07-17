@@ -17,6 +17,7 @@ class PassiveModule(Module):
     """
 
     def __init__(self, timer, netmap):
+        super().__init__()
         self.timer = timer
         self.netmap = netmap
         # thlist of instancied pairs at launch call (bg_thread, comm_thread)

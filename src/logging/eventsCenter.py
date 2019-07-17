@@ -1,5 +1,6 @@
 from src.logging.threatEvent import *
 from src.logging.modifEvent import *
+from src.logging.feedback import Feedback
 import logging
 
 
@@ -29,6 +30,7 @@ class EventsCenter:
         self.last_feedback = []
         self.temp_ind = 0
         self.setup_loggers()
+        self.feedback_queue = Feedback()
 
     def setup_loggers(self):
         logging.log_feedback = self.log_feedback
@@ -126,16 +128,17 @@ class EventsCenter:
                 logging.getLogger(logitin).log(lvl, msg)
         self.feedback(msg)
 
+    # --- Feedback communication ---
+
+    def get_feedback(self):
+        return self.feedback_queue
+
     def feedback(self, str_fb):
         """Feed the feedback content with new strings, split based on newline character"""
-        self.last_feedback.extend(str_fb.split('\n'))
+        self.feedback_queue.feed(str_fb)
 
     def pull_feedback(self, nbr_lines=2, nbr_pass=1):
-        to_return = '\n'.join(self.last_feedback[:nbr_lines])
-        if len(self.last_feedback) > nbr_lines:
-            # There are still lines in waiting to be displayed
-            self.last_feedback = self.last_feedback[nbr_pass:]
-        return to_return + '\n' if len(to_return) > 0 and to_return[-1] != '\n' else ''
+        return self.feedback_queue.pull_feedback(nbr_lines, nbr_pass)
 
     # --- Retrieving events object based on filters ---
 
