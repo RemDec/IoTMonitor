@@ -96,6 +96,14 @@ class QueueEntry(Entry):
     def set_timer(self, new_timer):
         self.exp_timer = new_timer
 
+    def set_init_timer(self, new_init_timer):
+        self.init_timer = new_init_timer
+
+    def reset_timer(self, new_init_timer=None):
+        if new_init_timer is not None:
+            self.set_init_timer(new_init_timer)
+        self.exp_timer = self.init_timer
+
     def get_timer(self):
         return self.exp_timer
 

@@ -35,6 +35,9 @@ class Core:
     def instantiate_module(self, mod_id, curr_params=None):
         return self.modmanager.get_mod_from_id(mod_id, curr_params=curr_params, timer=self.timer, netmap=self.netmap)
 
+    def get_mod_descriptor(self, mod_id):
+        return self.modmanager.get_mod_desc(mod_id)
+
     def get_available_mods(self, only_names=False, stringed=False):
         # All modules referenced by current used modules library
         if only_names:

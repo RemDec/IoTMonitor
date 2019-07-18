@@ -67,17 +67,6 @@ class ActiveModule(Module):
     def __str__(self):
         return self.str_threads()
 
-    def treat_params(self, defaults, given_params):
-        final_par = {}
-        for par, val in defaults.items():
-            if given_params.get(par):
-                # Parameter is given as is
-                final_par[par] = given_params[par]
-            elif val[1]:
-                # Ungiven parameter but mandatory -> take default
-                final_par[par] = val[0]
-        return final_par
-
 
 class ScriptThread(threading.Thread):
 

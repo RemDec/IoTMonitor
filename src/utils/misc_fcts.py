@@ -137,18 +137,6 @@ def pretty_str_curr_param(current, defaults, descriptions={}, prefix=''):
     return s
 
 
-def treat_params(scheme_params, given_params):
-    final_par = {}
-    for par, val in scheme_params.items():
-        if given_params.get(par):
-            # Parameter is given as is
-            final_par[par] = given_params[par]
-        elif val[1]:
-            # Not given parameter but mandatory -> take default
-            final_par[par] = val[0]
-    return final_par
-
-
 def get_sep_modparams(modinstance):
     _, PARAMS, _ = modinstance.get_params()
     mandatory = [param_code for param_code in PARAMS if PARAMS[param_code][1]]

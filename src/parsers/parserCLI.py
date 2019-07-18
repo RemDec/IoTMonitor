@@ -315,14 +315,16 @@ class CLIparser:
         self.curr_menu = self.index_menus[target_menu_index]
 
     def after_mod_slct(self, mod_id):
-        dflts = self.get_user_confirm(f"[{mod_id}] use defaults params (Y/n) ? ")
-        in_rout = self.get_user_confirm(f"[{mod_id}] append it in routine (Y/n) ?")
+        mod_descriptor = self.core.get_mod_descriptor(mod_id)
+        _, PARAMS, desc_params = mod_descriptor.get_all_params()
+        ask_default = f"[{mod_id}] Code of settable module parameters :\n{'  '.join(PARAMS.keys())}\n" \
+                      f"Use default parameters values (Y/n) ? "
+        dflts = self.get_user_confirm(ask_default)
         if dflts:
             mod_inst = self.core.instantiate_module(mod_id)
         else:
             # Taking values for module paramaters from descriptions provided
             input_params = {}
-            _, PARAMS, desc_params = self.core.modmanager.get_mod_desc_params(mod_id)
             for code_param, (dflt, mand, pref) in PARAMS.items():
                 desc = desc_params.get(code_param, "No parameter description")
                 perm = "mandatory" if mand else "optional"
@@ -363,6 +365,7 @@ class CLIparser:
         except ValueError:
             print("Incorrect format for given timer (should be integer > 0) -> use default one")
             timer = 0
+        in_rout = self.get_user_confirm(f"[{mod_id}] append it in routine (Y/n) ?")
         if in_rout:
             setid = self.get_user_in_or_dflt(None, marker="\nGive a setid if desired (alphanumeric)\n[setid] :")
             entry = self.core.add_to_routine(mod_inst, given_setid=setid, given_timer=timer)
@@ -443,12 +446,15 @@ class CLIparser:
         input_timer = self.get_user_in_or_dflt(str(dflt_val), marker=marker).strip()
         try:
             timer = abs(int(input_timer))
-            if input_timer != '' and is_mod_act:
-                modentry.set_timer(timer)
-            elif input_timer != '' and not is_mod_act:
+            if is_mod_act:
+                modentry.reset_timer(timer)
+            else:
                 modinst.set_read_interval(timer)
         except ValueError:
-            print("Incorrect format for given timer (should be integer > 0)")
+            # arrives here if enter was pressed to pass or wrong input format
+            if input_timer != '':
+                self.clear_cls = False
+                print("Incorrect format for given timer (should be integer > 0)")
         self.back_main_menu()
 
     def after_rename_vi_slct(self, mapid):

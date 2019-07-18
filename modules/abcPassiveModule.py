@@ -119,16 +119,7 @@ class PassiveModule(Module):
     def __str__(self):
         return self.str_pair_threads()
 
-    def treat_params(self, defaults, given_params):
-        final_par = {}
-        for par, val in defaults.items():
-            if given_params.get(par):
-                final_par[par] = given_params[par]
-            elif val[1]:
-                final_par[par] = val[0]
-        return final_par
-    
-    
+
 class BackgroundThread(threading.Thread):
     
     def __init__(self, output_stream=None):

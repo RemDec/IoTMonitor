@@ -9,16 +9,17 @@
 - [OK] More control on View terminal process
 - [OK] Multiline display for containers (avoid wrapping in View)
 - NMap parsing errors
-- edit active mod entry timer set current exp timer not exp timer init value
+- [OK] Edit active mod entry timer set current exp timer not exp timer init value
 - Management of dependencies/requirements for underlying programs
 !- State of VI through time
+!- Sorting VI depending their state
 - Strict format for VI fields
 - Make uniform methods/attributes/notions in code
 - DOC
 - DTDs
-- Help for starting in app usage
+! - Help for starting in app usage
 - Constants for events target types
-!- Limit nbr of displayed events and redundant threats alerts in stdin
+- [OK] Limit nbr of displayed events and redundant threats alerts in stdin
 - Proper way to leave app with sig
 - More feedback communications
 - Events/core target unification with constants
@@ -31,8 +32,8 @@
 
 ### TO SEE
 
-- Full feedback in View
-- Keep nbr events per mod inst
+- [OK] Full feedback in View
+- [OK] Keep nbr events per mod inst
 !- Summary mail (cumulative threats)
 - Sorting/filtering of events
 - More possible manipulations with library file
