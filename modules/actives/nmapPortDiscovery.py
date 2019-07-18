@@ -77,10 +77,10 @@ class AModNmapPortDisc(ActiveModule):
                 # Filling dict from which PortTable is built
                 table[int(port_nbr)] = (port_service, prot.upper(), port_state, div_portinfos)
             # Updating or creating corresponding VI based on retrieved informations
-            mapid = self.netmap.get_similar_VI(mac=mac, ip=ip, hostname=hostname)
+            mapid = self.netmap.get_similar_vi(mac=mac, ip=ip, hostname=hostname)
             if mapid is None:
                 port_table = PortTable(table)
-                mapid, vi = self.netmap.create_VI(mac=mac, ip=ip, hostname=hostname, ports=port_table)
+                mapid, vi = self.netmap.create_vi(mac=mac, ip=ip, hostname=hostname, ports=port_table)
                 vi.set_state(state)
                 self.netmap.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
                                            old_state='Non-existing VI',
@@ -89,7 +89,7 @@ class AModNmapPortDisc(ActiveModule):
                 changed_vi += 1
                 changed_table += 1
             else:
-                vi = self.netmap.get_VI(mapid)
+                vi = self.netmap.get_vi(mapid)
                 vi.set_state(state)
                 old = vi.detail_str(2)
                 old_portstable = vi.get_ports_table().detail_str(level=3)

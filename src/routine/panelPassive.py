@@ -106,7 +106,7 @@ class PanelEntry(Entry):
             curr_params, dflt_params, desc_PARAMS = self.module.get_params()
             rel_vi_str = '| < no specific VI >'
             if len(self.rel_to_vi) > 0 and self.module.netmap is not None:
-                rel_vi_str = self.module.netmap.vi_frames(self.module.netmap.get_VI_mapids(subset_mapids=self.rel_to_vi))
+                rel_vi_str = self.module.netmap.vi_frames(self.module.netmap.get_vi_mapids(subset_mapids=self.rel_to_vi))
             s += f"| PASSIVE module whose description is given as :\n"
             s += f"|  {self.module.get_description()}\n"
             s += f"| Associated underlying program : {self.module.get_cmd()}\n"

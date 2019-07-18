@@ -3,7 +3,7 @@ from src.coreConfig import CoreConfig
 import yaml
 
 
-def config_to_YAML(coreconfig, filepath=get_dflt_entry('configs', 'last_coreconfig.yaml'),
+def config_to_YAML(coreconfig, filepath=get_dflt_entry('last_cfg'),
                    XML_path_routine=None, XML_path_netmap=None):
     vals = {}
     cfgpaths = coreconfig.paths

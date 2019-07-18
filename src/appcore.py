@@ -107,16 +107,16 @@ class Core:
     # ----- Netmap interactions -----
 
     def add_to_netmap(self, vi, mapid=None):
-        self.netmap.add_VI(vi, mapid)
+        self.netmap.add_vi(vi, mapid)
 
     def get_from_netmap(self, mapid):
-        return self.netmap.get_VI(mapid)
+        return self.netmap.get_vi(mapid)
 
     def remove_from_netmap(self, mapid):
-        self.netmap.remove_VI(mapid)
+        self.netmap.remove_vi(mapid)
 
     def rename_netmap_vi(self, oldmapid, newmapid):
-        self.netmap.rename_VI(oldmapid, newmapid)
+        self.netmap.rename_vi(oldmapid, newmapid)
 
     def clear_netmap(self):
         self.netmap.clear()
@@ -125,7 +125,7 @@ class Core:
         return self.netmap
 
     def get_all_mapids(self):
-        return self.netmap.get_VI_mapids()
+        return self.netmap.get_vi_mapids()
 
     def get_saved_events(self, mapid, target='all', to_str_lvl=-1, reverse=False):
         event_list = self.netmap.get_saved_events_for_vi(mapid, target)

@@ -1,7 +1,7 @@
 from src.utils.misc_fcts import obj_str
 from src.utils.filesManager import FilesManager
 from src.logging.logger_setup import CustomLoggerSetup
-from src.utils.moduleManager import ModManager
+from src.utils.moduleManager import Library
 from src.utils.timer import TimerThread
 from src.routine.routine import Routine
 from src.net.netmap import Netmap
@@ -77,11 +77,11 @@ class CoreConfig:
 
     def init_modmanager(self, modmanager):
         if modmanager is None:
-            self.modmanager = ModManager(modlib_file=self.paths['library'], load_direct=True)
+            self.modmanager = Library(modlib_file=self.paths['library'], load_direct=True)
         elif isinstance(modmanager, str):
             self.paths['library'] = self.filemanager.complete_path('configs', modmanager)
-            self.modmanager = ModManager(modlib_file=self.paths['library'], load_direct=True)
-        elif isinstance(modmanager, ModManager):
+            self.modmanager = Library(modlib_file=self.paths['library'], load_direct=True)
+        elif isinstance(modmanager, Library):
             self.modmanager = modmanager
         else:
             pass

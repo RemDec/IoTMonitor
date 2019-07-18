@@ -63,16 +63,16 @@ class AModNmapExplorer(ActiveModule):
             hostname = parser.hostname_from_host(host)
             div = {'manufacturer': other['manufacturer']} if other.get('manufacturer') is not None else {}
             if self.netmap is not None:
-                mapid = self.netmap.get_similar_VI(mac=mac, ip=ip, hostname=hostname)
+                mapid = self.netmap.get_similar_vi(mac=mac, ip=ip, hostname=hostname)
                 if mapid is None:
-                    mapid, vi = self.netmap.create_VI(mac=mac, ip=ip, hostname=hostname, div=div)
+                    mapid, vi = self.netmap.create_vi(mac=mac, ip=ip, hostname=hostname, div=div)
                     changed += 1
                     vi.set_state(state)
                     self.netmap.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
                                                old_state='Non-existing VI', new_state='New VI instance',
                                                logit_with_lvl=20)
                 else:
-                    vi = self.netmap.get_VI(mapid)
+                    vi = self.netmap.get_vi(mapid)
                     vi.set_state(state)
                     old = vi.detail_str(2)
                     changed_this_vi = vi.complete_fields(mac=mac, ip=ip, hostname=hostname, div=div)

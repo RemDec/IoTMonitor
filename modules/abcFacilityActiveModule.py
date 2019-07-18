@@ -1,5 +1,6 @@
 from modules.abcActiveModule import ActiveModule, ScriptThread
-from src.utils.misc_fcts import log_feedback_available, treat_params
+from src.utils.misc_fcts import log_feedback_available
+from src.utils.constants import DFLT_EXP_TIMER, MAX_EXEC_TIME_ACTIVE
 import abc
 
 
@@ -103,13 +104,13 @@ class FacilityActiveModule(ActiveModule):
 
     def set_params(self, given_params):
         scheme = self.get_scheme_params()
-        self.params = treat_params(scheme, {} if given_params is None else given_params)
+        self.params = super().treat_params(scheme, {} if given_params is None else given_params)
 
     def get_default_timer(self):
-        return 60
+        return DFLT_EXP_TIMER
 
     def get_max_exec_time(self):
-        return 120
+        return MAX_EXEC_TIME_ACTIVE
 
     def get_script_thread(self, rel_to_vi=[]):
         return ScriptThread(callback_fct=self.distrib_output, rel_to_vi=rel_to_vi,

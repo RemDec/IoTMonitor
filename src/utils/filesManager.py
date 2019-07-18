@@ -191,13 +191,13 @@ class ModuleIntegrator:
             raise ModuleIntegrationError(err_msg)
 
     def compute_library(self, library):
-        from src.utils.moduleManager import ModManager
-        if isinstance(library, ModManager):
+        from src.utils.moduleManager import Library
+        if isinstance(library, Library):
             return library
         elif isinstance(library, str):
-            return ModManager(modlib_file=complete_path('configs', library))
+            return Library(modlib_file=complete_path('configs', library))
         elif library is None:
-            return ModManager()
+            return Library()
 
     def integrate_module(self):
         """Include the module in the library collection

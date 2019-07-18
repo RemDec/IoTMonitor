@@ -1,5 +1,6 @@
 from modules.abcPassiveModule import PassiveModule, BackgroundThread, CommunicationThread
-from src.utils.misc_fcts import log_feedback_available, treat_params
+from src.utils.misc_fcts import log_feedback_available
+from src.utils.constants import DFLT_READ_INTERVAL
 from time import sleep
 import abc
 
@@ -11,7 +12,7 @@ class FacilityActiveModule(PassiveModule):
     You can find information about their purposes and job to implement in superclass Module.
     """
 
-    def __init__(self, read_interval=20, params=None, timer=None, netmap=None):
+    def __init__(self, read_interval=DFLT_READ_INTERVAL, params=None, timer=None, netmap=None):
         super().__init__(timer, netmap)
         self.read_interval = read_interval
         self.params = params
@@ -72,16 +73,7 @@ class FacilityActiveModule(PassiveModule):
         comm_thread = self.new_comm_thread()
         self.work_before_launching(cmd_to_exec, bg_thread, comm_thread, rel_to_vi)
         bg_thread.start(cmd_to_exec)
-        pipe = bg_thread.get_output_pipe()
-        i = 0
-        while pipe is None:
-            if i == 10:
-                log_feedback_available(f"[{self.get_module_id()}] Unable to get output pipe of {bg_thread}")
-                return
-            # Need to wait underlying process to instantiate its output stream
-            sleep(0.3)
-            i += 1
-            pipe = bg_thread.get_output_pipe()
+        pipe = bg_thread.wait_for_output_pipe()
         comm_thread.start(pipe)
         super().register_threadpair((bg_thread, comm_thread))
 
@@ -104,7 +96,7 @@ class FacilityActiveModule(PassiveModule):
 
     def set_params(self, given_params):
         scheme = self.get_scheme_params()
-        self.params = treat_params(scheme, {} if given_params is None else given_params)
+        self.params = super().treat_params(scheme, {} if given_params is None else given_params)
 
     def new_bg_thread(self):
         return BackgroundThread()

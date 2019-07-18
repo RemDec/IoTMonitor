@@ -1,6 +1,7 @@
 from src.logging.eventsCenter import *
 from src.utils.misc_fcts import replace_in_dicts
 from src.utils.filesManager import get_dflt_entry
+from src.utils.constants import MAIL_TIMEOUT
 import logging
 import logging.config
 import logging.handlers
@@ -139,7 +140,7 @@ class TlsSMTPHandler(logging.handlers.SMTPHandler):
             port = self.mailport
             if not port:
                 port = smtplib.SMTP_PORT
-            smtp = smtplib.SMTP(self.mailhost, port, timeout=5)
+            smtp = smtplib.SMTP(self.mailhost, port, timeout=MAIL_TIMEOUT)
             msg = self.format(record)
             msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nDate: %s\r\n\r\n%s" % (
                 self.fromaddr,
@@ -169,7 +170,7 @@ class TlsSMTPHandlerErrorFree(logging.handlers.SMTPHandler):
         port = self.mailport
         if not port:
             port = smtplib.SMTP_PORT
-        smtp = smtplib.SMTP(self.mailhost, port, timeout=5)
+        smtp = smtplib.SMTP(self.mailhost, port, timeout=MAIL_TIMEOUT)
         msg = self.format(record)
         msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nDate: %s\r\n\r\n%s" % (
             self.fromaddr,

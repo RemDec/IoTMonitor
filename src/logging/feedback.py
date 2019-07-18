@@ -1,4 +1,4 @@
-MAX_FEEDBACK = 30
+from src.utils.constants import MAX_FEEDBACK_QSIZE
 
 
 class Feedback:
@@ -9,7 +9,14 @@ class Feedback:
         self.nbr_to_pass = nbr_pass
 
     def feed(self, feed_string):
-        self.feedqueue.extend(feed_string.split('\n'))
+        split_lines = feed_string.split('\n')
+        if len(self) + len(split_lines) <= MAX_FEEDBACK_QSIZE:
+            self.feedqueue.extend(split_lines)
+        else:
+            # Queue is full, pop first messages in the queue
+            excedent = len(self) + len(split_lines) - MAX_FEEDBACK_QSIZE
+            self.pull_feedback(nbr_lines=excedent, nbr_pass=excedent)
+            self.feedqueue.extend(split_lines)
 
     def pull_feedback(self, nbr_lines=None, nbr_pass=None):
         nbr_lines = nbr_lines if nbr_lines is not None else self.nbr_to_pull

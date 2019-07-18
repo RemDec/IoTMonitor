@@ -23,7 +23,7 @@ for event in center.get_ordered_events():
 
 # Testing cooperation with network map
 netmap = Netmap(event_center=center)
-netmap.create_VI(mapid='target_mapid', ip='192.168.0.1', user_created=True)
+netmap.create_vi(mapid='target_mapid', ip='192.168.0.1', user_created=True)
 
 threats = netmap.get_threats_for_vi(mapid='target_mapid')
 modifs = netmap.get_modifs_for_vi(mapid='target_mapid')

@@ -1,7 +1,7 @@
 from lxml import etree
 from lxml.builder import E
 from src.utils.moduleManager import ModDescriptor
-from src.utils.moduleManager import ModManager
+from src.utils.moduleManager import Library
 from src.utils.filesManager import get_dflt_entry
 from src.routine.routine import Routine, Queue, Panel
 
@@ -44,7 +44,7 @@ def write_routine_XML(routine, filepath=None):
 # --- Parse XML files to build routine elements instances ---
 
 def XML_to_queue(queue_elmt, timer=None, netmap=None, modmanager=None):
-    modmanager = modmanager if modmanager is not None else ModManager(load_direct=True)
+    modmanager = modmanager if modmanager is not None else Library(load_direct=True)
     running = bool(queue_elmt.get('running'))
     queue = Queue(timer, netmap)
     for modconfig in queue_elmt.findall('modconfig'):
@@ -54,7 +54,7 @@ def XML_to_queue(queue_elmt, timer=None, netmap=None, modmanager=None):
 
 
 def XML_to_panel(panel_elmt, timer=None, netmap=None, modmanager=None):
-    modmanager = modmanager if modmanager is not None else ModManager(load_direct=True)
+    modmanager = modmanager if modmanager is not None else Library(load_direct=True)
     running = bool(panel_elmt.get('running'))
     panel = Panel(netmap=netmap)
     for modconfig in panel_elmt.findall('modconfig'):
@@ -65,7 +65,7 @@ def XML_to_panel(panel_elmt, timer=None, netmap=None, modmanager=None):
 
 
 def XML_to_routine(routine_elmt, timer=None, netmap=None,
-                   modmanager=ModManager(load_direct=True)):
+                   modmanager=Library(load_direct=True)):
     queue_elmt = routine_elmt.find('queue')
     panel_elmt = routine_elmt.find('panel')
     queue, _ = XML_to_queue(queue_elmt, timer, netmap, modmanager)
@@ -75,7 +75,7 @@ def XML_to_routine(routine_elmt, timer=None, netmap=None,
 
 def parse_routine_XML(filepath=None, resume_routine=False,
                       timer=None, netmap=None,
-                      modmanager=ModManager(load_direct=True)):
+                      modmanager=Library(load_direct=True)):
     if filepath is None:
         filepath = get_dflt_entry('routines', suffix="last_routine.xml")
     with open(filepath, 'r') as f:
@@ -87,7 +87,7 @@ def parse_routine_XML(filepath=None, resume_routine=False,
 
 
 if __name__ == '__main__':
-    acts, pas = ModManager(load_direct=True).instantiate_all_available_mods()
+    acts, pas = Library(load_direct=True).instantiate_all_available_mods()
     routine = Routine(modules=acts+pas)
     print("### Routine to save in XML ###")
     print(routine.detail_str(level=1))

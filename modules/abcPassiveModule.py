@@ -1,6 +1,7 @@
 from modules.abcModule import *
 from src.utils.timer import *
 from src.utils.misc_fcts import get_infoname_py, log_feedback_available
+from src.utils.constants import MAX_INTERRUPT_TRIES, MAX_TIME_WAIT_PIPE
 from time import sleep
 import threading
 import subprocess
@@ -22,7 +23,6 @@ class PassiveModule(Module):
         self.netmap = netmap
         # thlist of instancied pairs at launch call (bg_thread, comm_thread)
         self.pair_threads = []
-        self.max_shutdown_time = 5
 
     @abc.abstractmethod
     def new_bg_thread(self):
@@ -81,7 +81,7 @@ class PassiveModule(Module):
         # order all threads to terminate (bgs first and comms after)
         self.interrupt_thlist()
         i = 0
-        while i < self.max_shutdown_time:
+        while i < MAX_INTERRUPT_TRIES:
             if self.purge_thlist():
                 # all threads finished their tasks
                 break
@@ -90,7 +90,7 @@ class PassiveModule(Module):
             i += 1
             if wait_interv:
                 sleep(wait_interv)
-        if i > self.max_shutdown_time:
+        if i >= MAX_INTERRUPT_TRIES:
             log_feedback_available(f"Some module underlying process remains unterminable : {self}", logitin='error', lvl=40)
             return False
         return True
@@ -148,8 +148,8 @@ class BackgroundThread(threading.Thread):
         else:
             return True, ret
 
-    def wait_for_output_pipe(self, steps=4, time=2):
-        time = max(time, 5)
+    def wait_for_output_pipe(self, steps=4, time=MAX_TIME_WAIT_PIPE):
+        time = min(time, 5)
         step_time = max(time / steps, 0.1)
         c = 0
         while self.get_output_pipe() is None:

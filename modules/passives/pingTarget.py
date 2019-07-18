@@ -81,11 +81,11 @@ class PModPing(PassiveModule):
         most_recent = lines[-1] if len(lines) > 0 else None
         ip, state = self.parse_host_state(most_recent)
         if not(None in [self.netmap, ip, state]):
-            mapid = self.netmap.get_similar_VI(ip=ip)
+            mapid = self.netmap.get_similar_vi(ip=ip)
             if mapid is None:
-                mapid, vi = self.netmap.create_VI(create_event=True, creator=self.m_id, ip=ip)
+                mapid, vi = self.netmap.create_vi(create_event=True, creator=self.m_id, ip=ip)
             else:
-                vi = self.netmap.get_VI(mapid)
+                vi = self.netmap.get_vi(mapid)
             old_state = vi.state
             if old_state == state:
                 log_feedback_available(f"Module [{self.m_id}] didn't modify {ip} state ({state})")
@@ -126,7 +126,7 @@ class PModPing(PassiveModule):
 if __name__ == '__main__':
     from src.net.netmap import Netmap
     netmap = Netmap()
-    netmap.create_VI(mac='2D-8E-53-17-26-D9', ip='192.168.0.1', hostname='myfalseVI')
+    netmap.create_vi(mac='2D-8E-53-17-26-D9', ip='192.168.0.1', hostname='myfalseVI')
     ping = PModPing(read_interval=2, params={'IP': '192.168.0.1', 'interv': '3'}, timer=TimerThread(), netmap=netmap)
     ping.launch()
     ping.timer.launch()

@@ -6,7 +6,7 @@ from src.utils.filesManager import get_dflt_entry
 default_libfile = get_dflt_entry("dflt_lib")
 
 
-class ModManager:
+class Library:
 
     def __init__(self, modlib_file=default_libfile, load_direct=False):
         self.modlib_file = modlib_file
@@ -334,7 +334,7 @@ if __name__ == '__main__':
 
     from modules.passives.pingTarget import *
     ping = PModPing()
-    manager = ModManager(get_dflt_entry("div_outputs", suffix="testModManager.xml"))
+    manager = Library(get_dflt_entry("div_outputs", suffix="testModManager.xml"))
     manager.create_modlib([nmap, nmap2, ping], True)
     manager.load_modlib()
     print("## Create and reload modlib ##")

@@ -1,6 +1,7 @@
 from src.logging.threatEvent import *
 from src.logging.modifEvent import *
 from src.logging.feedback import Feedback
+from src.utils.constants import MAX_MODIFS, MAX_THREATS
 import logging
 
 
@@ -23,8 +24,6 @@ class EventsCenter:
 
     def __init__(self, loggers=[]):
         self.loggers = loggers if isinstance(loggers, list) else [loggers]
-        self.MAX_THREATS = 20
-        self.MAX_MODIFS = 20
         self.threats = []
         self.modifs = []
         self.last_feedback = []
@@ -186,21 +185,21 @@ class EventsCenter:
         return len(self.filter_events(filter_fct=lambda event: event == tomatch)) > 0
 
     def check_lengths(self):
-        while len(self.threats) > self.MAX_THREATS:
+        while len(self.threats) > MAX_THREATS:
             self.threats.pop()
-        while len(self.modifs) > self.MAX_MODIFS:
+        while len(self.modifs) > MAX_MODIFS:
             self.modifs.pop()
 
     def detail_str(self, level=0):
         s = f"EventCenter with registered loggers : {', '.join([l.name for l in self.loggers])}\n"
         if level == 0:
-            s += f"    | Threats events logged in history : {len(self.threats)}/{self.MAX_THREATS}\n"
-            s += f"    | Modifications events logged in history : {len(self.modifs)}/{self.MAX_MODIFS}\n"
+            s += f"    | Threats events logged in history : {len(self.threats)}/{MAX_THREATS}\n"
+            s += f"    | Modifications events logged in history : {len(self.modifs)}/{MAX_MODIFS}\n"
         elif level == 1:
-            s += f"    | Threats events logged in history ({len(self.threats)}/{self.MAX_THREATS})\n"
+            s += f"    | Threats events logged in history ({len(self.threats)}/{MAX_THREATS})\n"
             for _, threat in reversed(self.threats):
                 s += f"    + {threat.detail_str(level=0)}"
-            s += f"    |\n    | Modifications events logged in history ({len(self.modifs)}/{self.MAX_MODIFS})\n"
+            s += f"    |\n    | Modifications events logged in history ({len(self.modifs)}/{MAX_MODIFS})\n"
             for _, modif in reversed(self.modifs):
                 s += f"    + {modif.detail_str(level=0)}"
         else:

@@ -71,7 +71,7 @@ def get_available_modules(stringnames=True):
 def write_modlib(file_dest=None):
     from modules.actives import arbitraryCmd, nmapExplorer, nmapPortDiscovery, nmapVulners
     from modules.passives import arbitraryCmdBg, pingTarget, fpingNetwork
-    from src.utils.moduleManager import ModManager
+    from src.utils.moduleManager import Library
     from src.utils.filesManager import get_dflt_entry
 
     if file_dest is None:
@@ -80,7 +80,7 @@ def write_modlib(file_dest=None):
                nmapVulners.AModNmapVulners()]
     passives = [arbitraryCmdBg.PModArbitraryCmdBg(), pingTarget.PModPing(), fpingNetwork.PModFping()]
     mod_instances = actives + passives
-    ModManager(str(file_dest)).create_modlib(mod_instances)
+    Library(str(file_dest)).create_modlib(mod_instances)
 
 
 def is_program_callable(prog):

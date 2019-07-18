@@ -22,7 +22,7 @@ class Netmap:
 
     # ----- Interactions with the network map maintaining Virtual Instances -----
 
-    def add_VI(self, vi, given_mapid=None):
+    def add_vi(self, vi, given_mapid=None):
         """Append a new VI to the current set with an unused mapid
 
         Args:
@@ -37,7 +37,7 @@ class Netmap:
         self.map[mapid] = vi
         return mapid
 
-    def remove_VI(self, mapid):
+    def remove_vi(self, mapid):
         """Remove an indexed VI by its mapid if exists"""
         if mapid in self.map:
             self.map.pop(mapid)
@@ -47,7 +47,7 @@ class Netmap:
         self.map = {}
         self.svd_events = {}
 
-    def create_VI(self, mapid=None, append_netmap=True, create_event=False, creator='unknown',
+    def create_vi(self, mapid=None, append_netmap=True, create_event=False, creator='unknown',
                   mac=None, ip=None, hostname=None, div=None, ports=None, user_created=False):
         """Instantiate a VI from given parameters, append it in netmap and register creation event (as a modification)
 
@@ -69,28 +69,28 @@ class Netmap:
         """
         vi = VirtualInstance(mac=mac, ip=ip, hostname=hostname, div=div, ports=ports, user_created=user_created)
         if append_netmap:
-            mapid = self.add_VI(vi, given_mapid=mapid)
+            mapid = self.add_vi(vi, given_mapid=mapid)
             if create_event:
                 self.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=creator,
                                     old_state="Non-existing VI", new_state="Registered VI in netmap", logit_with_lvl=20)
         return mapid, vi
 
-    def rename_VI(self, oldmapid, newmapid):
+    def rename_vi(self, oldmapid, newmapid):
         """Replace an existing mapid by a new one. If newmapid already present, it is renamed before to free it."""
         if newmapid != '' and oldmapid in self.map:
             vi_to_rename = self.map.pop(oldmapid)
             if newmapid in self.map:
-                self.map[self.get_unique_id(newmapid)] = self.get_VI(newmapid)
+                self.map[self.get_unique_id(newmapid)] = self.get_vi(newmapid)
             self.map[newmapid] = vi_to_rename
 
-    def get_VI(self, mapid):
+    def get_vi(self, mapid):
         return self.map.get(mapid)
 
     def vi_present(self, mapid):
         if isinstance(mapid, str):
             return mapid in self.map
 
-    def get_VI_mapids(self, subset_mapids=None, filter_fct=lambda vi_inst: True):
+    def get_vi_mapids(self, subset_mapids=None, filter_fct=lambda vi_inst: True):
         """Get mapids of some filtered VIs amongst all indexed or a subset
 
         Args:
@@ -102,14 +102,14 @@ class Netmap:
         """
         ids = []
         for mapid in self.map if subset_mapids is None else subset_mapids:
-            if self.vi_present(mapid) and filter_fct(self.get_VI(mapid)):
+            if self.vi_present(mapid) and filter_fct(self.get_vi(mapid)):
                 ids.append(mapid)
         return ids
 
-    def get_VIs_from_mapids(self, mapids_list):
-        return [self.get_VI(mapid) for mapid in mapids_list if self.get_VI(mapid) is not None]
+    def get_vis_from_mapids(self, mapids_list):
+        return [self.get_vi(mapid) for mapid in mapids_list if self.get_vi(mapid) is not None]
 
-    def get_similar_VI(self, mac=None, ip=None, hostname=None, div={}):
+    def get_similar_vi(self, mac=None, ip=None, hostname=None, div={}):
         """Find the best matching in indexed IVs, given some VI fields
 
         Args:
@@ -127,14 +127,14 @@ class Netmap:
             if vi.repr_same_device(mac, ip, hostname, div):
                 return mapid
 
-    def map_fct_on_VIs(self, mapids, fct, purge=False):
-        applied = list(map(fct, self.get_VIs_from_mapids(mapids)))
+    def map_fct_on_vis(self, mapids, fct, purge=False):
+        applied = list(map(fct, self.get_vis_from_mapids(mapids)))
         if not purge:
             return applied
         return [info for info in applied if info is not None]
 
     def get_IPs_from_mapids(self, mapids):
-        return self.map_fct_on_VIs(mapids, lambda vi: vi.get_ip(), purge=True)
+        return self.map_fct_on_vis(mapids, lambda vi: vi.get_ip(), purge=True)
 
     # ----- Events interactions (saved for VI and logged in event center) -----
 
@@ -191,7 +191,7 @@ class Netmap:
         Returns:
             events(list): the list of events with first element as the most recent event
         """
-        vi = self.get_VI(mapid)
+        vi = self.get_vi(mapid)
         if self.event_center is None or vi is None:
             return None
         find_fct = lambda event: event.rel_to_vi() == mapid
@@ -322,11 +322,11 @@ class Netmap:
     def vi_icons(self, mapid):
         nbr_threats = len(self.get_saved_threats_for_vi(mapid))
         nbr_modifs = len(self.get_saved_modifs_for_vi(mapid))
-        state = self.get_VI(mapid).str_state()
+        state = self.get_vi(mapid).str_state()
         return f"[{state}]    {nbr_threats} /!\\  {nbr_modifs} -o-"
 
     def vi_frame_str(self, mapid, max_char=25):
-        vi = self.get_VI(mapid)
+        vi = self.get_vi(mapid)
         header = f" {mapid} {self.vi_icons(mapid)} "
         l = max(max_char, len(header))
         cut = lambda s: s if len(s)<l else s[:l]
@@ -342,7 +342,7 @@ class Netmap:
 
     def vi_frames(self, slcted_vis=None):
         if slcted_vis is None:
-            slcted_vis = self.get_VI_mapids()
+            slcted_vis = self.get_vi_mapids()
         vi_frames = [self.vi_frame_str(mapid) for mapid in slcted_vis]
         return str_multiframe(vi_frames)
 
@@ -350,13 +350,13 @@ class Netmap:
         s = f"Netmap maintaining {len(self.map)} virtual instances" \
             f"{'' if self.event_center is None else ' and ref to an EventCenter'}\n"
         if level == 0:
-            return s + ', '.join(self.get_VI_mapids()) + '\n'
+            return s + ', '.join(self.get_vi_mapids()) + '\n'
         elif level == 1:
             for mapid, vi in self.map.items():
                 s += f"      <<<[{mapid}]>>>\n{vi.detail_str(1)}"
             return s
         elif level == 2:
-            vi_frames = [self.vi_frame_str(mapid, max_char=max_char_per_vi) for mapid in self.get_VI_mapids()]
+            vi_frames = [self.vi_frame_str(mapid, max_char=max_char_per_vi) for mapid in self.get_vi_mapids()]
             return s + str_multiframe(vi_frames, by_pack_of=vi_by_pack_of)
         else:
             for mapid, vi in self.map.items():
@@ -382,8 +382,8 @@ if __name__ == '__main__':
 
     vi2 = VirtualInstance(mac="86:EE:EE:12:B2:6A", hostname="router")
     netmap = Netmap()
-    netmap.add_VI(vi, given_mapid="testdevice")
-    netmap.add_VI(vi, given_mapid="testdevice2")
-    netmap.add_VI(vi2)
+    netmap.add_vi(vi, given_mapid="testdevice")
+    netmap.add_vi(vi, given_mapid="testdevice2")
+    netmap.add_vi(vi2)
     #print(netmap.vi_frame_str("testdevice"))
     print(netmap.detail_str(level=2))

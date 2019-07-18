@@ -3,13 +3,13 @@ from src.net.netmap import *
 
 
 def fill_netmap(netmap):
-    netmap.create_VI(mapid='VirtInst1', mac='B6-E3-5E-7A-C1-D6', ip='192.168.0.3', hostname='wifiCam')
-    netmap.create_VI(mapid='VirtInst2', mac='BB-E5-BA-6F-7E-2A', ip='192.168.0.4', user_created=True)
-    netmap.create_VI(mapid='VirtInst3', mac='31-E7-FA-9C-6C-FC', ip='192.168.0.5',
+    netmap.create_vi(mapid='VirtInst1', mac='B6-E3-5E-7A-C1-D6', ip='192.168.0.3', hostname='wifiCam')
+    netmap.create_vi(mapid='VirtInst2', mac='BB-E5-BA-6F-7E-2A', ip='192.168.0.4', user_created=True)
+    netmap.create_vi(mapid='VirtInst3', mac='31-E7-FA-9C-6C-FC', ip='192.168.0.5',
                      div={'uptime': '1245s', 'rate': '500kbps'})
     ports = PortTable({53: ('domain', 'TCP', 'open'), 80: ('http', 'TCP', 'open'),
                        5060: ('sip', 'TCP', 'open'), 49152: ('unknwown', 'UDP', 'open')})
-    netmap.create_VI(mapid='homemodem', mac='5A-82-CB-48-47-C6', ip='192.168.0.100', user_created=True,
+    netmap.create_vi(mapid='homemodem', mac='5A-82-CB-48-47-C6', ip='192.168.0.100', user_created=True,
                      div={'clients': 'VirtInst1 VirtInst2'}, ports=ports)
 
 
