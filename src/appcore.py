@@ -1,4 +1,5 @@
 from src.coreConfig import CoreConfig
+from modules.abcModule import Module
 from src.utils.misc_fcts import obj_str, log_feedback_available
 import signal
 
@@ -48,24 +49,60 @@ class Core:
                 return actives, passives
         return self.modmanager.get_all_desc()
 
-    # ----- Independant running modules -----
+    # ----- Independent running modules -----
 
-    def add_indep_module(self, id_or_mod, launch_it=True):
+    def add_indep_module(self, id_or_mod, curr_params=None, launch_it=False):
+        self.clear_not_running_mods()
         if isinstance(id_or_mod, str):
-            id_or_mod = self.instantiate_module(id_or_mod)
+            id_or_mod = self.instantiate_module(id_or_mod, curr_params=curr_params)
+        elif isinstance(id_or_mod, Module) and curr_params is not None:
+            id_or_mod.set_params(curr_params)
         self.indep_mods.append(id_or_mod)
         if launch_it:
             id_or_mod.launch()
+        return id_or_mod
+
+    def get_indep_mod(self, module_or_index):
+        try:
+            if isinstance(module_or_index, Module):
+                return module_or_index if module_or_index in self.indep_mods else None
+            elif isinstance(module_or_index, int):
+                return self.indep_mods[module_or_index]
+        except (ValueError, IndexError):
+            return None
+
+    def get_independent_modules(self):
+        return self.indep_mods
 
     def stop_indep_module(self, module_or_index):
-        if isinstance(module_or_index, int):
-            self.indep_mods[module_or_index].stop()
-        elif module_or_index in self.indep_mods:
-            self.indep_mods[self.indep_mods.index(module_or_index)].stop()
+        modinst = self.get_indep_mod(module_or_index)
+        if modinst is not None:
+            modinst.stop()
+        self.clear_not_running_mods()
 
     def stop_all_indep(self):
         for mod in self.indep_mods:
             mod.stop()
+        self.clear_not_running_mods()
+
+    def clear_not_running_mods(self):
+        terminated = [modinst for modinst in self.indep_mods if not modinst.is_running()]
+        for modinst in terminated:
+            self.indep_mods.remove(modinst)
+
+    def clear_indep_mods(self):
+        self.stop_all_indep()
+        self.indep_mods = []
+
+    def str_indep_mods(self):
+        if len(self.indep_mods) == 0:
+            return '< no independent module >'
+        s = []
+        for modinst in self.indep_mods:
+            state = 'R' if modinst.is_running() else 'NR'
+            s.append(f"{modinst.get_module_id()}({state})")
+        return ', '.join(s)
+
 
     # ----- Routine interactions -----
 
@@ -149,7 +186,10 @@ class Core:
     # ----- Utilities -----
 
     def clear_target(self, target):
-        self.corresp_target(target).clear()
+        if target == 'indep':
+            self.clear_indep_mods()
+        else:
+            self.corresp_target(target).clear()
 
     def clear(self):
         self.clear_netmap()
@@ -159,7 +199,7 @@ class Core:
         if self.timer is not None:
             self.timer.stop()
         if self.indep_mods is not None:
-            self.stop_all_indep()
+            self.clear_indep_mods()
         if self.routine is not None:
             self.routine.stop()
 
@@ -182,12 +222,14 @@ class Core:
             all_display = ""
             for indiv_obj in obj:
                 all_display += obj_str(indiv_obj, level)
+                if not all_display.endswith('\n\n'):
+                    all_display += '\n'
             return all_display
         return obj_str(obj, level)
 
     def detail_str(self, level=2):
         actives, passives = self.modmanager.list_all_modid()
-        indeps = [mod.get_module_id() for mod in self.indep_mods] if len(self.indep_mods) > 0 else ['< no independent module >']
+        indeps = self.str_indep_mods()
         s = ""
         if level == 0:
             s += f"=++====== Core application =========\n"
@@ -202,7 +244,7 @@ class Core:
                 s += last_feedback + '_' * 100 + '\n\n'
             s += f"=++====== Core application =========\n"
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
-            s += f" || Routine independent modules :\n || {','.join(indeps)}\n"
+            s += f" || Routine independent modules :\n || {indeps}\n"
             s += f" ++------- ROUTINE -------"
             s += f"{self.routine.detail_str(level=1)}"
             s += f" ||\n ++------- NETMAP  -------\n"
@@ -215,7 +257,7 @@ class Core:
             s += f" || Core config file : {self.coreconfig.get_cfg_file()}\n"
             s += f" || {self.logger_setup.email_str()}\n"
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
-            s += f" || Routine independent modules :\n ||  {','.join(indeps)}\n"
+            s += f" || Routine independent modules :\n ||  {indeps}\n"
             s += f" ||\n ++------- ROUTINE -------"
             s += f"{self.routine.detail_str(level=level)}"
             s += f" ||\n ++------- NETMAP  -------\n"
@@ -231,7 +273,7 @@ class Core:
             s += f" || Using loggers {', '.join(self.logger_setup.get_all_loggers())}\n"
             s += f" || Available AModules : {', '.join(actives)}\n"
             s += f" || Available PModules : {', '.join(passives)}\n"
-            s += f" || Routine independent modules added :\n || {','.join(indeps)}\n"
+            s += f" || Routine independent modules :\n || {indeps}\n"
             s += f" ++------- ROUTINE -------"
             s += f"{self.routine.detail_str(level=3)}"
             s += f" ||\n ++------- NETMAP -------\n"

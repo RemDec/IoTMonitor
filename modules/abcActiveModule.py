@@ -30,6 +30,9 @@ class ActiveModule(Module):
     def is_active(self):
         return True
 
+    def is_running(self):
+        return self.get_nbr_running() > 0
+
     def register_thread(self, th):
         if th not in self.curr_threads:
             self.curr_threads.append(th)
@@ -50,8 +53,8 @@ class ActiveModule(Module):
         # count threads which underlying script subprocess not yet exited
         return len([th for th in self.curr_threads if not th.under_proc_state()[0]])
 
-    def str_threads(self):
-        s = f"[{self.get_module_id()}] List of active threads in this module instance\n"
+    def str_threads(self, header=None):
+        s = f"[{self.get_module_id()}] List of active threads in this module instance\n" if header is None else header
         for i, thread in enumerate(self.curr_threads):
             state = "Alive" if thread.is_alive() else "Terminated"
             s += f">>>>>>> Thread {i} ({state}) <<<<<<<\n"
@@ -65,7 +68,11 @@ class ActiveModule(Module):
         return s
 
     def __str__(self):
-        return self.str_threads()
+        modifs, threats = super().get_nbr_events()
+        s = f"[{self.get_module_id()}] Module instance that lead following events:\n" \
+            f"    Threats {threats} /!\\  Modifications {modifs} -o-\n"
+        s += self.str_threads(header="    Thread list associated with this instance :\n")
+        return s
 
 
 class ScriptThread(threading.Thread):
@@ -81,7 +88,7 @@ class ScriptThread(threading.Thread):
     def run(self):
         cmd_as_shell = isinstance(self.cmd, str)
         log_feedback_available(f"Starting {super().getName()}", 'debug')
-        self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE,
+        self.popen = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL,
                                       stderr=subprocess.STDOUT, universal_newlines=True,
                                       shell=cmd_as_shell)
         try:

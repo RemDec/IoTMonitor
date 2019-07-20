@@ -140,3 +140,12 @@ class Module(abc.ABC):
         # an output stream with collected information to read and work on
         pass
 
+    @abc.abstractmethod
+    def is_running(self):
+        """Retrieve state of threads running underlying program execution if there are some
+
+        Returns:
+            running (bool): whether some threads instantiated from Module instance (underlying program execution)
+                            are yet running it
+        """
+

@@ -67,7 +67,7 @@ class AModArbitraryCmd(ActiveModule):
         super().purge_threadlist()
 
     def get_script_thread(self, rel_to_vi=[]):
-        return ScriptThread(callback_fct=self.distrib_output, rel_to_vi=rel_to_vi, max_exec_time=30)
+        return ScriptThread(callback_fct=self.distrib_output, rel_to_vi=rel_to_vi, max_exec_time=120)
 
     def get_default_timer(self):
         return 60

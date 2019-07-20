@@ -43,6 +43,9 @@ class PassiveModule(Module):
     def is_active(self):
         return False
 
+    def is_running(self):
+        return self.nbr_alive_subproc() + self.nbr_reading_comm() > 0
+
     def get_bg_threads(self):
         return [th_pair[0] for th_pair in self.pair_threads]
 
@@ -77,7 +80,7 @@ class PassiveModule(Module):
         for thread in self.get_comm_threads():
             thread.interrupt()
 
-    def terminate_threads(self, wait_interv=0):
+    def terminate_threads(self, wait_interv=0.001):
         # order all threads to terminate (bgs first and comms after)
         self.interrupt_thlist()
         i = 0
@@ -88,10 +91,11 @@ class PassiveModule(Module):
             # relaunch terminate signal on each pair thread
             self.interrupt_thlist()
             i += 1
-            if wait_interv:
+            if wait_interv > 0:
                 sleep(wait_interv)
         if i >= MAX_INTERRUPT_TRIES:
-            log_feedback_available(f"Some module underlying process remains unterminable : {self}", logitin='error', lvl=40)
+            log_feedback_available(f"Some module underlying process remains unterminable : {self}",
+                                   logitin='error', lvl=40)
             return False
         return True
 
@@ -101,8 +105,11 @@ class PassiveModule(Module):
     def nbr_reading_comm(self):
         return len([comm for comm in self.get_comm_threads() if not comm.must_read])
 
-    def str_pair_threads(self):
-        s = f"[{self.get_module_id()}] Pair list of active threads in this module instance\n"
+    def str_pair_threads(self, header=None):
+        if header is None:
+            s = f"[{self.get_module_id()}] Pair list of active threads in this module instance\n"
+        else:
+            s = header
         for i, (bg, comm) in enumerate(self.pair_threads):
             s += f">>>>>>> Threadpair {i} <<<<<<<\n"
             s += f"----- Background ({bg.is_alive()}) -----\n"
@@ -117,7 +124,11 @@ class PassiveModule(Module):
         return f"[{self.get_module_id()}] BGth[{self.nbr_alive_subproc()}/{len(self.get_bg_threads())}]"
 
     def __str__(self):
-        return self.str_pair_threads()
+        modifs, threats = super().get_nbr_events()
+        s = f"[{self.get_module_id()}] Module instance that lead following events:\n" \
+            f"    Threats {threats} /!\\  Modifications {modifs} -o-\n"
+        s += self.str_pair_threads(header="    Thread lists associated with this instance :\n")
+        return s
 
 
 class BackgroundThread(threading.Thread):
@@ -180,7 +191,7 @@ class BackgroundThread(threading.Thread):
         if self.cmd is None:
             cmd = "unknown (must be passed with start())"
         else:
-            cmd = ' '.join(self.cmd)
+            cmd = ' '.join(self.cmd) if isinstance(self.cmd, list) else self.cmd
         ended, code_or_pid = self.under_proc_state()
         s = f"Background thread for cmd {cmd}"
         if ended:

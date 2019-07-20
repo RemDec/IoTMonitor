@@ -62,7 +62,7 @@ class PModFping(FacilityActiveModule):
             parsed = self.parse_host(line)
             if parsed is not None:
                 ip, hostname, state = parsed
-                mapid = self.netmap.get_similar_vi(ip=ip)
+                mapid = self.netmap.get_similar_vi(ip=ip, hostname=hostname)
                 if mapid is None:
                     if state == 'up':
                         mapid, vi = self.netmap.create_vi(create_event=True, creator=self.get_module_id(),

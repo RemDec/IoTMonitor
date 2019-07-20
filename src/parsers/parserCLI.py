@@ -304,6 +304,9 @@ class CLIparser:
         # [[mod in panel pid] , [mod in queue qid]]
         return self.core.get_all_setids()
 
+    def get_indep_indexes(self):
+        return [[f"{i}.{mod.get_module_id()}" for i, mod in enumerate(self.core.get_independent_modules())]]
+
     def get_map_mapids(self):
         return [self.core.get_all_mapids()]
 
@@ -370,9 +373,13 @@ class CLIparser:
             setid = self.get_user_in_or_dflt(None, marker="\nGive a setid if desired (alphanumeric)\n[setid] :")
             entry = self.core.add_to_routine(mod_inst, given_setid=setid, given_timer=timer)
             entry.set_vi_relative(vis)
+            self.back_main_menu()
         else:
-            self.core.add_indep_module(mod_inst)
-        self.back_main_menu()
+            self.core.add_indep_module(mod_inst, launch_it=True)
+            # This input taking is needed to resolve a bug dur to module launching not yet resolved
+            back_main = self.get_user_confirm("Back main menu (Y/n) ?")
+            if back_main:
+                self.back_main_menu()
 
     def after_edit_vi_slct(self, mapid):
         vi = self.core.get_from_netmap(mapid)
@@ -475,6 +482,16 @@ class CLIparser:
         self.core.remove_from_routine(mod_setid)
         self.back_main_menu()
 
+    def after_remove_indep_mod_slct(self, prefixed_modid):
+        index = prefixed_modid.split('.')[0]
+        try:
+            index = int(index)
+        except ValueError:
+            self.back_main_menu()
+            return
+        self.core.stop_indep_module(index)
+        self.back_main_menu()
+
     def after_remove_vi_slct(self, vi_mapid):
         self.core.remove_from_netmap(vi_mapid)
         self.back_main_menu()
@@ -492,7 +509,7 @@ class CLIparser:
             self.curr_menu = self.show_modentry
         else:
             lvl_info = f"(increase it with $set lvl {self.curr_display_lvl + 1}" if self.curr_display_lvl < 10 else ''
-            print(f"Displaying app element {show_input_name} with level {self.curr_display_lvl} {lvl_info})\n")
+            print(f"Displaying app element '{show_input_name}' with level {self.curr_display_lvl} {lvl_info})\n")
             to_disp = self.core.get_display(res_to_show, level=self.curr_display_lvl)
             print(to_disp if to_disp.strip() != '' else f"   < empty app element : {show_input_name} >\n")
             self.no_wipe_next()
@@ -664,7 +681,7 @@ class CLIparser:
 
         self.edit = {'desc': "Edit an application element on the fly",
                      'help': get_res_CLI('edit_help'),
-                     'choices': {'VI field': 'editVI', 'module entry (routine)': "editMod"},
+                     'choices': {'vi field': 'editVI', 'module entry (routine)': "editMod"},
                      'fct_choice': self.transit_menu}
 
         self.rename = {'desc': "Rename an application element (changing its unique id)",
@@ -763,7 +780,9 @@ class CLIparser:
                            'marker': "[setid] :", 'choices': self.get_routine_setids,
                            'fct_choice': self.after_remove_mod_slct}
 
-        self.remove_indep_mod = {'desc': "Remove a module from routine independent running module"}
+        self.remove_indep_mod = {'desc': "Remove a module from routine independent running module",
+                                 'marker': "[indep mod] :", 'choices': self.get_indep_indexes,
+                                 'fct_choice': self.after_remove_indep_mod_slct}
 
         self.remove_VI = {'desc': "Remove a virtual instance from the netmap by mapid",
                           'marker': "[mapid] :", 'choices': self.get_map_mapids,

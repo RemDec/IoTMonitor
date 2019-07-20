@@ -135,14 +135,14 @@ class VirtualInstance:
         Returns:
             match(bool) : whether given values can be considered as ones belonging to the same real equipment
         """
-        if mac is not None:
+        if mac is not None and self.mac is not None:
             return self.mac == mac
-        elif ip is not None:
+        elif ip is not None and self.ip is not None:
             if self.ip == ip:
                 if hostname is not None:
                     return self.hostname == hostname
                 return True
-        elif hostname is not None:
+        elif hostname is not None and self.hostname is not None:
             if self.hostname == hostname:
                 for div_field, val in div.items():
                     if self.div[div_field] != val:
