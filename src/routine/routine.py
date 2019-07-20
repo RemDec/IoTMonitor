@@ -91,8 +91,11 @@ class Routine:
 
     def resume_it(self, target):
         t = self.str_to_target(target)
-        if not t.is_running:
-            t.resume()
+        if t is self:
+            self.resume()
+        else:
+            if not t.is_running:
+                t.resume()
         self.correct_state()
 
     def correct_state(self):

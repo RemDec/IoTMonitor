@@ -60,6 +60,8 @@ class Core:
         self.indep_mods.append(id_or_mod)
         if launch_it:
             id_or_mod.launch()
+        log_feedback_available(f"Added [{id_or_mod.get_module_id()}] in independent modules list "
+                               f"(launching it: {launch_it})")
         return id_or_mod
 
     def get_indep_mod(self, module_or_index):
@@ -103,13 +105,15 @@ class Core:
             s.append(f"{modinst.get_module_id()}({state})")
         return ', '.join(s)
 
-
     # ----- Routine interactions -----
 
     def add_to_routine(self, id_or_mod, given_setid=None, given_timer=None):
         if isinstance(id_or_mod, str):
             id_or_mod = self.instantiate_module(id_or_mod)
-        return self.routine.add_module(id_or_mod, setid=given_setid, given_timer=given_timer)
+        entry = self.routine.add_module(id_or_mod, setid=given_setid, given_timer=given_timer)
+        log_feedback_available(f"Routine : adding a new Module entry [{id_or_mod.get_module_id()}] "
+                               f"with setid {entry.get_setid()}")
+        return entry
 
     def change_mod_params(self, setid, new_params):
         self.routine.change_mod_params(setid, new_params)
@@ -118,24 +122,29 @@ class Core:
         return self.routine.get_mod_by_setid(setid, whole_entry)
 
     def remove_from_routine(self, setid_or_mod):
+        log_feedback_available(f"Routine : removing entry {setid_or_mod if isinstance(setid_or_mod, str) else ''}")
         return self.routine.remove_module(setid_or_mod)
 
     def rename_routine_modentry(self, oldsetid, newsetid):
-        self.routine.rename_module(oldsetid, newsetid)
+        log_feedback_available(f"Routine : renaming entry {oldsetid} in {newsetid}")
+        return self.routine.rename_module(oldsetid, newsetid)
 
     def clear_routine(self):
+        log_feedback_available(f"Routine : clearing both sets")
         self.routine.clear()
 
     def pause(self):
         self.routine.pause()
 
     def pause_it(self, target):
+        log_feedback_available(f"Routine : pausing {target}")
         self.routine.pause_it(target)
 
     def resume(self):
         self.routine.resume()
 
     def resume_it(self, target):
+        log_feedback_available(f"Routine : resuming {target}")
         self.routine.resume_it(target)
 
     def get_all_setids(self):
@@ -144,7 +153,9 @@ class Core:
     # ----- Netmap interactions -----
 
     def add_to_netmap(self, vi, mapid=None):
-        self.netmap.add_vi(vi, mapid)
+        attrib_mapid = self.netmap.add_vi(vi, mapid)
+        log_feedback_available(f"Netmap : adding a new VI with mapid {attrib_mapid}")
+        return attrib_mapid
 
     def get_from_netmap(self, mapid):
         return self.netmap.get_vi(mapid)
@@ -153,9 +164,11 @@ class Core:
         self.netmap.remove_vi(mapid)
 
     def rename_netmap_vi(self, oldmapid, newmapid):
+        log_feedback_available(f"Netmap : renaming VI {oldmapid} to {newmapid}")
         self.netmap.rename_vi(oldmapid, newmapid)
 
     def clear_netmap(self):
+        log_feedback_available(f"Netmap : clearing all existing VIs and associated events")
         self.netmap.clear()
 
     def get_netmap(self):
@@ -194,8 +207,10 @@ class Core:
     def clear(self):
         self.clear_netmap()
         self.clear_routine()
+        self.clear_indep_mods()
 
     def quit(self):
+        log_feedback_available(f"AppCore : quitting application, shut down all processes running")
         if self.timer is not None:
             self.timer.stop()
         if self.indep_mods is not None:
