@@ -199,6 +199,9 @@ class ModuleIntegrator:
         elif library is None:
             return Library()
 
+    def get_module_id(self):
+        return self.modinst.get_module_id()
+
     def integrate_module(self):
         """Include the module in the library collection
 

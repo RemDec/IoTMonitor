@@ -161,6 +161,7 @@ class Core:
         return self.netmap.get_vi(mapid)
 
     def remove_from_netmap(self, mapid):
+        log_feedback_available(f"Netmap : removing a VI using mapid {mapid}")
         self.netmap.remove_vi(mapid)
 
     def rename_netmap_vi(self, oldmapid, newmapid):

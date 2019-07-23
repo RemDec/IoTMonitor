@@ -165,7 +165,7 @@ class CLIparser:
         elif len(corresp) == 1:
             self.reserved[corresp[0]](args=cmd)
         else:
-            print("Ambiguous special command amongs : ", ', '.join(corresp))
+            print("Ambiguous special command amongst : ", ', '.join(corresp))
             self.no_wipe_next()
 
     def get_user_confirm(self, marker=None, val=('y', 'o', 'yes', 'oui', 'ok'), empty_ok=True):
@@ -211,19 +211,25 @@ class CLIparser:
             self.core.quit()
 
     def ask_help(self, args=[]):
-        # help for current menu by default (no menu id given)
+        # help for current menu by default (if no menu id given)
         target_menu = self.curr_menu
         if len(args) >= 1:
-            target_menu = self.index_menus.get(args[0])
+            try:
+                target_menu = int(args[0])
+            except ValueError:
+                target_menu = self.index_menus.get(args[0])
         if target_menu is None:
             print("Invalid target menu\n")
             return
-        if target_menu.get('help', False):
-            print(f"help[{self.get_menu_index(target_menu)}]\n {target_menu['help']}")
-        elif target_menu.get('desc', "") != "":
-            print(f"[{self.get_menu_index(target_menu)}]description (no help available)\n {target_menu['desc']}")
+        if isinstance(target_menu, int):
+            print(get_res_CLI(target_menu))
         else:
-            print(f"No help provided for this menu ([{self.get_menu_index(target_menu)}])\n")
+            if target_menu.get('help', False):
+                print(f"help[{self.get_menu_index(target_menu)}]\n {target_menu['help']}")
+            elif target_menu.get('desc', "") != "":
+                print(f"[{self.get_menu_index(target_menu)}]description (no help available)\n {target_menu['desc']}")
+            else:
+                print(f"No help provided for this menu ([{self.get_menu_index(target_menu)}])\n")
         self.no_wipe_next()
 
     def ask_choices(self, args=[]):
@@ -398,7 +404,9 @@ class CLIparser:
                 if field not in (list(main_fields.keys()) + list(div_fields.keys())):
                     marker = f"Value for new field [{field}] :"
                 new_val = self.get_user_in_or_dflt(default=None, marker=marker)
-                vi.complete_fields_from_dict({field: new_val.strip() if isinstance(new_val, str) else new_val})
+                if new_val is not None:
+                    vi.complete_fields_from_dict({field: new_val.strip()})
+                    log_feedback_available(f"Netmap : editing VI field {field} with new value {new_val}")
                 self.clear_console()
             else:
                 take_field = False
@@ -631,6 +639,8 @@ class CLIparser:
                 integrate_ok = self.get_user_confirm(marker="Validate Module integration (Y/n) ? ")
                 if integrate_ok:
                     integrator.integrate_module()
+                    log_feedback_available(f"Library : integrated new Module [{integrator.get_module_id()}] from python"
+                                           f"package {target}")
             except ModuleIntegrationError as e:
                 print("     Integration FAILED\n", e)
                 self.no_wipe_next()
