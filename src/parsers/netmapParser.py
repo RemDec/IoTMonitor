@@ -118,9 +118,9 @@ if __name__ == '__main__':
     netmap.register_threat('scanmodule1', level=4, mapid='VirtInst2',
                            msg='Several exploitx detected for this device :CVE-40000.10.10, CVE-40000.21.3',
                            patch='Look at update from manufacturer : https://www.samsung.com/be_fr/')
-    netmap.register_modif('IP field', obj_type='virt_inst', obj_id='VirtInst1', modificator='scanmodule2',
+    netmap.register_modif('IP field', elmt_type='virt_inst', elmt_id='VirtInst1', modificator='scanmodule2',
                           old_state='192.168.0.3', new_state='192.168.0.9')
-    netmap.register_modif('ports table', obj_type='virt_inst', obj_id='homemodem', modificator='scanmodule2',
+    netmap.register_modif('ports table', elmt_type='virt_inst', elmt_id='homemodem', modificator='scanmodule2',
                           new_state='+ entry 9000: (cslistener, TCP, open)')
 
     print("### Netmap to write as XML ###")

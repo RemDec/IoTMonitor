@@ -53,7 +53,7 @@ def XML_to_modif(modif_elmt):
     div = modif_elmt.find('diveventinfos')
     obj_id = div.get('objid')
     modificator = div.get('modificator', 'app')
-    return ModifEvent(modified_res, obj_type=obj_type, obj_id=obj_id, modificator=modificator,
+    return ModifEvent(modified_res, elmt_type=obj_type, elmt_id=obj_id, modificator=modificator,
                       old_state=old_state, new_state=new_state)
 
 
@@ -82,8 +82,8 @@ if __name__ == '__main__':
     t3 = ThreatEvent("mymodule", 1, "target_mapid", "Same module raised easy alert")
     m1 = ModifEvent("instance MAC field", "virt_inst", "myinst_id", "scanmodule", "unknown", "1C:39:47:12:AA:B3")
     m2 = ModifEvent("'target' module parameter", "module", None, "app user", "192.168/16", "10.102/16")
-    m3 = ModifEvent("VI hostname field", obj_type='virt_inst', obj_id='target_mapid', modificator='user',
-                          old_state='old_hostname', new_state='NEW_HOSTNAME')
+    m3 = ModifEvent("VI hostname field", elmt_type='virt_inst', elmt_id='target_mapid', modificator='user',
+                    old_state='old_hostname', new_state='NEW_HOSTNAME')
     print(etree.tostring(threat_to_XML(t1), pretty_print=True).decode())
     print(etree.tostring(threat_to_XML(t2), pretty_print=True).decode())
     print(etree.tostring(threat_to_XML(t3), pretty_print=True).decode())

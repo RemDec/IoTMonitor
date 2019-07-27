@@ -1,4 +1,17 @@
 
+APP_RESOURCE = 'app_res'
+APP_CONFIG = 'app_cfg'
+LIBRARY = 'library'
+ROUTINE = 'routine'
+MODULE = 'module'
+NETMAP = 'netmap'
+VI = 'virt_inst'
+INDEPENDENTS = 'indep'
+INDEP_MOD = 'indep_mod'
+
+ELMT_TYPES = [APP_RESOURCE, APP_CONFIG, LIBRARY, ROUTINE, MODULE, NETMAP, VI, INDEPENDENTS, INDEP_MOD]
+
+
 class ModifEvent:
     """
 
@@ -9,29 +22,27 @@ class ModifEvent:
     a mapid for a VI or a setid for a routine Module, it may be passed to the constructor.
     """
 
-    def __init__(self, modified_res, obj_type='app_res', obj_id=None, modificator='app', old_state=None, new_state=None):
+    def __init__(self, modified_res, elmt_type='app_res', elmt_id=None, modificator='app', old_state=None, new_state=None):
         """
 
         Args:
             modified_res(str): arbitrary string describing the modified resource
-            obj_type(str): one of available element whose resource can be modified, or 'app_res' if not determined
-            obj_id(str): the id of the element identifying it in the app component or None if undetermined
+            elmt_type(str): one of available element whose resource can be modified, or 'app_res' if not determined
+            elmt_id(str): the id of the element identifying it in the app component or None if undetermined
             modificator(str): a string describing the origin of the modification (likely a module id or the user)
             old_state(str): the resource state before modification
             new_state(str): the resource state after modification
         """
-        self.OBJ_TYPES = ['app_res', 'app_cfg', 'library', 'routine', 'module', 'netmap', 'virt_inst',
-                          'indep', 'indep_mod']
         self.modified_res = modified_res
-        self.obj_type = self.verify_res_type(obj_type)
-        self.obj_id = obj_id
+        self.obj_type = self.verify_res_type(elmt_type)
+        self.obj_id = elmt_id
         self.modificator = modificator
         self.old_state = old_state
         self.new_state = new_state
 
     def verify_res_type(self, given_type):
-        if not(given_type in self.OBJ_TYPES):
-            return 'app_res'
+        if not(given_type in ELMT_TYPES):
+            return APP_RESOURCE
         return given_type
 
     def is_relative_to_obj(self, obj_str):

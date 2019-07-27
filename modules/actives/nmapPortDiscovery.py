@@ -15,10 +15,11 @@ class AModNmapPortDisc(ActiveModule):
         super().__init__(netmap)
         self.m_id = "nmapports"
         self.CMD = "nmap"
-        self.PARAMS = {'options': ("", False, ""),
+        self.PARAMS = {
                        'nbrports': ("50", True, "--top-ports "),
                        'version': ("false", True, "-sV"),
                        'XMLfile': ("/tmp/nmap_portdisc.xml", True, "-oX "),
+                       'options': ("", False, ""),
                        'IP': (get_ip(mask=24), True, "")
                        }
         self.desc_PARAMS = {'options': "Others options to pass to nmap scan",
@@ -82,7 +83,7 @@ class AModNmapPortDisc(ActiveModule):
                 port_table = PortTable(table)
                 mapid, vi = self.netmap.create_vi(mac=mac, ip=ip, hostname=hostname, ports=port_table)
                 vi.set_state(state)
-                self.netmap.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
+                self.netmap.register_modif('VI ' + mapid, elmt_id=mapid, modificator=self.m_id,
                                            old_state='Non-existing VI',
                                            new_state='New VI instance with PortTable:\n'+port_table.detail_str(1),
                                            logit_with_lvl=20)
@@ -99,11 +100,11 @@ class AModNmapPortDisc(ActiveModule):
                 changed_table += int(changed_this_portstable)
                 if changed_this_vi:
                     new = vi.detail_str(2)
-                    self.netmap.register_modif('VI ' + mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
+                    self.netmap.register_modif('VI ' + mapid, elmt_id=mapid, modificator=self.m_id,
                                                old_state=old, new_state=new, logit_with_lvl=20)
                 if changed_this_portstable:
                     new_portstable = vi.get_ports_table().detail_str(level=3)
-                    self.netmap.register_modif('PortsTable VI ' + mapid, obj_type='virt_inst', obj_id=mapid,
+                    self.netmap.register_modif('PortsTable VI ' + mapid, elmt_id=mapid,
                                                modificator=self.m_id, old_state=old_portstable,
                                                new_state=new_portstable, logit_with_lvl=20)
         name = f"Module [{self.m_id}]"

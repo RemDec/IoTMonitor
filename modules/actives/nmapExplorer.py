@@ -68,7 +68,7 @@ class AModNmapExplorer(ActiveModule):
                     mapid, vi = self.netmap.create_vi(mac=mac, ip=ip, hostname=hostname, div=div)
                     changed += 1
                     vi.set_state(state)
-                    self.netmap.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
+                    self.netmap.register_modif('VI ' + mapid, elmt_id=mapid, modificator=self.m_id,
                                                old_state='Non-existing VI', new_state='New VI instance',
                                                logit_with_lvl=20)
                 else:
@@ -77,7 +77,7 @@ class AModNmapExplorer(ActiveModule):
                     old = vi.detail_str(2)
                     changed_this_vi = vi.complete_fields(mac=mac, ip=ip, hostname=hostname, div=div)
                     if changed_this_vi:
-                        self.netmap.register_modif('VI ' + mapid, obj_type='virt_inst', obj_id=mapid,
+                        self.netmap.register_modif('VI ' + mapid, elmt_id=mapid,
                                                    modificator=self.m_id, old_state=old, new_state=vi.detail_str(2),
                                                    logit_with_lvl=20)
                         changed += 1

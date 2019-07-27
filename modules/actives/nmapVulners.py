@@ -96,8 +96,8 @@ class AModNmapVulners(FacilityActiveModule):
                 port_table = PortTable(table)
                 mapid, vi = self.netmap.create_vi(mac=mac, ip=ip, hostname=hostname, ports=port_table)
                 vi.set_state(state)
-                self.netmap.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid,
-                                           modificator=self.get_module_id(), old_state='Non-existing VI',
+                self.netmap.register_modif('VI ' + mapid, elmt_id=mapid, modificator=self.get_module_id(),
+                                           old_state='Non-existing VI',
                                            new_state='New VI instance with PortTable:\n'+port_table.detail_str(1),
                                            logit_with_lvl=20)
                 super().did_modification()
@@ -109,13 +109,12 @@ class AModNmapVulners(FacilityActiveModule):
                 changed_fields, changed_ports = False, False
                 if vi.complete_fields(mac=mac, ip=ip, hostname=hostname):
                     new = vi.detail_str(2)
-                    self.netmap.register_modif('VI ' + mapid, obj_type='virt_inst', obj_id=mapid,
-                                               modificator=self.get_module_id(),
+                    self.netmap.register_modif('VI ' + mapid, elmt_id=mapid, modificator=self.get_module_id(),
                                                old_state=old, new_state=new, logit_with_lvl=20)
                     changed_fields = True
                 if vi.complete_ports_table(table):
                     new_portstable = vi.get_ports_table().detail_str(level=3)
-                    self.netmap.register_modif('PortsTable VI ' + mapid, obj_type='virt_inst', obj_id=mapid,
+                    self.netmap.register_modif('PortsTable VI ' + mapid, elmt_id=mapid,
                                                modificator=self.get_module_id(), old_state=old_portstable,
                                                new_state=new_portstable, logit_with_lvl=20)
                     changed_ports = True

@@ -4,7 +4,9 @@ from src.appcore import Core
 from src.utils.timer import TimerInterface, TimerThread
 from src.coreConfig import get_coreconfig_from_file
 from src.utils.filesManager import FilesManager
+from src.utils.misc_fcts import log_feedback_available
 import subprocess
+import signal
 import os
 
 
@@ -59,11 +61,12 @@ class AppCLI(TimerInterface):
         else:
             self.coreconfig = CoreConfig(timer=self.timer)
             self.coreconfig.set_mailinfos_tuple(mail_infos)
-        self.core = Core(self.coreconfig)
+        self.core = Core(self.coreconfig, handle_sigint=False)
         self.paths = self.coreconfig.paths
 
         self.output = self.config_output(terminal)  # Init output controller object depending on mode selected
         self.cli = CLIparser(self.core, core_controller=self)
+        signal.signal(signal.SIGINT, self.interrupt_handler)
 
         self.start_app(start_parsing, start_pull_output)
 
@@ -75,6 +78,10 @@ class AppCLI(TimerInterface):
         if start_parsing:
             # blocking on input waiting
             self.cli.start_parsing()
+
+    def interrupt_handler(self, sig, frame):
+        log_feedback_available(f"AppController : handling interrupt signal {sig}")
+        self.stop_app()
 
     def stop_app(self, oppose_to_saving=False):
         self.cli.stop_parsing()
@@ -279,6 +286,7 @@ class PipeOutput(BaseOutput):
         self.stop_reading()
         if os.path.exists(self.PIPE_PATH):
             os.remove(self.PIPE_PATH)
+        log_feedback_available(f"PipeOutput : stop feeding the pipe {self.PIPE_PATH} and removing it")
 
     def __str__(self):
         return "PipeOutput object - informations are sent in a pipe, which you can do whatever with (recommanded" \
@@ -324,6 +332,8 @@ class ConsoleOutput(BaseOutput):
             self.popen.terminate()
             if self.popen.poll() is None:
                 self.popen.kill()
+        log_feedback_available(f"ConsoleOutput : killing the terminal process ({self.terminal_cmd}) that was watching"
+                               f"pipe {self.PIPE_PATH}")
 
     def __str__(self):
         return f"ConsoleOutput spawning '{self.terminal_key}' terminal monitoring app state pulling info from pipe\n" \

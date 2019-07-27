@@ -1,31 +1,30 @@
 ### TODO
 
-- Bug autocompletion
-- Bug save config doesn't reference current file desc previously redefined?
 - [OK] Menus : cmd to backward previous menu
 - [OK] Easier new Module integration + more verifications (is program callable, desc non-empty, ...)
 - [OK] Save mod inst timers in XML
 - [OK] Passable desired terminal for View
 - [OK] More control on View terminal process
 - [OK] Multiline display for containers (avoid wrapping in View)
-- NMap parsing errors
+- [OK] Help for starting in app usage
+- [OK] Constants for events target types
+- [OK] Limit nbr of displayed events and redundant threats alerts in stdin
+- [OK] Proper way to leave app with sig
+- [OK] More feedback communications
 - [OK] Edit active mod entry timer set current exp timer not exp timer init value
-- Management of dependencies/requirements for underlying programs
-!- State of VI through time
-!- Sorting VI depending their state
+- [OK] Make uniform methods/attributes/notions in code
+- [OK] Sorting VI depending their state
+- NMap parsing errors
+- Bug save config doesn't reference current file desc previously redefined?
+- State of VI through time
 - Strict format for VI fields
-- Make uniform methods/attributes/notions in code
+- Bug autocompletion
 - DOC
 - DTDs
-- [OK] Help for starting in app usage
-- Constants for events target types
-- [OK] Limit nbr of displayed events and redundant threats alerts in stdin
-- Proper way to leave app with sig
-- [OK] More feedback communications
-- Events/core target unification with constants
 
 - [OK] Restructure containers Panel & Queue with a superclass
 - [OK] Management of Independent Modules
+- Management of dependencies/requirements for underlying programs
 - Intermediate Tkinter interface for multifields forms
 !- New Modules !
 

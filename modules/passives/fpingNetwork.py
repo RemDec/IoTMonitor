@@ -75,7 +75,7 @@ class PModFping(FacilityActiveModule):
                     vi.set_state(state)
                     changed = vi.complete_fields(ip=ip, hostname=hostname)
                     if old_state != state or changed:
-                        self.netmap.register_modif(f"VI {mapid}", obj_type='virt_inst', obj_id=mapid,
+                        self.netmap.register_modif(f"VI {mapid}", elmt_type='virt_inst', elmt_id=mapid,
                                                    modificator=self.get_module_id(),
                                                    old_state=f"Network state:{old_state}\n{vi.detail_str(level=1)}",
                                                    new_state=f"Network state:{state}\n{vi.detail_str(level=1)}",

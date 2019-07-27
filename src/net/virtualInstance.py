@@ -186,6 +186,9 @@ class VirtualInstance:
     def get_ports_table(self):
         return self.ports_table
 
+    def get_state(self):
+        return self.state
+
     def str_state(self):
         if self.state == 'unknown':
             return '?'

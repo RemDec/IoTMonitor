@@ -91,7 +91,7 @@ class PModPing(PassiveModule):
                 log_feedback_available(f"Module [{self.m_id}] didn't modify {ip} state ({state})")
                 return
             vi.set_state(state)
-            self.netmap.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=self.m_id,
+            self.netmap.register_modif('VI ' + mapid, elmt_type='virt_inst', elmt_id=mapid, modificator=self.m_id,
                                        old_state=f"Network state: {old_state}", new_state=f"Network state: {vi.state}",
                                        logit_with_lvl=20)
             log_feedback_available(f"Module [{self.m_id}] determined new state for {ip} : {state}")

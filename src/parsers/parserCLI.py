@@ -323,7 +323,7 @@ class CLIparser:
         self.previous_menu = self.curr_menu
         self.curr_menu = self.index_menus[target_menu_index]
 
-    def after_mod_slct(self, mod_id):
+    def after_create_mod_slct(self, mod_id):
         mod_descriptor = self.core.get_mod_descriptor(mod_id)
         _, PARAMS, desc_params = mod_descriptor.get_all_params()
         ask_default = f"[{mod_id}] Code of settable module parameters :\n{'  '.join(PARAMS.keys())}\n" \
@@ -386,6 +386,29 @@ class CLIparser:
             back_main = self.get_user_confirm("Back main menu (Y/n) ?")
             if back_main:
                 self.back_main_menu()
+
+    def after_create_vi_slct(self, preset):
+        if preset in ['basic', 'scratch']:
+            mac = self.get_user_in_or_dflt(default=None, marker="[MAC address]: ")
+            ip = self.get_user_in_or_dflt(default=None, marker="[IP address]: ")
+            hostname = self.get_user_in_or_dflt(default=None, marker="[hostname]: ")
+            vi = VirtualInstance(mac=mac, ip=ip, hostname=hostname, user_created=True)
+            if preset == 'scratch':
+                print("Add known port infos entries")
+                port = self.get_user_in_or_dflt(default=None, marker="[used port]: ")
+                while port is not None:
+                    vi.get_ports_table().set_port(int(port))
+                    port = self.get_user_in_or_dflt(default=None, marker="[used port]: ")
+                print("Additional divers fields")
+                for field in vi.unused_div_fields():
+                    field_val = self.get_user_in_or_dflt(default=None, marker=f"[{field}]: ")
+                    if field_val is not None:
+                        vi.add_divinfo(field, field_val)
+        mapid = self.get_user_in_or_dflt(default=None, marker="[map id?]: ")
+        print(vi.detail_str(level=2))
+        if self.get_user_confirm(f"Confirm [{mapid}] adding to netmap ? (Y/n)"):
+            self.core.add_to_netmap(vi, mapid)
+        self.back_main_menu()
 
     def after_edit_vi_slct(self, mapid):
         vi = self.core.get_from_netmap(mapid)
@@ -504,7 +527,7 @@ class CLIparser:
         self.core.remove_from_netmap(vi_mapid)
         self.back_main_menu()
 
-    def after_show_select(self, show_input_name):
+    def after_show_slct(self, show_input_name):
         map = {'app': "app", 'routine': "routine", 'netmap': "netmap", 'library': "library", 'main timer': "timer",
                'independent mods': "indep", 'virtual instance': "vi", 'entry module in routine': "entry",
                'threat events': "threats", 'modification events': "modifs", 'feedback': "feedback"}
@@ -555,7 +578,7 @@ class CLIparser:
         print(s if s is not "" else f"   < No module entry in routine referenced by setid {setid} >")
         self.no_wipe_next()
 
-    def after_clear_select(self, target):
+    def after_clear_slct(self, target):
         code = self.get_choice_val(target)
         advert = f"Clearing {target} will empty it and loose all its components (irreversible).\n" \
                  f"Are you sure? (y/N) :"
@@ -564,7 +587,7 @@ class CLIparser:
             self.core.clear_target(code)
         self.back_main_menu()
 
-    def after_save_select(self, target):
+    def after_save_slct(self, target):
         # Save components state and/or whole app configuration by writing formatted files (yaml, xml)
         target = self.get_choice_val(target)
         ask_path = lambda res, dflt : \
@@ -603,29 +626,6 @@ class CLIparser:
     def after_pause_slct(self, to_resume):
         target = self.get_choice_val(to_resume)
         self.core.pause_it(target)
-        self.back_main_menu()
-
-    def iv_creation(self, preset):
-        if preset in ['basic', 'scratch']:
-            mac = self.get_user_in_or_dflt(default=None, marker="[MAC address]: ")
-            ip = self.get_user_in_or_dflt(default=None, marker="[IP address]: ")
-            hostname = self.get_user_in_or_dflt(default=None, marker="[hostname]: ")
-            vi = VirtualInstance(mac=mac, ip=ip, hostname=hostname, user_created=True)
-            if preset == 'scratch':
-                print("Add known port infos entries")
-                port = self.get_user_in_or_dflt(default=None, marker="[used port]: ")
-                while port is not None:
-                    vi.get_ports_table().set_port(int(port))
-                    port = self.get_user_in_or_dflt(default=None, marker="[used port]: ")
-                print("Additional divers fields")
-                for field in vi.unused_div_fields():
-                    field_val = self.get_user_in_or_dflt(default=None, marker=f"[{field}]: ")
-                    if field_val is not None:
-                        vi.add_divinfo(field, field_val)
-        mapid = self.get_user_in_or_dflt(default=None, marker="[map id?]: ")
-        print(vi.detail_str(level=2))
-        if self.get_user_confirm(f"Confirm [{mapid}] adding to netmap ? (Y/n)"):
-            self.core.add_to_netmap(vi, mapid)
         self.back_main_menu()
 
     def after_integrate_slct(self, pymod_name):
@@ -715,7 +715,7 @@ class CLIparser:
                                   'routine': "routine",
                                   'independent modules': "indep",
                                   'library': "library"},
-                      'fct_choice': self.after_clear_select}
+                      'fct_choice': self.after_clear_slct}
 
         self.show = {'desc': "Display current state of application resources",
                      'help': get_res_CLI('show_help'),
@@ -723,7 +723,7 @@ class CLIparser:
                                  ['virtual instance', 'entry module in routine'],
                                  ['threat events', 'modification events', 'feedback']],
                      'dflt_choice': 'routine',
-                     'fct_choice': self.after_show_select}
+                     'fct_choice': self.after_show_slct}
 
         self.save = {'desc': "Save the current application configuration or components separatly",
                      'help': get_res_CLI('save_help'),
@@ -732,7 +732,7 @@ class CLIparser:
                                  'routine (xml)': "routine",
                                  'netmap (xml)': "netmap"},
                      'dflt_choice': 'whole app (yaml cfg + xml comp.)',
-                     'fct_choice': self.after_save_select}
+                     'fct_choice': self.after_save_slct}
 
         self.pause = {'desc': "Pause (interrupt running module threads) routine or its components",
                       'help': get_res_CLI('pause_help'),
@@ -760,7 +760,7 @@ class CLIparser:
         # -- Secondary menu --
         self.create_mod = {'desc': "Choose a module in the current library and instantiate it",
                            'marker': "[mod_id] :", 'choices': self.get_available_mods,
-                           'fct_choice': self.after_mod_slct}
+                           'fct_choice': self.after_create_mod_slct}
 
         self.create_VI = {'desc': "Create a new 'virtual instance' ie a network equipment in-app representation",
                           'help': "A VI is the unit aggregating informations retrieved from Modules results parsing\n"
@@ -768,7 +768,7 @@ class CLIparser:
                                   "fields values for new VI crafting than 'basic' (but still editable later).",
                           'choices': [['basic', 'scratch']],
                           'dflt_choice': 'basic',
-                          'fct_choice': self.iv_creation}
+                          'fct_choice': self.after_create_vi_slct}
 
         self.edit_VI = {'desc': "Edit current fields of a virtual instance to fill/correct them manually",
                         'marker': "[mapid] :", 'choices': self.get_map_mapids,

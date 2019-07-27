@@ -10,11 +10,12 @@ class Core:
     It is the upper level of the logic part through all elements can be managed.
     """
 
-    def __init__(self, coreconfig=None):
+    def __init__(self, coreconfig=None, handle_sigint=True):
         if coreconfig is None:
             coreconfig = CoreConfig()
         log_feedback_available('Instantiation of AppCore considering '+coreconfig.detail_str(level=0))
-        signal.signal(signal.SIGINT, self.interrupt_handler)
+        if handle_sigint:
+            signal.signal(signal.SIGINT, self.interrupt_handler)
         self.coreconfig = coreconfig
         self.logger_setup = coreconfig.logger_setup
         self.modmanager = coreconfig.modmanager
@@ -247,7 +248,7 @@ class Core:
         actives, passives = self.modmanager.list_all_modid()
         indeps = self.str_indep_mods()
         s = ""
-        header = f"=++====== Core application (disp. lvl {level}) =========\n"
+        header = f"=++============ Core application (disp. lvl {level}) ===============\n"
         if level == 0:
             s += header
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"

@@ -136,7 +136,7 @@ class QueueEntry(Entry):
             return s + f"\n{self.get_mod_inst().str_summary()}\n{vistr[:40]}\n      {threats} /!\\   {modifs} -o-"
         elif level == 5:
             curr_params, dflt_params, desc_PARAMS = self.module.get_params()
-            rel_vi_str = '| < no specific VI >' if len(self.rel_to_vi) == 0 else ', '.join(self.rel_to_vi)
+            rel_vi_str = '\n| < no specific VI >' if len(self.rel_to_vi) == 0 else ', '.join(self.rel_to_vi)
             s += f"| ACTIVE module whose description is given as :\n"
             s += f"|  {self.module.get_description()}\n"
             modifs, threats = self.module.get_nbr_events()

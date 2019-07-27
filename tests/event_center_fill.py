@@ -8,7 +8,7 @@ def fill_center(center):
     center.register_threat("second_module", 5, "target_mapid", "Very SERIOUS alert!")
     center.register_threat("mymodule", 1, "target_mapid", "Same module raised easy alert")
     center.register_modif("'target' module parameter", "module", None, "app user", "192.168/16", "10.102/16")
-    center.register_modif("VI hostname field", obj_type='virt_inst', obj_id='target_mapid', modificator='user',
+    center.register_modif("VI hostname field", elmt_type='virt_inst', elmt_id='target_mapid', modificator='user',
                           old_state='old_hostname', new_state='NEW_HOSTNAME')
 
 

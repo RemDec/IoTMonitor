@@ -3,6 +3,7 @@ from src.logging.modifEvent import *
 from src.logging.threatEvent import *
 from src.logging.eventsCenter import EventsCenter
 from src.utils.misc_fcts import str_multiframe
+import src.logging.modifEvent as modif_event
 
 
 class Netmap:
@@ -71,7 +72,7 @@ class Netmap:
         if append_netmap:
             mapid = self.add_vi(vi, given_mapid=mapid)
             if create_event:
-                self.register_modif('VI '+mapid, obj_type='virt_inst', obj_id=mapid, modificator=creator,
+                self.register_modif('VI ' + mapid, elmt_type='virt_inst', elmt_id=mapid, modificator=creator,
                                     old_state="Non-existing VI", new_state="Registered VI in netmap", logit_with_lvl=20)
         return mapid, vi
 
@@ -90,21 +91,31 @@ class Netmap:
         if isinstance(mapid, str):
             return mapid in self.map
 
-    def get_vi_mapids(self, subset_mapids=None, filter_fct=lambda vi_inst: True):
+    def get_vi_mapids(self, subset_mapids=None, sorted=True, filter_fct=lambda vi_inst: True):
         """Get mapids of some filtered VIs amongst all indexed or a subset
 
         Args:
             subset_mapids(str list): list of mapids to consider for the filtering
+            sorted(bool): whether VIs should be grouped and sorted by their current state (up, down, unknown)
             filter_fct(function): an arbitrary function taking one parameter (the VI instance) returning a bool
 
         Returns:
             ids(list) : mapids of so indexed VIs for which filter_fct returns true
         """
-        ids = []
+        up, down, unkown = [], [], []
         for mapid in self.map if subset_mapids is None else subset_mapids:
             if self.vi_present(mapid) and filter_fct(self.get_vi(mapid)):
-                ids.append(mapid)
-        return ids
+                if not sorted:
+                    up.append(mapid)
+                else:
+                    vi_state = self.get_vi(mapid).get_state()
+                    if vi_state == 'up':
+                        up.append(mapid)
+                    elif vi_state == 'down':
+                        down.append(mapid)
+                    else:
+                        unkown.append(mapid)
+        return up + down + unkown
 
     def get_vis_from_mapids(self, mapids_list):
         return [self.get_vi(mapid) for mapid in mapids_list if self.get_vi(mapid) is not None]
@@ -254,7 +265,7 @@ class Netmap:
                     self.register_threat_event(event)
                     return event
 
-    def register_modif(self, modified_res, obj_type='app_res', obj_id=None, modificator='app',
+    def register_modif(self, modified_res, elmt_type=modif_event.VI, elmt_id=None, modificator='app',
                        old_state=None, new_state=None,
                        logit_with_lvl=-1, target_logger="modifs",
                        save_vi_event=True, avoid_duplicate=True):
@@ -262,8 +273,8 @@ class Netmap:
 
         Args:
             modified_res(str): description of the modified resource
-            obj_type(str): type of the element whose resource has been modified
-            obj_id(str): element id in the app
+            elmt_type(str): type of the element whose resource has been modified
+            elmt_id(str): element id in the app
             modificator(str): agent that modified the resource
             old_state(str): representation of the old resource state
             new_state(str): representation of the new resource state
@@ -278,7 +289,7 @@ class Netmap:
         """
         if self.event_center is None:
             return None
-        event = self.event_center.register_modif(modified_res, obj_type, obj_id, modificator,
+        event = self.event_center.register_modif(modified_res, elmt_type, elmt_id, modificator,
                                                  old_state, new_state,
                                                  logit_with_lvl, target_logger)
         if save_vi_event:
