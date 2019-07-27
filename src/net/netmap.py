@@ -329,7 +329,7 @@ class Netmap:
         vi = self.get_vi(mapid)
         header = f" {mapid} {self.vi_icons(mapid)} "
         l = max(max_char, len(header))
-        cut = lambda s: s if len(s)<l else s[:l]
+        cut = lambda s: s if len(s) < l else s[:l]
         s = header + '\n' + '='*l + '\n'
         s += cut(f" MAC: {vi.get_mac()}") + '\n'
         s += cut(f" IP: {vi.get_ip()}") + '\n'
@@ -350,12 +350,9 @@ class Netmap:
         s = f"Netmap maintaining {len(self.map)} virtual instances" \
             f"{'' if self.event_center is None else ' and ref to an EventCenter'}\n"
         if level == 0:
-            return s + ', '.join(self.get_vi_mapids()) + '\n'
-        elif level == 1:
-            for mapid, vi in self.map.items():
-                s += f"      <<<[{mapid}]>>>\n{vi.detail_str(1)}"
-            return s
-        elif level == 2:
+            vis_state = [f"{mapid}[{self.get_vi(mapid).str_state()}]" for mapid in self.get_vi_mapids()]
+            return s + ', '.join(vis_state) + '\n'
+        elif level <= 2:
             vi_frames = [self.vi_frame_str(mapid, max_char=max_char_per_vi) for mapid in self.get_vi_mapids()]
             return s + str_multiframe(vi_frames, by_pack_of=vi_by_pack_of)
         else:

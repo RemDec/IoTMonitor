@@ -719,7 +719,7 @@ class CLIparser:
 
         self.show = {'desc': "Display current state of application resources",
                      'help': get_res_CLI('show_help'),
-                     'choices': [['app', 'routine', 'netmap', 'library', 'independent mods', 'main timer'],
+                     'choices': [['app', 'routine', 'netmap', 'library', 'independent mods', 'main timer', 'config'],
                                  ['virtual instance', 'entry module in routine'],
                                  ['threat events', 'modification events', 'feedback']],
                      'dflt_choice': 'routine',

@@ -1,5 +1,5 @@
 from modules.abcPassiveModule import *
-from src.utils.misc_fcts import log_feedback_available, treat_params, get_ip
+from src.utils.misc_fcts import log_feedback_available, get_ip
 from ipaddress import ip_address
 import shlex
 import re
@@ -42,7 +42,7 @@ class PModPing(PassiveModule):
         return self.params, self.PARAMS, self.desc_PARAMS
 
     def set_params(self, params):
-        self.params = treat_params(self.PARAMS, {} if params is None else params)
+        self.params = super().treat_params(self.PARAMS, {} if params is None else params)
 
     def new_bg_thread(self):
         return BackgroundThread()

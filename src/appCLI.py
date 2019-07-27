@@ -39,7 +39,7 @@ class AppCLI(TimerInterface):
         self.mode = self.correct_mode(mode)
         self.level = level
         self.save_on_exit = save_on_exit # Save core components state at regular app exiting
-        self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library",
+        self.poss_display = ["app", "routine", "indep", "netmap", "timer", "library", "config",
                              "events", "threats", "modifs", "feedback"]
         self.to_disp = "app"
         # Check whether essential files are in place
@@ -326,7 +326,7 @@ class ConsoleOutput(BaseOutput):
                 self.popen.kill()
 
     def __str__(self):
-        return f"ConsoleOutput spawning {self.terminal_key} monitoring app state pulling info from pipe\n" \
+        return f"ConsoleOutput spawning '{self.terminal_key}' terminal monitoring app state pulling info from pipe\n" \
                f"{self.PIPE_PATH} using watch command to regularly display it"
 
 

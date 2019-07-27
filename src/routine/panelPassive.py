@@ -69,7 +69,7 @@ class PanelEntry(Entry):
         s = f"{self.setid} ~ {self.module.get_read_interval()}s"
         if level == 0:
             # setid and read interval
-            return str_lines_frame(s)
+            return s
         elif level == 1:
             # adding original module id (not settable as setid)
             return s + f" [{self.get_mod_inst().get_module_id()}]"

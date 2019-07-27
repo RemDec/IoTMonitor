@@ -116,7 +116,7 @@ class QueueEntry(Entry):
     def detail_str(self, level=0):
         s = f"{self.setid} ~ {self.exp_timer}s/{self.init_timer}"
         if level == 0:
-            return str_lines_frame(s)
+            return s
         elif level == 1:
             return s + f" [{self.get_mod_inst().get_module_id()}]"
         elif level == 2:

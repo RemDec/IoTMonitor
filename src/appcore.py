@@ -27,7 +27,7 @@ class Core:
         self.timer.launch()
 
         self.code_components = {'app': self, 'routine': self.routine, 'netmap': self.netmap, 'indep': self.indep_mods,
-                                'timer': self.timer, 'library': self.modmanager,
+                                'timer': self.timer, 'library': self.modmanager, 'config': self.coreconfig,
                                 'events': self.get_event_center(), 'feedback': self.get_feedback()}
         log_feedback_available('Finished instantiation of AppCore and its components')
 
@@ -247,8 +247,9 @@ class Core:
         actives, passives = self.modmanager.list_all_modid()
         indeps = self.str_indep_mods()
         s = ""
+        header = f"=++====== Core application (disp. lvl {level}) =========\n"
         if level == 0:
-            s += f"=++====== Core application =========\n"
+            s += header
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
             s += f" ++------- ROUTINE -------"
             s += f"{self.routine.detail_str(level=0)}"
@@ -258,7 +259,7 @@ class Core:
             last_feedback = self.get_event_center().pull_feedback()
             if last_feedback.strip() != '':
                 s += last_feedback + '_' * 100 + '\n\n'
-            s += f"=++====== Core application =========\n"
+            s += header
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
             s += f" || Routine independent modules :\n || {indeps}\n"
             s += f" ++------- ROUTINE -------"
@@ -269,7 +270,7 @@ class Core:
             last_feedback = self.get_event_center().pull_feedback(nbr_lines=3)
             if last_feedback.strip() != '':
                 s += last_feedback + '_' * 130 + '\n\n'
-            s += f"=++====== Core application =========\n"
+            s += header
             s += f" || Core config file : {self.coreconfig.get_cfg_file()}\n"
             s += f" || {self.logger_setup.email_str()}\n"
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
@@ -282,7 +283,7 @@ class Core:
             last_feedback = self.get_event_center().pull_feedback(nbr_lines=min(5, level))
             if last_feedback.strip() != '':
                 s += last_feedback + '_'*50 + "^^^ FEEDBACK BAR ^^^" + '_'*50 + '\n\n'
-            s += f"=++====== Core application =========\n"
+            s += header
             s += f" || Coreconfig instance maintains file configuration paths :\n"
             s += self.coreconfig.str_current_paths(prefix=" ||  -")
             s += f" || {self.logger_setup.email_str()}\n"
@@ -293,7 +294,8 @@ class Core:
             s += f" ++------- ROUTINE -------"
             s += f"{self.routine.detail_str(level=3)}"
             s += f" ||\n ++------- NETMAP -------\n"
-            s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=4, max_char_per_vi=35)}"
+            vi_per_line = 4 if level < 8 else 5
+            s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=vi_per_line, max_char_per_vi=37)}"
         return s
 
     def __str__(self):

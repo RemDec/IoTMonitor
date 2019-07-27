@@ -33,7 +33,7 @@ class CoreConfig:
         self.timer, self.netmap, self.routine = (None, )*3
         self.logger_setup, self.event_center, self.modmanager = (None, )*3
 
-        # files and default paths are looked in a filemanager instance, refrenced for saving at exiting time
+        # files and default paths are looked in a filemanager instance, referenced for saving at exiting time
         self.filemanager = filemanager if filemanager is not None else FilesManager()
 
         self.paths = {'config': self.filemanager.get_res_path('last_cfg') if file_from == '' else file_from,

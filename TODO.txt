@@ -17,11 +17,11 @@
 - Make uniform methods/attributes/notions in code
 - DOC
 - DTDs
-! - Help for starting in app usage
+- [OK] Help for starting in app usage
 - Constants for events target types
 - [OK] Limit nbr of displayed events and redundant threats alerts in stdin
 - Proper way to leave app with sig
-- More feedback communications
+- [OK] More feedback communications
 - Events/core target unification with constants
 
 - [OK] Restructure containers Panel & Queue with a superclass
