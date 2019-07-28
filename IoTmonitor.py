@@ -79,6 +79,8 @@ parser.add_argument("--testmail", help="Set it to send a test email to specified
 parser.add_argument("--term", default='xterm',
                     help="Terminal to use for view in cli mode, should be in path or constant 'auto' (default 'xterm')")
 
+parser.add_argument("--installprogs", help="Try to install all underlying programs present in the Modules Library and"
+                                           " not yet installed in the system", action="store_true")
 args = parser.parse_args()
 
 auto_save = not args.noautosave
@@ -89,6 +91,13 @@ pwd = None
 mail_server = args.mserver
 must_test_email = args.testmail
 term_cmd = args.term
+install = args.installprogs
+
+if install:
+    from src.utils.misc_fcts import install_programs
+    print("Starting research and installation of lacking underlying programs in this system..\n\n")
+    print(install_programs('svd/configs/modlib.xml'))
+    exit(0)
 
 if clean_last:
     filesmanager.clean_last_files()

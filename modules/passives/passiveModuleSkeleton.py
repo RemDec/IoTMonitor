@@ -85,3 +85,12 @@ class PModNameMod(PassiveModule):
     def stop(self):
         # ask registered threads to smoothly terminate their activity
         super().terminate_threads()
+
+    def install_info(self):
+        # help for underlying program installation in the system. May be empty or with None values, see doc abcModule
+        return {'program': None, 'version': None,
+                'install': {'apt': None,
+                            'yum': None,
+                            'snap': None
+                            }
+                }

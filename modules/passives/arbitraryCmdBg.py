@@ -69,3 +69,11 @@ class PModArbitraryCmdBg(PassiveModule):
 
     def stop(self):
         super().terminate_threads()
+
+    def install_info(self):
+        return {'program': None, 'version': None,
+                'install': {'apt': None,
+                            'yum': None,
+                            'snap': None
+                            }
+                }

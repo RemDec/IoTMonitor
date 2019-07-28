@@ -105,6 +105,57 @@ def verify_program(prog):
         raise NonExecutableError(prog)
 
 
+def install_programs(modlib_file):
+    """Install all Module underlying programs not found in the running system
+
+    List all Modules available in the given Library and the packets manager usable to install it in this system.
+    Create a temporary script which calls the packet manager for each non installed program (given by Module function
+    install_info()) and executes it with an available shell (like bash).
+    Args:
+        modlib_file: the path of the Library file to install referenced Modules underlying programs
+
+    Returns:
+        feedback_msg(str): a string describing what happened during installation
+    """
+    import subprocess, sys
+    from tempfile import NamedTemporaryFile
+    from src.utils.moduleManager import Library
+    install_cmds = {'apt': "apt-get install ", 'yum': "yum install ", 'snap': "snap install ",
+                    'dnf': "dnf install ", 'pacman': "pacman -S ", 'zypper': "zypper install "}
+    lib = Library(modlib_file, load_direct=True)
+    installed = []
+    install_lines = []
+    feedback_msg = "\n\n------- Installation feedback -------\n"
+    for mod_desc in lib.get_all_desc():
+        install_info = mod_desc.install
+        prog = install_info.get('program')
+        if prog and not is_program_callable(prog):
+            for manager, package in install_info.get('install', {}).items():
+                if is_program_callable(manager) and install_cmds.get(manager):
+                    install_line = install_cmds[manager] + package
+                    if not(install_line in install_lines):
+                        installed.append(package)
+                        install_lines.append(install_line)
+                    break
+    if len(installed) == 0:
+        feedback_msg += "All underlying programs are already usable on this system"
+    else:
+        feedback_msg += f"Following programs installations tried using packet managers commands :\n" \
+                        '\n'.join(install_lines)
+        fd = NamedTemporaryFile(delete=False)
+        fd.file.write('\n'.join(install_lines).encode())
+        for shell in ['bash', 'sh', 'ksh', 'zsh', 'tcsh']:
+            if is_program_callable(shell):
+                feedback_msg += f"\n\nTemporary script file were sourced using shell '{shell}'\n"
+                fd.file.seek(0)
+                subprocess.run([shell, fd.name], stdout=sys.stdout, stderr=subprocess.STDOUT)
+                fd.file.close()
+                return feedback_msg
+        feedback_msg += f"No shell found on this system to source the temp installation script file {fd.name}"
+        fd.file.close()
+        return feedback_msg
+
+
 def str_param_comp(current, defaults, descriptions={}, prefix=''):
     """Illustrate which value would be given for each param
 

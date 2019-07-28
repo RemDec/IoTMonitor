@@ -157,6 +157,14 @@ class AModNmapPortDisc(ActiveModule):
     def get_default_timer(self):
         return 60
 
+    def install_info(self):
+        return {'program': "nmap", 'version': "7.01",
+                'install': {'apt': "nmap",
+                            'yum': "nmap",
+                            'snap': "nmap"
+                            }
+                }
+
 
 if __name__ == '__main__':
     nmap = AModNmapPortDisc(params={'IP': get_ip(), 'nbrports': "10"})

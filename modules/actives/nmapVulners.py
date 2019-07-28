@@ -183,6 +183,13 @@ class AModNmapVulners(FacilityActiveModule):
             all_CVEs_infos.append({'code': CVEcode, 'severity': severity, 'url': url})
         vulns_dict[portnum] = (service_cpe, all_CVEs_infos)
 
+    def install_info(self):
+        return {'program': "nmap", 'version': "7.01",
+                'install': {'apt': "nmap",
+                            'yum': "nmap",
+                            'snap': "nmap"
+                            }
+                }
 
 if __name__ == '__main__':
     # from src.utils.moduleManager import ModDescriptor

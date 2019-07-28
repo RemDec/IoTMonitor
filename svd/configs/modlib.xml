@@ -8,7 +8,7 @@
         <param code="args" mandatory="False" default="No or bad command given to arbitrary module [arbcmd]" prefix="">CLI arguments to pass as one string (all in it)</param>
       </defparams>
       <savedparams/>
-      <dependencies/>
+      <install/>
     </actmod>
     <actmod modid="nmapexplo" cmd="nmap -sn" pymod="modules.actives.nmapExplorer" pyclass="AModNmapExplorer">
       <desc>[nmapexplo] Nmap scan to discover hosts (-sn mode, no port scanning) by SYN/UDP probing on common ports (really fast)</desc>
@@ -20,7 +20,11 @@
         <param code="IP" mandatory="True" default="192.168.1.36/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams/>
-      <dependencies/>
+      <install program="nmap" version="7.01">
+        <package manager="apt" name="nmap"/>
+        <package manager="yum" name="nmap"/>
+        <package manager="snap" name="nmap"/>
+      </install>
     </actmod>
     <actmod modid="nmapports" cmd="nmap" pymod="modules.actives.nmapPortDiscovery" pyclass="AModNmapPortDisc">
       <desc>[nmapports] Nmap scan focusing on used ports discovery, attempting on a nbr of top most common ports</desc>
@@ -32,7 +36,11 @@
         <param code="IP" mandatory="True" default="192.168.1.36/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams/>
-      <dependencies/>
+      <install program="nmap" version="7.01">
+        <package manager="apt" name="nmap"/>
+        <package manager="yum" name="nmap"/>
+        <package manager="snap" name="nmap"/>
+      </install>
     </actmod>
     <actmod modid="nmapvulners" cmd="nmap -sV -script=nmap-vulners" pymod="modules.actives.nmapVulners" pyclass="AModNmapVulners">
       <desc>[nmapvulners] Nmap scan using NSE script Vulners, checking for services CVE in online DB but also good at services discovery</desc>
@@ -44,7 +52,11 @@
         <param code="IP" mandatory="True" default="192.168.1.36/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams/>
-      <dependencies/>
+      <install program="nmap" version="7.01">
+        <package manager="apt" name="nmap"/>
+        <package manager="yum" name="nmap"/>
+        <package manager="snap" name="nmap"/>
+      </install>
     </actmod>
   </actives>
   <passives>
@@ -55,7 +67,7 @@
         <param code="args" mandatory="False" default="-t -n1 echo repeated_text_default_arbcmd_bg" prefix="">CLI arguments to pass as one string (all in it)</param>
       </defparams>
       <savedparams/>
-      <dependencies/>
+      <install/>
     </passmod>
     <passmod modid="pingit" cmd="ping" pymod="modules.passives.pingTarget" pyclass="PModPing">
       <desc>[pingit] Module pinging constantly a given target</desc>
@@ -65,7 +77,7 @@
         <param code="IP" mandatory="True" default="192.168.1.36" prefix="">Target IP adress in ping command syntax (only one specifiable)</param>
       </defparams>
       <savedparams/>
-      <dependencies/>
+      <install program="ping" version="s20121221"/>
     </passmod>
     <passmod modid="fping" cmd="fping -l -A -d" pymod="modules.passives.fpingNetwork" pyclass="PModFping">
       <desc>[fping] Module looping pinging multiple hosts in the network, determining their state/reachability</desc>
@@ -77,7 +89,12 @@
         <param code="indivIP" mandatory="False" default="192.168.1.36" prefix="">specific IP(s) to target given one per one (overwrite netIP ones)</param>
       </defparams>
       <savedparams/>
-      <dependencies/>
+      <install program="fping" version="3.13">
+        <package manager="apt" name="fping"/>
+        <package manager="yum" name="fping"/>
+        <package manager="dnf" name="fping"/>
+        <package manager="pacman" name="fping"/>
+      </install>
     </passmod>
   </passives>
 </modlib>

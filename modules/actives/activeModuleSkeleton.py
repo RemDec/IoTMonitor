@@ -97,3 +97,12 @@ class AModNameMod(ActiveModule):
     def get_default_timer(self):
         # how frequent should be executed in automated queue of routine by default (sec)
         return 60
+
+    def install_info(self):
+        # help for underlying program installation in the system. May be empty or with None values, see doc abcModule
+        return {'program': None, 'version': None,
+                'install': {'apt': None,
+                            'yum': None,
+                            'snap': None
+                            }
+                }

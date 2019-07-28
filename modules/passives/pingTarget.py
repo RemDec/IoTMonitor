@@ -122,6 +122,14 @@ class PModPing(PassiveModule):
     def stop(self):
         super().terminate_threads()
 
+    def install_info(self):
+        return {'program': "ping", 'version': "s20121221",
+                'install': {'apt': None,
+                            'yum': None,
+                            'snap': None
+                            }
+                }
+
 
 if __name__ == '__main__':
     from src.net.netmap import Netmap

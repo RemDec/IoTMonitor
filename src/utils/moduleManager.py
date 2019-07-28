@@ -94,7 +94,7 @@ class Library:
         return ModDescriptor(mod_inst=mod_instance).modconfig_to_xml(set_id)
 
     def modinst_from_modconfig(self, xml_config, timer=None, netmap=None):
-        # instantiate a module from its xml modconfig element (as returned by modconfig_to_xm) and set params in config
+        # instantiate a module from its xml modconfig element (as returned by modconfig_to_xml) and set params in config
         mod_desc = ModDescriptor()
         mod_desc.parse_modconfig(xml_config)
         if self.is_available(mod_desc.m_id):
@@ -158,14 +158,18 @@ class Library:
 
 
 class ModDescriptor:
+    """
 
-    # Transitional class stating for a module created from a module instance or a XML code
-    # and able to reoutput module configuration as another module instance or XML code
-    # See it like a container for a module configuration (parameters, id, ...) from which you
-    # can poll desired representation in a given format (instance or XML)
-    #                      |-->|                   |-->
-    #       mod. instance      |  mod. descriptor  |      XML signature/code
-    #                       <--|                   |<--|
+    Transitional class stating for a module created from a module instance or a XML code and able to reoutput module
+    configuration as another module instance or XML code. See it like a container for a module configuration
+    (parameters, id, ...) from which you can poll desired representation in a given form (instance or XML)
+                         |-->|                   |-->
+          mod. instance      |  mod. descriptor  |      XML signature/code
+                          <--|                   |<--|
+    A Module can be divided in 2 info sets : Module infos (modinfos) stands for general values relative to the Module
+    class, like its modid, description, default timer, class name and python module defined in. Module configuration is
+    relative to the current parameters of a Module instance, its id in the app.
+    """
 
     def __init__(self, mod_inst=None, xml_tree=None, include_nondefault_param=False):
         self.m_id = "unknown"
@@ -176,6 +180,7 @@ class ModDescriptor:
         self.def_timer = -1
         self.pymod = "unknown python module"
         self.pyclass = "unknown python class"
+        self.install = {}
         self.curr_params, self.PARAMS, self.desc_params = ({}, {}, {})
         if mod_inst is not None:
             self.extract_modinfos(mod_inst, include_nondefault_param)
@@ -195,6 +200,7 @@ class ModDescriptor:
             self.def_timer = mod_inst.get_read_interval()
         self.pymod = mod_inst.__module__
         self.pyclass = mod_inst.__class__.__name__
+        self.install = mod_inst.install_info() if mod_inst.install_info() is not None else {}
         self.extract_paraminfos(mod_inst, include_nondefault_param)
 
     def extract_paraminfos(self, mod_inst, include_nondefault_param):
@@ -215,7 +221,7 @@ class ModDescriptor:
                 E.desc(self.txt_desc),
                 self.defparam_to_xml(),
                 saved_params,
-                E.dependencies(),
+                self.install_info_to_xml(),
                 modattr)
         return xml
 
@@ -233,6 +239,19 @@ class ModDescriptor:
         xml.append(self.curr_param_to_xml())
         return xml
 
+    def install_info_to_xml(self):
+        install_elmt = etree.Element("install")
+        if self.install.get('program', False):
+            install_elmt.set('program', self.install['program'])
+        if self.install.get('version', False):
+            install_elmt.set('version', self.install['version'])
+        if self.install.get('install', False):
+            for manager, package in self.install['install'].items():
+                if package is not None:
+                    elmt_package = E.package(manager=manager, name=package)
+                    install_elmt.append(elmt_package)
+        return install_elmt
+                
     def defparam_to_xml(self):
         params = E.defparams()
         for parname, (defval, mand, prefix) in self.PARAMS.items():
@@ -258,6 +277,7 @@ class ModDescriptor:
         self.pymod = xml_tree.get("pymod")
         self.pyclass = xml_tree.get("pyclass")
         self.txt_desc = xml_tree.find("desc").text
+        self.parse_install(xml_tree.find('install'))
         self.parse_defparam(xml_tree)
         if saved_params:
             self.parse_savedparam(xml_tree)
@@ -273,6 +293,16 @@ class ModDescriptor:
         except (ValueError, TypeError):
             pass
         self.parse_savedparam(xml_tree)
+
+    def parse_install(self, xml_install):
+        if xml_install.get('program'):
+            self.install['program'] = xml_install.get('program')
+        if xml_install.get('version'):
+            self.install['version'] = xml_install.get('version')
+        if self.install.get('install') is None:
+            self.install['install'] = {}
+        for package in xml_install.findall('package'):
+            self.install['install'][package.get('manager')] = package.get('name')
 
     def parse_defparam(self, xml_tree):
         defaults = xml_tree.find("defparams")

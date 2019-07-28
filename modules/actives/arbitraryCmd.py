@@ -72,6 +72,14 @@ class AModArbitraryCmd(ActiveModule):
     def get_default_timer(self):
         return 60
 
+    def install_info(self):
+        return {'program': None, 'version': None,
+                'install': {'apt': None,
+                            'yum': None,
+                            'snap': None
+                            }
+                }
+
 
 if __name__ == '__main__':
     arb = AModArbitraryCmd({"prog": "sleep", "args": "10"})

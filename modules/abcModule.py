@@ -107,6 +107,15 @@ class Module(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def is_running(self):
+        """Retrieve state of threads running underlying program execution if there are some
+
+        Returns:
+            running (bool): whether some threads instantiated from Module instance (underlying program execution)
+                            are yet running it
+        """
+
+    @abc.abstractmethod
     def stop(self):
         """Terminate all running threads linked to this module.
 
@@ -141,11 +150,22 @@ class Module(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def is_running(self):
-        """Retrieve state of threads running underlying program execution if there are some
+    def install_info(self):
+        """Describe information about the underlying program and how to install it in the system if not yet
 
         Returns:
-            running (bool): whether some threads instantiated from Module instance (underlying program execution)
-                            are yet running it
+             info(dict) : a dictionary structured like that (example for nmap) :
+                          {'program': "nmap",
+                           'version': "7.2",
+                           'install': {
+                                       'apt': "nmap",
+                                       'yum': "nmap",
+                                       'snap': "nmap",
+                                       }
+                           where program is the command to use in a terminal to call the program (likely in PATH)
+                           version is the program version for which the Module has been developed
+                           where keys in install are packages managers and values the name of the package in
+                           corresponding repositories
+                           Every field can be ignored, this method can return an empty dict
         """
-
+        pass

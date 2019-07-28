@@ -104,6 +104,15 @@ class PModFping(FacilityActiveModule):
                 hostname = split[0][1].split(' ')[0]
                 return ip, hostname, 'up'
 
+    def install_info(self):
+        return {'program': "fping", 'version': "3.13",
+                'install': {'apt': "fping",
+                            'yum': "fping",
+                            'dnf': "fping",
+                            'pacman': "fping"
+                            }
+                }
+
 
 if __name__ == '__main__':
     from time import sleep

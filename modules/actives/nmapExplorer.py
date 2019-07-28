@@ -125,6 +125,14 @@ class AModNmapExplorer(ActiveModule):
     def get_default_timer(self):
         return 60
 
+    def install_info(self):
+        return {'program': "nmap", 'version': "7.01",
+                'install': {'apt': "nmap",
+                            'yum': "nmap",
+                            'snap': "nmap"
+                            }
+                }
+
 
 if __name__ == '__main__':
     from src.logging.eventsCenter import *
