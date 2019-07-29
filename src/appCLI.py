@@ -87,7 +87,7 @@ class AppCLI(TimerInterface):
         self.cli.stop_parsing()
         self.timer.unsub(self)
         self.output.exit()
-        if not(oppose_to_saving) and self.save_on_exit:
+        if self.save_on_exit and not oppose_to_saving:
             self.save_app_state()
         self.core.quit()
 
@@ -132,9 +132,6 @@ class AppCLI(TimerInterface):
         self.save_routine(routine_path)
         self.save_netmap(netmap_path)
         self.save_coreconfig(config_path, routine_path, netmap_path)
-
-    def save_target(self, target, filepath):
-        pass
 
     # ----- Managing the view (other terminal, graphical text field, ..)
 

@@ -24,7 +24,7 @@
 
 - [OK] Restructure containers Panel & Queue with a superclass
 - [OK] Management of Independent Modules
-- Management of dependencies/requirements for underlying programs
+- [OK] Management of dependencies/requirements for underlying programs
 - Intermediate Tkinter interface for multifields forms
 !- New Modules !
 

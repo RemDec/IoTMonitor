@@ -95,10 +95,13 @@ def XML_to_netmap(netmap_elmt, event_center=None):
 def parse_netmap_XML(filepath=None, event_center=None):
     if filepath is None:
         filepath = get_dflt_entry('last_netmap')
-    with open(filepath, 'r') as f:
-        tree = etree.parse(f)
-        netmap = XML_to_netmap(tree.getroot().find('netmap'), event_center=event_center)
-        return netmap
+    try:
+        with open(filepath, 'r') as f:
+            tree = etree.parse(f)
+            netmap = XML_to_netmap(tree.getroot().find('netmap'), event_center=event_center)
+            return netmap
+    except etree.XMLSyntaxError:
+        return Netmap(event_center=event_center)
 
 
 if __name__ == '__main__':

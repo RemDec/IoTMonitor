@@ -78,12 +78,15 @@ def parse_routine_XML(filepath=None, resume_routine=False,
                       modmanager=Library(load_direct=True)):
     if filepath is None:
         filepath = get_dflt_entry('routines', suffix="last_routine.xml")
-    with open(filepath, 'r') as f:
-        tree = etree.parse(f)
-        routine = XML_to_routine(tree.getroot().find('routine'), timer=timer, netmap=netmap, modmanager=modmanager)
-        if resume_routine:
-            routine.resume()
-        return routine
+    try:
+        with open(filepath, 'r') as f:
+            tree = etree.parse(f)
+            routine = XML_to_routine(tree.getroot().find('routine'), timer=timer, netmap=netmap, modmanager=modmanager)
+            if resume_routine:
+                routine.resume()
+            return routine
+    except etree.XMLSyntaxError:
+        return Routine(timer=timer, netmap=netmap)
 
 
 if __name__ == '__main__':

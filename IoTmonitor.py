@@ -119,7 +119,7 @@ try:
     if args.interface == 'cli':
         if must_test_email:
             from smtplib import SMTPException
-            # Doesn't immediatly start parsing that is blocking
+            # Doesn't immediately start parsing that is blocking
             appcli = AppCLI(mode=args.mode, terminal=term_cmd, level=args.lvldisplay, start_parsing=False,
                             start_pull_output=False,
                             save_on_exit=auto_save, use_last_coreconfig=use_last_cfg, target_coreconfig=args.fileconfig,

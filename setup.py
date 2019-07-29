@@ -23,12 +23,13 @@ setup(name='IoTMonitor',
       packages=['src', 'modules'],
       install_requires=['PyYAML', 'lxml'])
 
-print("--- Project specific operations ---\n")
-print("  Be aware to install external dependencies with\n"
-      "sudo apt-get install python-yaml python3-lxml libxml2-dev libxslt1-dev xterm")
-print("  Underlying Modules programs (nmap for example) must be installed on this system")
-print("  Cleaning target files for auto-save purpose...")
+print("\n--- Project specific operations ---\n")
+print("  > Be aware to install external dependencies if autoinstall with 'develop' didn't work, use\n"
+      "sudo apt-get install python-yaml python3-lxml libxml2-dev libxslt1-dev xterm\n")
+print("  > Underlying Modules programs (nmap for example) must be installed on this system. Such programs\n"
+      "  referenced in the used Modules Library can be automatically installed using --installprogs flag\n"
+      "  at application call (IoTmonitor.py execution with python 3.7)(add -h flag to get help on it)\n")
+print("  > Cleaning target files for auto-save purpose...\n")
 clean()
-print("  Rewriting modules library based on programmatically defined default modules...")
-print("  Empty autosave files...")
+print("  > Rewriting modules library based on programmatically defined default modules...\n")
 rewrite()

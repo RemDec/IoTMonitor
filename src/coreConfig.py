@@ -54,7 +54,8 @@ class CoreConfig:
         if logger_setup is None:
             self.logger_setup = CustomLoggerSetup(cfg_file=self.paths['logger_setup'])
         elif isinstance(logger_setup, str):
-            self.paths['logger_setup'] = self.filemanager.complete_path('configs', logger_setup)
+            self.paths['logger_setup'] = self.filemanager.complete_path('configs', logger_setup,
+                                                                        dflt_ifnonexist=self.paths['logger_setup'])
             self.logger_setup = CustomLoggerSetup(cfg_file=self.paths['logger_setup'])
         elif isinstance(CustomLoggerSetup, logger_setup):
             self.logger_setup = logger_setup
@@ -79,7 +80,8 @@ class CoreConfig:
         if modmanager is None:
             self.modmanager = Library(modlib_file=self.paths['library'], load_direct=True)
         elif isinstance(modmanager, str):
-            self.paths['library'] = self.filemanager.complete_path('configs', modmanager)
+            self.paths['library'] = self.filemanager.complete_path('configs', modmanager,
+                                                                   dflt_ifnonexist=self.paths['library'])
             self.modmanager = Library(modlib_file=self.paths['library'], load_direct=True)
         elif isinstance(modmanager, Library):
             self.modmanager = modmanager
@@ -99,7 +101,8 @@ class CoreConfig:
             self.netmap = Netmap(event_center=self.event_center)
         elif isinstance(netmap, str):
             from src.parsers.netmapParser import parse_netmap_XML
-            self.paths['netmap'] = self.filemanager.complete_path('netmaps', netmap)
+            self.paths['netmap'] = self.filemanager.complete_path('netmaps', netmap,
+                                                                  dflt_ifnonexist=self.paths['netmap'])
             self.netmap = parse_netmap_XML(filepath=self.paths['netmap'], event_center=self.event_center)
         elif isinstance(netmap, Netmap):
             self.netmap = netmap
@@ -111,7 +114,8 @@ class CoreConfig:
             self.routine = Routine(timer=self.timer, netmap=self.netmap)
         elif isinstance(routine, str):
             from src.parsers.routineParser import parse_routine_XML
-            self.paths['routine'] = self.filemanager.complete_path('routines', routine)
+            self.paths['routine'] = self.filemanager.complete_path('routines', routine,
+                                                                   dflt_ifnonexist=self.paths['routine'])
             self.routine = parse_routine_XML(filepath=self.paths['routine'], timer=self.timer, netmap=self.netmap,
                                              modmanager=self.modmanager)
         elif isinstance(routine, Routine):
@@ -126,7 +130,7 @@ class CoreConfig:
     def check_file_tree(self, filemanager=None):
         if filemanager is None:
             filemanager = FilesManager()
-        return filemanager
+        return filemanager.check_all_files()
 
     def str_current_paths(self, prefix=""):
         s = ""
