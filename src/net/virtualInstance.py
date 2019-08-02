@@ -1,9 +1,29 @@
 from src.utils.misc_fcts import str_lines_frame
-
+from src.parsers.ipOutputParser import IPv4_addr
+import re
 
 div_fields = {'manufacturer': "",
               'model': "", 'firmware': ""
               }
+
+
+re_MAC = r'([\dA-F]{2}(?:[-:][\dA-F]{2}){5})'
+re_IPv4 = IPv4_addr
+
+
+class FieldFormatError(Exception):
+
+    def __init__(self, field, corr_format):
+        super().__init__(f"Wrong format for field {field} that accepts only values given by {corr_format}")
+
+
+def assess_formats(fields):
+    if fields.get('mac') is not None:
+        if re.match(re_MAC, fields['mac']) is None:
+            raise FieldFormatError('MAC address', 'Regex :' + re_MAC)
+    if fields.get('ip') is not None:
+        if re.match(re_IPv4, fields['ip']) is None:
+            raise FieldFormatError('IP address', 'Regex :' + re_IPv4)
 
 
 class VirtualInstance:
@@ -21,6 +41,7 @@ class VirtualInstance:
     """
 
     def __init__(self, mac=None, ip=None, hostname=None, div=None, ports=None, user_created=False):
+        assess_formats({'mac': mac, 'ip': ip})
         self.mac = mac
         self.ip = ip
         self.hostname = hostname
@@ -48,6 +69,7 @@ class VirtualInstance:
         Returns:
             changed(bool): whether one field took the corresponding given value
         """
+        assess_formats({'mac': mac, 'ip': ip})
         changed = False
         if mac is not None and mac != self.mac:
             if self.mac is None or not self.user_created:
@@ -79,6 +101,7 @@ class VirtualInstance:
         Returns:
             changed(bool): whether one field took the corresponding given value
         """
+        assess_formats(fields_dict)
         given_div = dict([(key, val) for key, val in fields_dict.items() if key not in ['mac', 'ip', 'hostname']])
         return self.complete_fields(mac=fields_dict.get('mac'), ip=fields_dict.get('ip'),
                                     hostname=fields_dict.get('hostname'), div=given_div)
@@ -139,7 +162,7 @@ class VirtualInstance:
             return self.mac == mac
         elif ip is not None and self.ip is not None:
             if self.ip == ip:
-                if hostname is not None:
+                if hostname is not None and self.hostname is not None:
                     return self.hostname == hostname
                 return True
         elif hostname is not None and self.hostname is not None:

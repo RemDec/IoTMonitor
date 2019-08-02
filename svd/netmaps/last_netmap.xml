@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='ASCII'?>
+<xmlsave>
+  <netmap>
+    <instances>
+      <virtinst mapid="device0" usercreated="True">
+        <mainfields mac="12:11:11:00:11:EE"/>
+        <divfields firmware="lol" fiek="sre" oui="mp"/>
+        <portstable/>
+      </virtinst>
+      <virtinst mapid="device1" usercreated="True">
+        <mainfields/>
+        <divfields o="e"/>
+        <portstable>
+          <port portnum="87">
+            <maininfos service="unknown" protocol="unknown" state="unknown"/>
+            <divportinfos/>
+          </port>
+        </portstable>
+      </virtinst>
+    </instances>
+    <savedevents/>
+  </netmap>
+</xmlsave>

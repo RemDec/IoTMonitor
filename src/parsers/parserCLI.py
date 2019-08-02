@@ -388,29 +388,49 @@ class CLIparser:
                 self.back_main_menu()
 
     def after_create_vi_slct(self, preset):
-        if preset in ['basic', 'scratch']:
-            mac = self.get_user_in_or_dflt(default=None, marker="[MAC address]: ")
-            ip = self.get_user_in_or_dflt(default=None, marker="[IP address]: ")
-            hostname = self.get_user_in_or_dflt(default=None, marker="[hostname]: ")
-            vi = VirtualInstance(mac=mac, ip=ip, hostname=hostname, user_created=True)
-            if preset == 'scratch':
-                print("Add known port infos entries")
-                port = self.get_user_in_or_dflt(default=None, marker="[used port]: ")
-                while port is not None:
-                    vi.get_ports_table().set_port(int(port))
-                    port = self.get_user_in_or_dflt(default=None, marker="[used port]: ")
-                print("Additional divers fields")
-                for field in vi.unused_div_fields():
-                    field_val = self.get_user_in_or_dflt(default=None, marker=f"[{field}]: ")
-                    if field_val is not None:
-                        vi.add_divinfo(field, field_val)
+        from src.net.virtualInstance import assess_formats, FieldFormatError
+        main_fields = dict.fromkeys(['mac', 'ip', 'hostname'])
+        while True:
+            try:
+                main_fields['mac'] = self.get_user_in_or_dflt(default=main_fields['mac'],
+                                                              marker=f"[MAC address (current {main_fields['mac']})]: ")
+                main_fields['ip'] = self.get_user_in_or_dflt(default=main_fields['ip'],
+                                                             marker=f"[IP address (current {main_fields['ip']})]: ")
+                main_fields['hostname'] = self.get_user_in_or_dflt(default=main_fields['hostname'],
+                                                                   marker=f"[hostname (current {main_fields['hostname']})]: ")
+                vi = VirtualInstance(mac=main_fields['mac'], ip=main_fields['ip'],
+                                     hostname=main_fields['hostname'], user_created=True)
+                break
+            except FieldFormatError as e:
+                print(e)
+        if preset == 'scratch':
+            print("Additional diverse fields")
+            for field in vi.unused_div_fields():
+                field_val = self.get_user_in_or_dflt(default=None, marker=f"[{field}]: ")
+                if field_val is not None:
+                    vi.add_divinfo(field, field_val)
+            while True:
+                name = self.get_user_in_or_dflt(default=None, marker="New field name or enter to pass : ")
+                if name is None:
+                    break
+                value = self.get_user_in_or_dflt(default="", marker=f"[{name}] : ")
+                if value != "":
+                    vi.add_divinfo(name, value)
+            print("Add known port infos entries")
+            port = self.get_user_in_or_dflt(default=None, marker="[used port nbr]: ")
+            while port is not None:
+                vi.get_ports_table().set_port(int(port), {})
+                port = self.get_user_in_or_dflt(default=None, marker="[used port nbr]: ")
+
         mapid = self.get_user_in_or_dflt(default=None, marker="[map id?]: ")
         print(vi.detail_str(level=2))
-        if self.get_user_confirm(f"Confirm [{mapid}] adding to netmap ? (Y/n)"):
+        if self.get_user_confirm(f"Confirm adding to netmap (given mapid:{mapid}) ? (Y/n)"):
+            log_feedback_available(f"Finished VI creation from {preset} preset, adding it into Netmap")
             self.core.add_to_netmap(vi, mapid)
         self.back_main_menu()
 
     def after_edit_vi_slct(self, mapid):
+        from src.net.virtualInstance import FieldFormatError
         vi = self.core.get_from_netmap(mapid)
         take_field = True
         while take_field:
@@ -427,10 +447,13 @@ class CLIparser:
                 if field not in (list(main_fields.keys()) + list(div_fields.keys())):
                     marker = f"Value for new field [{field}] :"
                 new_val = self.get_user_in_or_dflt(default=None, marker=marker)
-                if new_val is not None:
-                    vi.complete_fields_from_dict({field: new_val.strip()})
-                    log_feedback_available(f"Netmap : editing VI field {field} with new value {new_val}")
-                self.clear_console()
+                try:
+                    if new_val is not None:
+                            vi.complete_fields_from_dict({field: new_val.strip()})
+                            log_feedback_available(f"Netmap : editing VI field {field} with new value {new_val}")
+                    self.clear_console()
+                except FieldFormatError as e:
+                    print(e, "\n")
             else:
                 take_field = False
         self.back_main_menu()

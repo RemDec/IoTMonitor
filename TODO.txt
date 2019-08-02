@@ -17,10 +17,9 @@
 - NMap parsing errors
 - Bug save config doesn't reference current file desc previously redefined?
 - State of VI through time
-- Strict format for VI fields
+- [OK] Strict format for VI fields
 - Bug autocompletion
 - DOC
-- DTDs
 
 - [OK] Restructure containers Panel & Queue with a superclass
 - [OK] Management of Independent Modules
