@@ -346,6 +346,17 @@ class CLIparser:
                 else:
                     input_params[code_param] = user_in
             mod_inst = self.core.instantiate_module(mod_id, curr_params=input_params)
+        # Check if Module underlying program is available
+        if not is_module_callable(mod_inst):
+            m = "The underlying Module program was determined as not installed/callable on this system, cancel this\n" \
+                "instantiation (try to run the app with --installprogs) (Y/n) ? "
+            cancel = self.get_user_confirm(marker=m)
+            if cancel:
+                self.back_main_menu()
+                return
+            log_feedback_available(f"Module [{mod_inst.get_module_id()}] will be instantiated but underlying program"
+                                   f" {mod_inst.get_cmd()} is not installed/callable on this system",
+                                   logitin='error', lvl=50)
         # Taking VIs mapids the mod exec will be relative to
         marker = f"\nIndicate specific VIs the [{mod_id}] execution should be relative to (y/N) ?"
         take_vi = self.get_user_confirm(marker=marker, empty_ok=False)
@@ -374,6 +385,7 @@ class CLIparser:
         except ValueError:
             print("Incorrect format for given timer (should be integer > 0) -> use default one")
             timer = 0
+        # Determine where the Module instance will go
         in_rout = self.get_user_confirm(f"[{mod_id}] append it in routine (Y/n) ?")
         if in_rout:
             setid = self.get_user_in_or_dflt(None, marker="\nGive a setid if desired (alphanumeric)\n[setid] :")
@@ -386,10 +398,6 @@ class CLIparser:
             back_main = self.get_user_confirm("Back main menu (Y/n) ?")
             if back_main:
                 self.back_main_menu()
-        if not is_module_callable(mod_inst):
-            log_feedback_available(f"Module [{mod_inst.get_module_id()}] instantiated but underlying program"
-                                   f" {mod_inst.get_cmd()} is not installed/callable on this system",
-                                   logitin='error', lvl=50)
 
     def after_create_vi_slct(self, preset):
         from src.net.virtualInstance import assess_formats, FieldFormatError
