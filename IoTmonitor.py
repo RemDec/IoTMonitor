@@ -67,7 +67,7 @@ parser.add_argument("-nal", "--noautoload", action="store_true",
 parser.add_argument("-cln", "--cleanlast", action="store_true",
                     help="clean files resulted from autosave of last app elements state at exiting (/svd/*/last_*)")
 
-parser.add_argument("-lvl", "--lvldisplay", type=int, choices=range(0, 10), default=1,
+parser.add_argument("-lvl", "--lvldisplay", type=int, choices=range(0, 10), default=3,
                     help="initial informations display level in app (mutable later by interface)"),
 parser.add_argument("--mail", help="Email to use for threat alerts, prior to which defined in config file if exists")
 

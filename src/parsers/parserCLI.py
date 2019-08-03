@@ -1,6 +1,6 @@
 from src.appcore import *
 from src.net.virtualInstance import *
-from src.utils.misc_fcts import str_lines_frame, pretty_str_curr_param, get_sep_modparams
+from src.utils.misc_fcts import str_lines_frame, pretty_str_curr_param, get_sep_modparams, is_module_callable
 from src.parsers.parserCLI_helper import get_res_CLI
 import readline
 import os
@@ -386,6 +386,10 @@ class CLIparser:
             back_main = self.get_user_confirm("Back main menu (Y/n) ?")
             if back_main:
                 self.back_main_menu()
+        if not is_module_callable(mod_inst):
+            log_feedback_available(f"Module [{mod_inst.get_module_id()}] instantiated but underlying program"
+                                   f" {mod_inst.get_cmd()} is not installed/callable on this system",
+                                   logitin='error', lvl=50)
 
     def after_create_vi_slct(self, preset):
         from src.net.virtualInstance import assess_formats, FieldFormatError

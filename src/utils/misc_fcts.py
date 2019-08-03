@@ -92,6 +92,16 @@ def is_program_callable(prog):
     return os.access(prog, os.F_OK or os.X_OK)
 
 
+def is_module_callable(mod_inst):
+    """Check whether the underlying program of a Module is usable, so that it can be launched from an instance"""
+    install_info = mod_inst.install_info()
+    if isinstance(install_info, dict):
+        prog = mod_inst.install_info().get('program')
+        if prog and not is_program_callable(prog):
+            return False
+    return True
+
+
 class NonExecutableError(Exception):
 
     def __init__(self, tried_prog_call):
