@@ -139,17 +139,22 @@ class AppCLI(TimerInterface):
         return mode if mode in cli_modes else cli_modes[2]
 
     def config_output(self, terminal=None):
-        if isinstance(self.mode, int):
-            ind = min(max(self.mode, 0), len(cli_modes))
-            self.mode = cli_modes[ind]
-        if self.mode == 'noout':
+        try:
+            if isinstance(self.mode, int):
+                ind = min(max(self.mode, 0), len(cli_modes))
+                self.mode = cli_modes[ind]
+            if self.mode == 'noout':
+                return NoOutput()
+            elif self.mode == 'outpiped':
+                return PipeOutput()
+            elif self.mode == 'outscreen':
+                return ConsoleOutput(terminal)
+            elif self.mode == 'tkinter':
+                return TkinterOutput(self)
+        except Exception as e:
+            log_feedback_available(f"An exception occurred during View initialisation, setting it to No Output for "
+                                   f"application launching :\n{e}", logitin='error', lvl=50)
             return NoOutput()
-        elif self.mode == 'outpiped':
-            return PipeOutput()
-        elif self.mode == 'outscreen':
-            return ConsoleOutput(terminal)
-        elif self.mode == 'tkinter':
-            return TkinterOutput(self)
 
     def start_display_output(self):
         self.output.start_reading()
@@ -298,12 +303,24 @@ class ConsoleOutput(BaseOutput):
 
     def __init__(self, terminal=None):
         super().__init__()
-        from src.utils.misc_fcts import verify_program
+        from src.utils.misc_fcts import verify_program, is_program_callable, NonExecutableError
         self.PIPE_PATH = "/tmp/output_monitor"
         self.popen = None
         self.terminal_key = 'xterm' if terminal is None else terminal
-        self.terminal_cmd = terms.get(self.terminal_key, [self.terminal_key])
-        verify_program(self.terminal_cmd[0])
+        # Recuperate already defined CLI terminal call in term dict, if not present use terminal name passed as callword
+        self.terminal_cmd = terms.get(self.terminal_key, [self.terminal_key, '-e'])
+        try:
+            verify_program(self.terminal_cmd[0])
+        except NonExecutableError as e:
+            log_feedback_available(str(e), logitin='error', lvl=50)
+            for term_key, term_cmd in terms.items():
+                if is_program_callable(term_cmd[0]):
+                    log_feedback_available(f"Use another terminal '{term_cmd[0]}' because given one"
+                                           f" '{self.terminal_cmd[0]}' is not installed on the system")
+                    self.terminal_key = term_key
+                    self.terminal_cmd = term_cmd
+                    return
+            raise NonExecutableError(self.terminal_cmd[0])
 
     def write(self, to_output):
         # Write where this object want to bufferise the information to display
@@ -329,7 +346,7 @@ class ConsoleOutput(BaseOutput):
             self.popen.terminate()
             if self.popen.poll() is None:
                 self.popen.kill()
-        log_feedback_available(f"ConsoleOutput : killing the terminal process ({self.terminal_cmd}) that was watching"
+        log_feedback_available(f"ConsoleOutput : killing the terminal process ({self.terminal_cmd}) that was watching\n"
                                f"pipe {self.PIPE_PATH}")
 
     def __str__(self):

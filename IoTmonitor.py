@@ -64,7 +64,7 @@ parser.add_argument("-nas", "--noautosave", help="disable current app state bein
                     action="store_true")
 parser.add_argument("-nal", "--noautoload", action="store_true",
                     help="disable auto loading of last config and app elements autosaved when exiting")
-parser.add_argument("-clean", "--cleanlast", action="store_true",
+parser.add_argument("-cln", "--cleanlast", action="store_true",
                     help="clean files resulted from autosave of last app elements state at exiting (/svd/*/last_*)")
 
 parser.add_argument("-lvl", "--lvldisplay", type=int, choices=range(0, 10), default=1,
@@ -140,7 +140,7 @@ try:
     else:
         print("Only CLI interface is implemented ATM, please use argument -i cli or none")
 except Exception as e:
-    print("An unexpected exception occurred, try to run the app with -clean and check the parameters you gave are\n"
+    print("An unexpected exception occurred, try to run the app with --clean and check the parameters you gave are\n"
           "correct following --help description. Also ensure paths present in superconfig file (default\n"
           "svd/configs/last_coreconfig.yaml) are correct.\nPlease report traceback :\n")
     raise e

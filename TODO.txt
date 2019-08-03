@@ -14,11 +14,11 @@
 - [OK] Edit active mod entry timer set current exp timer not exp timer init value
 - [OK] Make uniform methods/attributes/notions in code
 - [OK] Sorting VI depending their state
+- [OK] Bug autocompletion
+- [OK] Strict format for VI fields
 - NMap parsing errors
 - Bug save config doesn't reference current file desc previously redefined?
 - State of VI through time
-- [OK] Strict format for VI fields
-- Bug autocompletion
 - DOC
 
 - [OK] Restructure containers Panel & Queue with a superclass
