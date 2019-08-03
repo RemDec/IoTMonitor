@@ -325,6 +325,7 @@ class ModDescriptor:
     # ----- To module instance -----
 
     def get_mod_instance(self, default_params=True, timer=None, netmap=None):
+        from src.utils.misc_fcts import is_program_callable
         from importlib import import_module
         modclass = getattr(import_module(self.pymod), self.pyclass)
         mod_inst = modclass(netmap=netmap) if self.m_active else modclass(timer=timer, netmap=netmap)
@@ -333,6 +334,11 @@ class ModDescriptor:
         mod_inst.set_params(self.curr_params)
         if not self.m_active:
             mod_inst.set_read_interval(self.def_timer)
+        if isinstance(mod_inst.install_info(), dict):
+            prog = mod_inst.install_info().get('program')
+            if prog and not is_program_callable(prog):
+                log_feedback_available(f"[{self.m_id}] Module instantiated but underlying program {prog} is not "
+                                       f"installed/callable on this system", logitin='error', lvl=50)
         return mod_inst
 
     # ----- Misc -----
