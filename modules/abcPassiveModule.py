@@ -292,7 +292,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
                 if thread.is_alive():
                     remaining = True
         if remaining:
-            logging.getLogger("debug").warning("Warning dumb thread alive after interrupt->join", self.decr_threads)
+            logging.getLogger("debug").warning("Dumb thread alive after join() call in interrupt procedure")
         self.decr_threads = []
 
     def __str__(self):

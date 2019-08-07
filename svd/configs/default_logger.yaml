@@ -5,6 +5,9 @@ formatters:
   short:
     format: '%(asctime)s,%(msecs)03d [%(name)s]:%(message)s'
     datefmt: '%H:%M:%S'
+  discover:
+    format: '%(created)f %(message)s'
+    datefmt: '%H:%M:%S'
 handlers:
   console:
     class: logging.StreamHandler
@@ -40,6 +43,14 @@ handlers:
       - support_team@domain.tld
       - dev_team@domain.tld
     subject: Houston, we have a problem.
+  discovfile:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: discover
+    filename: logs/discoverhosts.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 2
+    encoding: utf8
 loggers:
   debug:
     level: DEBUG
@@ -72,6 +83,10 @@ loggers:
   mail:
     level: DEBUG
     handlers: []
+    propagate: no
+  discover:
+    level: DEBUG
+    handlers: [discovfile]
     propagate: no
 
 root:

@@ -9,6 +9,8 @@ class Feedback:
         self.nbr_to_pass = nbr_pass
 
     def feed(self, feed_string):
+        if not isinstance(feed_string, str):
+            feed_string = str(feed_string)
         split_lines = feed_string.split('\n')
         if len(self) + len(split_lines) <= MAX_FEEDBACK_QSIZE:
             self.feedqueue.extend(split_lines)

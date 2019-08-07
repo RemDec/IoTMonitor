@@ -296,7 +296,7 @@ class Core:
             s += f"{self.routine.detail_str(level=3)}"
             s += f" ||\n ++------- NETMAP -------\n"
             vi_per_line = 4 if level < 8 else 5
-            s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=vi_per_line, max_char_per_vi=37)}"
+            s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=vi_per_line, max_char_per_vi=35)}"
         return s
 
     def __str__(self):

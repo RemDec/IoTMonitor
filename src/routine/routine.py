@@ -63,6 +63,7 @@ class Routine:
     def clear(self):
         self.panel.clear()
         self.queue.clear()
+        self.correct_state()
 
     # --- Execution state related methods ---
 

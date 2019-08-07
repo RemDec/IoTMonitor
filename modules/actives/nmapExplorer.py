@@ -22,10 +22,11 @@ class AModNmapExplorer(ActiveModule):
         self.m_id = "nmapexplo"
         self.CMD = "nmap -sn"
         subnetwork = get_ip(mask='24')
-        self.PARAMS = {"options": ("", False, ""),
+        self.PARAMS = {
                        "SYNports": ("21,22,23,80,443,3389", True, "-PS"),
                        "UDPports": ("53,135,137,161", True, "-PU"),
                        "XMLfile": ("/tmp/nmapexplo.xml", True, "-oX "),
+                       "options": ("", False, ""),
                        "IP": (subnetwork, True, "")
                        }
         self.desc_PARAMS = desc_PARAMS
@@ -71,6 +72,8 @@ class AModNmapExplorer(ActiveModule):
                     self.netmap.register_modif('VI ' + mapid, elmt_id=mapid, modificator=self.m_id,
                                                old_state='Non-existing VI', new_state='New VI instance',
                                                logit_with_lvl=20)
+                    import logging
+                    logging.getLogger('discover').info(ip)
                 else:
                     vi = self.netmap.get_vi(mapid)
                     vi.set_state(state)

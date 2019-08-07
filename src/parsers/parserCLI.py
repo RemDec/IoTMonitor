@@ -341,9 +341,8 @@ class CLIparser:
                 header = f"Parameter {code_param} ({perm}, {flag}) : {desc}"
                 marker = f"[default:{dflt if dflt != '' else '<empty>'}] :"
                 user_in = input(f"{header}\n{marker}")
-                if user_in == "":
-                    input_params[code_param] = dflt
-                else:
+                if user_in != "":
+                    # If empty, default value will automatically be set for mandatory parameters using the scheme
                     input_params[code_param] = user_in
             mod_inst = self.core.instantiate_module(mod_id, curr_params=input_params)
         # Check if Module underlying program is available

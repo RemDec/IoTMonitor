@@ -38,7 +38,7 @@ class PModFping(FacilityActiveModule):
         ip_str = ''
         if self.params.get('indivIP') is not None:
             ip_str += self.params.get('indivIP')
-        if rel_to_vi is not None and self.netmap is not None:
+        if len(rel_to_vi) > 0 and self.netmap is not None:
             ip_str += ' '.join(self.netmap.get_IPs_from_mapids(rel_to_vi))
         if len(ip_str) == 0:
             # No specific IP given, use whole subnetwork
@@ -69,6 +69,8 @@ class PModFping(FacilityActiveModule):
                                                           ip=ip, hostname=hostname)
                         vi.set_state(state)
                         modified.append(mapid)
+                        import logging
+                        logging.getLogger('discover').info(ip)
                 else:
                     vi = self.netmap.get_vi(mapid)
                     old_state = vi.state

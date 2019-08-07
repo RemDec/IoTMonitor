@@ -18,6 +18,7 @@ class Panel(ModContainer):
     def clear(self):
         self.pause(kill_thmods=True)
         self.set = []
+        self.is_running = False
 
     def get_mod_entry(self, mod_inst, setid=None):
         # return a PanelEntry with adapted pid (no duplicate)
