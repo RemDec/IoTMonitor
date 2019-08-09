@@ -82,9 +82,9 @@
     <passmod modid="fping" cmd="fping -l -A -d" pymod="modules.passives.fpingNetwork" pyclass="PModFping">
       <desc>[fping] Module looping pinging multiple hosts in the network, determining their state/reachability</desc>
       <defparams>
-        <param code="period" mandatory="True" default="30000" prefix="-p ">time (ms) between reping each individual host</param>
+        <param code="period" mandatory="True" default="3000" prefix="-p ">time (ms) between reping each individual host</param>
         <param code="interval" mandatory="True" default="10" prefix="-i ">time (ms) between different host pings</param>
-        <param code="retry" mandatory="True" default="1" prefix="-r ">number of retries for each host</param>
+        <param code="retry" mandatory="True" default="2" prefix="-r ">number of retries for each host</param>
         <param code="netIP" mandatory="True" default="192.168.1.36/24" prefix="-g ">entire network in which all hosts will be pinged</param>
         <param code="indivIP" mandatory="False" default="192.168.1.36" prefix="">specific IP(s) to target given one per one (overwrite netIP ones)</param>
       </defparams>

@@ -64,11 +64,15 @@ class FilesManager:
             if dirpath is not None:
                 return str(root / dirpath)
 
-    def complete_path(self, prefix, filename, dflt_ifnonexist=None):
+    def complete_path(self, prefix, filename, dflt_ifnonexist='given'):
         if Path(filename).is_absolute():
+            if dflt_ifnonexist == 'given':
+                return filename
             return filename if self.check_file(filename) else dflt_ifnonexist
         dirpath = self.get_res_path(prefix)
         filepath = str(Path(dirpath) / filename)
+        if dflt_ifnonexist == 'given':
+            return filepath
         return filepath if self.check_file(filepath) else dflt_ifnonexist
 
     def check_file(self, path):

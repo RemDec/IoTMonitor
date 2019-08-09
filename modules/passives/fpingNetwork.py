@@ -7,7 +7,7 @@ import re
 class PModFping(FacilityActiveModule):
 
     def __init__(self, params=None, timer=None, netmap=None):
-        super().__init__(read_interval=35, params=params, timer=timer, netmap=netmap)
+        super().__init__(read_interval=10, params=params, timer=timer, netmap=netmap)
 
     def get_module_id(self):
         return "fping"
@@ -20,9 +20,9 @@ class PModFping(FacilityActiveModule):
         return f"fping -l -A -d"
 
     def get_scheme_params(self):
-        return {'period': ('30000', True, '-p '),
+        return {'period': ('3000', True, '-p '),
                 'interval': ('10', True, '-i '),
-                'retry': ('1', True, '-r '),
+                'retry': ('2', True, '-r '),
                 'netIP': (get_ip(mask='24'), True, '-g '),
                 'indivIP': (get_ip(), False, '')}
 
@@ -50,6 +50,8 @@ class PModFping(FacilityActiveModule):
         return cmd + ' ' + ip_str
 
     def parse_output(self, output, rel_to_vi=[]):
+        import logging
+        logging.getLogger('discover').info("call")
         if self.netmap is None:
             return
         str_out = output.decode()
@@ -69,7 +71,6 @@ class PModFping(FacilityActiveModule):
                                                           ip=ip, hostname=hostname)
                         vi.set_state(state)
                         modified.append(mapid)
-                        import logging
                         logging.getLogger('discover').info(ip)
                 else:
                     vi = self.netmap.get_vi(mapid)

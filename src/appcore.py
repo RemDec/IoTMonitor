@@ -131,7 +131,7 @@ class Core:
         return self.routine.rename_module(oldsetid, newsetid)
 
     def clear_routine(self):
-        log_feedback_available(f"Routine : clearing both sets")
+        log_feedback_available(f"Routine : clearing both sets, killing running programs")
         self.routine.clear()
 
     def pause(self):

@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='ASCII'?>
+<xmlsave>
+  <routine running="False">
+    <queue running="False" nbr_mods="0"/>
+    <panel running="False" nbr_mods="1">
+      <modconfig modid="fping" setid="fping" timer="10">
+        <savedparams>
+          <param code="period" value="3000"/>
+          <param code="interval" value="10"/>
+          <param code="retry" value="2"/>
+          <param code="netIP" value="192.168.56.100 192.168.56.255"/>
+        </savedparams>
+      </modconfig>
+    </panel>
+  </routine>
+</xmlsave>
