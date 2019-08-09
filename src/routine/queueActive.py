@@ -123,11 +123,8 @@ class QueueEntry(Entry):
         elif level == 2:
             return s + f"\n{self.get_mod_inst().str_summary()}"
         elif level == 3:
-            if len(self.rel_to_vi) == 0:
-                vistr = "Not specific VI relative"
-            else:
-                vistr = "VIs: " + ','.join(self.rel_to_vi)
-            return s + f"\n{self.get_mod_inst().str_summary()}\n{vistr[:40]}"
+            modifs, threats = self.module.get_nbr_events()
+            return s + f"\n{self.get_mod_inst().str_summary()}\n      {threats} /!\\   {modifs} -o-"
         elif level == 4:
             if len(self.rel_to_vi) == 0:
                 vistr = "Not specific VI relative"

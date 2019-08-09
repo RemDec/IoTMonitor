@@ -30,7 +30,7 @@
       <desc>[nmapports] Nmap scan focusing on used ports discovery, attempting on a nbr of top most common ports</desc>
       <defparams>
         <param code="nbrports" mandatory="True" default="50" prefix="--top-ports ">How many of top most used ports should be probed</param>
-        <param code="version" mandatory="True" default="false" prefix="-sV">Should try to guess running version of services (heavy in time)</param>
+        <param code="version" mandatory="True" default="false" prefix="-sV">Should try to guess running version of services (heavy in time): true or false</param>
         <param code="XMLfile" mandatory="True" default="/tmp/nmap_portdisc.xml" prefix="-oX ">The temp file where scan output will be written</param>
         <param code="options" mandatory="False" default="" prefix="">Others options to pass to nmap scan</param>
         <param code="IP" mandatory="True" default="192.168.1.36/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>

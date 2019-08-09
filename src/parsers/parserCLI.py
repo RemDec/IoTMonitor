@@ -513,7 +513,7 @@ class CLIparser:
         # Timer
         is_mod_act = modinst.is_active()
         timer_name = f"{'queue expiration' if is_mod_act else 'reading'} interval timer"
-        dflt_val = modinst.get_default_timer() if is_mod_act else modinst.get_read_interval()
+        dflt_val = modentry.init_timer if is_mod_act else modinst.get_read_interval()
         marker = f"Set {timer_name} if desired (numeric) or enter to pass\n[default:{dflt_val}] :"
         input_timer = self.get_user_in_or_dflt(str(dflt_val), marker=marker).strip()
         try:
@@ -522,6 +522,7 @@ class CLIparser:
                 modentry.reset_timer(timer)
             else:
                 modinst.set_read_interval(timer)
+            self.core.routine.queue.reorganize()
         except ValueError:
             # arrives here if enter was pressed to pass or wrong input format
             if input_timer != '':
@@ -723,20 +724,20 @@ class CLIparser:
                        'dflt_choice': 'module',
                        'fct_choice': self.transit_menu}
 
-        self.edit = {'desc': "Edit an application element on the fly",
+        self.edit = {'desc': "Edit an application element on the fly, in the Routine or the Netmap",
                      'help': get_res_CLI('edit_help'),
-                     'choices': {'vi field': 'editVI', 'module entry (routine)': "editMod"},
+                     'choices': {'vi field': 'editVI', 'module entry': "editMod"},
                      'fct_choice': self.transit_menu}
 
         self.rename = {'desc': "Rename an application element (changing its unique id)",
                        'help': get_res_CLI('rename_help'),
-                       'choices': {'Virtual Instance (netmap)': "renameVI",
-                                   'Module Entry (routine)': "renameMod"},
+                       'choices': {'virtual instance': "renameVI",
+                                   'module entry': "renameMod"},
                        'fct_choice': self.transit_menu}
 
         self.remove = {'desc': "Remove an existing object in the app",
                        'help': get_res_CLI('remove_help'),
-                       'choices': {'module': "delMod",
+                       'choices': {'module entry': "delMod",
                                    'independent module': "delIndepMod",
                                    'virtual instance': "delVI"},
                        'dflt_choice': 'module',

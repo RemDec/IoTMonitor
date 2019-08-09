@@ -262,9 +262,9 @@ class Core:
                 s += last_feedback + '_' * 100 + '\n\n'
             s += header
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
-            s += f" || Routine independent modules :\n || {indeps}\n"
+            s += f" || Routine independent Modules : {indeps}\n"
             s += f" ++------- ROUTINE -------"
-            s += f"{self.routine.detail_str(level=1)}"
+            s += f"{self.routine.detail_str(level=level)}"
             s += f" ||\n ++------- NETMAP  -------\n"
             s += f"{self.netmap.vi_frames()}"
         elif level < 5:
@@ -275,11 +275,26 @@ class Core:
             s += f" || Core config file : {self.coreconfig.get_cfg_file()}\n"
             s += f" || {self.logger_setup.email_str()}\n"
             s += f" || Available modules : {','.join(actives)} | {','.join(passives)}\n"
-            s += f" || Routine independent modules :\n ||  {indeps}\n"
+            s += f" || Routine independent Modules : {indeps}\n"
             s += f" ||\n ++------- ROUTINE -------"
             s += f"{self.routine.detail_str(level=level)}"
             s += f" ||\n ++------- NETMAP  -------\n"
             s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=4)}"
+        elif level < 8:
+            last_feedback = self.get_event_center().pull_feedback(nbr_lines=min(5, level))
+            if last_feedback.strip() != '':
+                s += last_feedback + '_'*50 + "^^^ FEEDBACK BAR ^^^" + '_'*50 + '\n\n'
+            s += header
+            s += f" || Core config file : {self.coreconfig.get_cfg_file()}\n"
+            s += f" || {self.logger_setup.email_str()}\n"
+            s += f" || Available AModules : {', '.join(actives)}\n"
+            s += f" || Available PModules : {', '.join(passives)}\n"
+            s += f" || Routine independent Modules :\n || {indeps}\n"
+            s += f" ++------- ROUTINE -------"
+            s += f"{self.routine.detail_str(level=4)}"
+            s += f" ||\n ++------- NETMAP -------\n"
+            vi_per_line = 4 if level < 8 else 5
+            s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=vi_per_line, max_char_per_vi=35)}"
         else:
             last_feedback = self.get_event_center().pull_feedback(nbr_lines=min(5, level))
             if last_feedback.strip() != '':
@@ -293,10 +308,10 @@ class Core:
             s += f" || Available PModules : {', '.join(passives)}\n"
             s += f" || Routine independent modules :\n || {indeps}\n"
             s += f" ++------- ROUTINE -------"
-            s += f"{self.routine.detail_str(level=3)}"
+            s += f"{self.routine.detail_str(level=4)}"
             s += f" ||\n ++------- NETMAP -------\n"
-            vi_per_line = 4 if level < 8 else 5
-            s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=vi_per_line, max_char_per_vi=35)}"
+            vi_per_line = 4 if level < 9 else 5
+            s += f"{self.netmap.detail_str(level=2, vi_by_pack_of=vi_per_line, max_char_per_vi=37)}"
         return s
 
     def __str__(self):

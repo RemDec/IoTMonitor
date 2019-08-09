@@ -17,6 +17,9 @@
 - [OK] Bug autocompletion
 - [OK] Strict format for VI fields
 - [OK] DOC
+- Enter to pass mapid choice
+- Handle $ in predefined input fcts
+- Verify lxterm compatibility
 - NMap parsing errors
 - State of VI through time
 

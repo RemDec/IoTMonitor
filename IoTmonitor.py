@@ -8,9 +8,9 @@ import os
 app_desc = "    Entry point for IoTMonitor launching, a Python > 3.6 application/framework for home\n" \
            "network security supervision. For more details about its features, refer to Github guide :\n" \
            "https://github.com/RemDec/IoTMonitor (you should need an intro to concepts manipulated in).\n" \
-           "You can also check the in-app help to be guided, depending chosen interface type.\n" \
+           "You can also check the in-app help to be guided.\n" \
            "    One feature of the app is the alert mailing. The only mail account involved is yours!\n" \
-           "It is used to send email to an authentication SMTP server with as default destination the\n" \
+           "It is used to send email to an authenticated SMTP server with as default destination the\n" \
            "same email address so that you are notified of found threats on your own mailbox. It is why\n" \
            "you have to provide your email credentials (if you want to use this feature with --mail).\n" \
            "    Notes :\n\n" \
@@ -53,22 +53,22 @@ sys.path.extend([os.path.splitext(os.path.abspath(__file__))[0]])
 parser = argparse.ArgumentParser(description=app_desc, formatter_class=RawDescriptionHelpFormatter)
 
 parser.add_argument("-i", "--interface",
-                    help="user interaction mode with the app (graphical or with inline context menu parser)",
+                    help="User interaction mode with the app (graphical or with inline context menu parser)",
                     choices=("cli", "gui"), default="cli")
-parser.add_argument("-m", "--mode", help="which interface mode to use, available modes depend on interface type",
+parser.add_argument("-m", "--mode", help="Which interface mode to use, available modes depend on interface type",
                     choices=cli_modes, default='outscreen')
 parser.add_argument("-cfg", "--fileconfig", default=None,
                     type=lambda x: is_valid_file(filesmanager, parser, x),
-                    help="path to config file to use (indicating itself others paths considered by the app)")
-parser.add_argument("-nas", "--noautosave", help="disable current app state being saved on regular exiting",
+                    help="Path to config file to use (indicating itself others paths considered by the app)")
+parser.add_argument("-nas", "--noautosave", help="Disable current app state being saved on regular exiting",
                     action="store_true")
 parser.add_argument("-nal", "--noautoload", action="store_true",
-                    help="disable auto loading of last config and app elements autosaved when exiting")
+                    help="Disable auto loading of last config and app elements autosaved when exiting")
 parser.add_argument("-cln", "--cleanlast", action="store_true",
-                    help="clean files resulted from autosave of last app elements state at exiting (/svd/*/last_*)")
+                    help="Clean files resulted from autosave of last app elements state at exiting (/svd/*/last_*)")
 
 parser.add_argument("-lvl", "--lvldisplay", type=int, choices=range(0, 10), default=3,
-                    help="initial informations display level in app (mutable later by interface)"),
+                    help="Initial information display level in app (mutable later by interface)"),
 parser.add_argument("--mail", help="Email to use for threat alerts, prior to which defined in config file if exists")
 
 parser.add_argument("--mserver", help="SMTP server to use for sending mails, not given implies guessing from address")
