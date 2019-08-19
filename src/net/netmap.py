@@ -336,6 +336,22 @@ class Netmap:
         state = self.get_vi(mapid).str_state()
         return f"[{state}]    {nbr_threats} /!\\  {nbr_modifs} -o-"
 
+    def summary_display(self, per_line=3):
+        s = ""
+        per_line = max(per_line, 1)
+        mapids = self.get_vi_mapids()
+        for i, mapid in enumerate(mapids):
+            vi = self.get_vi(mapid)
+            if vi.relevant_field() is not None:
+                s += f"{mapid} ({vi.relevant_field()})[{vi.str_state()}]"
+            else:
+                s += f"{mapid}[{vi.str_state()}]"
+            if (i+1) % per_line > 0 and i < len(mapids)-1:
+                s += ', '
+            else:
+                s += '\n'
+        return s
+
     def vi_frame_str(self, mapid, max_char=25):
         vi = self.get_vi(mapid)
         header = f" {mapid} {self.vi_icons(mapid)} "

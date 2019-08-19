@@ -346,8 +346,8 @@ class ConsoleOutput(BaseOutput):
             self.popen.terminate()
             if self.popen.poll() is None:
                 self.popen.kill()
-        log_feedback_available(f"ConsoleOutput : killing the terminal process ({self.terminal_cmd}) that was watching\n"
-                               f"pipe {self.PIPE_PATH}")
+        log_feedback_available(f"ConsoleOutput : killing the terminal process ('{' '.join(self.terminal_cmd)}') that\n"
+                               f"was watching pipe {self.PIPE_PATH}")
 
     def __str__(self):
         return f"ConsoleOutput spawning '{self.terminal_key}' terminal monitoring app state pulling info from pipe\n" \

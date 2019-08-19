@@ -17,7 +17,7 @@ class PModFping(FacilityActiveModule):
                f"determining their state/reachability"
 
     def get_cmd(self):
-        return f"fping -l -A -d"
+        return f"echo '' && fping -l -A -d"
 
     def get_scheme_params(self):
         return {'period': ('3000', True, '-p '),
@@ -51,11 +51,10 @@ class PModFping(FacilityActiveModule):
 
     def parse_output(self, output, rel_to_vi=[]):
         import logging
-        logging.getLogger('discover').info("call")
         if self.netmap is None:
             return
         str_out = output.decode()
-        lines = str_out.strip().split('\n')
+        lines = str_out.split('\n')
         if len(lines) > 1:  # first and last lines may be incomplete and so not well formatted
             lines.pop(0)
             lines.pop()
@@ -93,6 +92,9 @@ class PModFping(FacilityActiveModule):
         # Line for a reached host : 'mymodem (192.168.1.1)        : [0], 84 bytes, 5.14 ms (5.14 avg, 0% loss)'
         # or '192.168.1.6 (192.168.1.6)     : [1], 84 bytes, 293 ms (253 avg, 0% loss)'
         # For an unreachable : 'ICMP Host Unreachable from 192.168.1.50 for ICMP Echo sent to 192.168.1.3 (192.168.1.3)'
+        host_line = host_line.strip()
+        if host_line == '':
+            return None
         if re.search(r'Unreachable', host_line, re.IGNORECASE):
             ips = IpParser(host_line).find_IPs(duplicates=False)
             if len(ips) == 0:

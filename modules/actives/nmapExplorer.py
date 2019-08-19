@@ -103,7 +103,7 @@ class AModNmapExplorer(ActiveModule):
                                    logitin='error', lvl='error')
 
     def launch(self, rel_to_vi=[]):
-        logging.getLogger('discover').info('call')
+        # logging.getLogger('discover').info('call')
         super().purge_threadlist()
         cmd = self.CMD + ' '
         for param, val in self.params.items():

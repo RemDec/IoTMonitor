@@ -17,7 +17,7 @@
         <param code="UDPports" mandatory="True" default="53,135,137,161" prefix="-PU">Ports targeted for UDP probing</param>
         <param code="XMLfile" mandatory="True" default="/tmp/nmapexplo.xml" prefix="-oX ">The temp file where scan output will be written</param>
         <param code="options" mandatory="False" default="" prefix="">other options compatible with -sn to pass to nmap</param>
-        <param code="IP" mandatory="True" default="192.168.1.36/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
+        <param code="IP" mandatory="True" default="192.168.0.5/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams/>
       <install program="nmap" version="7.01">
@@ -33,7 +33,7 @@
         <param code="version" mandatory="True" default="false" prefix="-sV">Should try to guess running version of services (heavy in time): true or false</param>
         <param code="XMLfile" mandatory="True" default="/tmp/nmap_portdisc.xml" prefix="-oX ">The temp file where scan output will be written</param>
         <param code="options" mandatory="False" default="" prefix="">Others options to pass to nmap scan</param>
-        <param code="IP" mandatory="True" default="192.168.1.36/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
+        <param code="IP" mandatory="True" default="192.168.0.5/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams/>
       <install program="nmap" version="7.01">
@@ -43,13 +43,13 @@
       </install>
     </actmod>
     <actmod modid="nmapvulners" cmd="nmap -sV -script=nmap-vulners" pymod="modules.actives.nmapVulners" pyclass="AModNmapVulners">
-      <desc>[nmapvulners] Nmap scan using NSE script Vulners, checking for services CVE in online DB but also good at services discovery</desc>
+      <desc>[nmapvulners] Nmap scan using NSE script nmap-vulners (v1.2-release), checking for services CVE in online DB but also good at services discovery</desc>
       <defparams>
         <param code="ports" mandatory="False" default="usetop" prefix="-p">Specific port numbers to target, unspecified implies using top most generally used</param>
         <param code="nbrports" mandatory="True" default="5" prefix="--top-ports ">The number of top most used ports considered if specific ports are not specified</param>
         <param code="XMLfile" mandatory="True" default="/tmp/nmap_vulners.xml" prefix="-oX ">The temp file where scan output will be written</param>
         <param code="options" mandatory="False" default="" prefix="">other options compatible with -sn to pass to nmap</param>
-        <param code="IP" mandatory="True" default="192.168.1.36/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
+        <param code="IP" mandatory="True" default="192.168.0.5/24" prefix="">Target IP address(es) acceptable as Nmap syntax</param>
       </defparams>
       <savedparams/>
       <install program="nmap" version="7.01">
@@ -74,19 +74,19 @@
       <defparams>
         <param code="interv" mandatory="True" default="5" prefix="-i ">Interval between each ping (seconds)</param>
         <param code="divargs" mandatory="False" default="" prefix="">Other acceptable args for ping command</param>
-        <param code="IP" mandatory="True" default="192.168.1.36" prefix="">Target IP adress in ping command syntax (only one specifiable)</param>
+        <param code="IP" mandatory="True" default="192.168.0.5" prefix="">Target IP adress in ping command syntax (only one specifiable)</param>
       </defparams>
       <savedparams/>
       <install program="ping" version="s20121221"/>
     </passmod>
-    <passmod modid="fping" cmd="fping -l -A -d" pymod="modules.passives.fpingNetwork" pyclass="PModFping">
+    <passmod modid="fping" cmd="echo '' &amp;&amp; fping -l -A -d" pymod="modules.passives.fpingNetwork" pyclass="PModFping">
       <desc>[fping] Module looping pinging multiple hosts in the network, determining their state/reachability</desc>
       <defparams>
         <param code="period" mandatory="True" default="3000" prefix="-p ">time (ms) between reping each individual host</param>
         <param code="interval" mandatory="True" default="10" prefix="-i ">time (ms) between different host pings</param>
         <param code="retry" mandatory="True" default="2" prefix="-r ">number of retries for each host</param>
-        <param code="netIP" mandatory="True" default="192.168.1.36/24" prefix="-g ">entire network in which all hosts will be pinged</param>
-        <param code="indivIP" mandatory="False" default="192.168.1.36" prefix="">specific IP(s) to target given one per one (overwrite netIP ones)</param>
+        <param code="netIP" mandatory="True" default="192.168.0.5/24" prefix="-g ">entire network in which all hosts will be pinged</param>
+        <param code="indivIP" mandatory="False" default="192.168.0.5" prefix="">specific IP(s) to target given one per one (overwrite netIP ones)</param>
       </defparams>
       <savedparams/>
       <install program="fping" version="3.13">

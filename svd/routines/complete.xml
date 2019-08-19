@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='ASCII'?>
 <xmlsave>
-  <routine running="False">
-    <queue running="False" nbr_mods="3">
+  <routine running="True">
+    <queue running="True" nbr_mods="3">
       <modconfig modid="nmapexplo" setid="nmapexplo" timer="20">
         <savedparams>
           <param code="SYNports" value="21,22,23,80,443,3389"/>
@@ -26,7 +26,7 @@
         </savedparams>
       </modconfig>
     </queue>
-    <panel running="False" nbr_mods="1">
+    <panel running="True" nbr_mods="1">
       <modconfig modid="fping" setid="fping" timer="10">
         <savedparams>
           <param code="period" value="3000"/>

@@ -120,10 +120,16 @@ class CLIparser:
                             s += f"undefined description in menu [{choice_code}]\n"
         return s
 
+    def str_marker(self):
+        marker = self.curr_menu.get('marker', '>>>')
+        if callable(marker):
+            marker = marker()
+        return marker
+
     def header_from_menu(self, include_header=True):
         disp_desc = self.curr_menu.get('disp_desc', True)
         disp_choice = self.curr_menu.get('disp_choice', True)
-        marker = self.curr_menu.get('marker', ">>>")
+        marker = self.str_marker()
         s = ""
         if include_header:
             if disp_desc and self.curr_menu['desc'] != "":
@@ -315,6 +321,16 @@ class CLIparser:
 
     def get_map_mapids(self):
         return [self.core.get_all_mapids()]
+
+    # ----- Functions to get dynamic display before choice -----
+
+    def get_netmap_summary(self):
+        per_line = 3
+        if self.curr_display_lvl < 2:
+            per_line = 1
+        elif self.curr_display_lvl > 7:
+            per_line = 4
+        return self.core.netmap.summary_display(per_line=per_line)
 
     # ----- Functions called after a choice is taken (given as a string in arg) -----
 
@@ -835,8 +851,8 @@ class CLIparser:
 
         self.show_VI = {'desc': "Select an existing virtual instance and show its details (fields, linked events, ..)\n"
                                 "Use $main or $previous to leave this menu.",
-                        'marker': "[mapid] :", 'choices': self.get_map_mapids,
-                        'fct_choice': self.after_show_vi_slct}
+                        'marker': lambda: f"Where :\n{self.get_netmap_summary()}\n[mapid] :",
+                        'choices': self.get_map_mapids, 'fct_choice': self.after_show_vi_slct}
 
         self.show_modentry = {'desc': "Select a module entry in panel/queue to display info about this instance",
                               'marker': "[setid] :", 'choices': self.get_routine_setids,

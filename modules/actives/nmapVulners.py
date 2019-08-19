@@ -32,8 +32,8 @@ class AModNmapVulners(FacilityActiveModule):
         super().__init__(params, netmap)
 
     def get_description(self):
-        return f"[{self.get_module_id()}] Nmap scan using NSE script Vulners, checking for services CVE in online DB " \
-               f"but also good at services discovery"
+        return f"[{self.get_module_id()}] Nmap scan using NSE script nmap-vulners (v1.2-release), checking for" \
+               f" services CVE in online DB but also good at services discovery"
 
     def get_module_id(self):
         return "nmapvulners"
@@ -60,12 +60,11 @@ class AModNmapVulners(FacilityActiveModule):
             elif param == 'ports':
                 if val != 'usetop':
                     use_spec_ports = True
-                    cmd += self.scheme[param][2] + val
+                    cmd += self.scheme[param][2] + val + ' '
             elif param == 'nbrports' and use_spec_ports:
                 continue  # Do not use and include the top-port flag in the command
             else:
-                prefix = self.scheme[param][2]
-                cmd += prefix + val + ' '
+                cmd += self.scheme[param][2] + val + ' '
         cmd += '> /dev/null && cat ' + self.get_curr_params()['XMLfile']
         return cmd
 
@@ -150,7 +149,7 @@ class AModNmapVulners(FacilityActiveModule):
         div_port_attrs = ('product', 'version', 'extrainfo', 'conf')
         for port_elmt in parser.portlist_from_host(host_elmt):
             port_fields = parser.get_host_fields(port_elmt, fields=('service', 'script'))
-            # Main port informations (num, service, protocol, state)
+            # Main port information (num, service, protocol, state)
             portnum, portservice, protocol, portstate = parser.maininfos_from_port(port_elmt)
             # Checking for vuln found by Vulners script
             script_elmts = port_fields['script']
@@ -173,6 +172,25 @@ class AModNmapVulners(FacilityActiveModule):
 
     def treat_vulnscript_output(self, portnum, script_elmt, vulns_dict):
         # Split CVEs list in individual entries, update dict value corresponding to portnum with new parsed CVE(s) list
+        all_cves_infos = []
+        service_cpe = 'cpe:/a:'
+        for cpe_table in script_elmt.findall('table'):
+            service_cpe = cpe_table.get('key')
+            for cve_table in cpe_table.findall('table'):
+                cve_dict = dict.fromkeys(['code', 'severity', 'url'], 'unknown')
+                for elem in cve_table.findall('elem'):
+                    key = elem.get('key')
+                    if key == 'id':
+                        cve_dict['code'] = elem.text
+                    elif key == 'cvss':
+                        cve_dict['severity'] = elem.text
+                if cve_dict['code'] != 'unknown':
+                    cve_dict['url'] = 'https://vulners.com/cve/' + cve_dict['code']
+                all_cves_infos.append(cve_dict)
+        vulns_dict[portnum] = (service_cpe, all_cves_infos)
+
+    def treat_vulnscript_output_old(self, portnum, script_elmt, vulns_dict):
+        # Split CVEs list in individual entries, update dict value corresponding to portnum with new parsed CVE(s) list
         service_cpe_elmt = script_elmt.find('elem')
         service_cpe = service_cpe_elmt.get('key')
         vulns_txt = service_cpe_elmt.text.strip()
@@ -191,10 +209,11 @@ class AModNmapVulners(FacilityActiveModule):
                             }
                 }
 
+
 if __name__ == '__main__':
     # from src.utils.moduleManager import ModDescriptor
     from src.net.netmap import Netmap
-    vulners = AModNmapVulners(params={'nbrports': '2', 'IP': '192.168.0.1'}, netmap=Netmap())
+    vulners = AModNmapVulners(params={'nbrports': '2', 'IP': '192.168.0.5'}, netmap=Netmap())
     vulners.launch()
     # desc = ModDescriptor(mod_inst=vulners, include_nondefault_param=True)
     # desc.modinfos_to_xml()

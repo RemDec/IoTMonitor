@@ -8,7 +8,7 @@
           <param code="period" value="3000"/>
           <param code="interval" value="10"/>
           <param code="retry" value="2"/>
-          <param code="netIP" value="192.168.56.100 192.168.56.255"/>
+          <param code="netIP" value="192.168.56.3 192.168.56.255"/>
         </savedparams>
       </modconfig>
     </panel>

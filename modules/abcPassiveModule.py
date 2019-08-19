@@ -256,6 +256,7 @@ class CommunicationThread(threading.Thread, TimerInterface):
 
     def read_pipe(self):
         # start program running in exec thread output treatment
+        # logging.getLogger('discover').info("call")
         self.call_parsing_fct(self.pipe_r.read1())
 
     def close_pipe(self):
